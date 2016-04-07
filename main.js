@@ -822,6 +822,7 @@ var changeFloor = function(number) {
 var gainExcelia = function(arg) {
 	var gain = buffs.exceliaMultiplier * (arg.str + arg.con + arg.dex)/15;
 	updateExcelia(gain);
+	readUpgrades();
 };
 
 //Where has my stuff gone?
