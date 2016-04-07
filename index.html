@@ -1,0 +1,298 @@
+<html>
+	<head>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+		<title>ICrawler</title>
+	</head>
+	<body>
+		<script type="text/javascript" src="main.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+		<div class="container-fluid">
+			<div class="row">
+				<p class="text-center h1">ICrawler <small>alpha ver0.7</small></p>
+			</div>
+			<div class="row" style="height: 30px;"></div>
+			<div class="row">
+				<div class="col-xs-3">
+					<div class="row">
+						<div class="col-xs-12">
+							<div class="well well-sm">
+								<div class="row">
+									<div class="col-xs-12">
+										<p class="text-danger">Status Screen</p>
+										<p>Name: <span id="name">Crawler</span></p>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-xs-1">
+										<p>HP:</p>
+									</div>
+									<div class="col-xs-10">
+										<div class="progress">
+											<div id="hpbar" class="progress-bar progress-bar-danger" role="progressbar" style="width: 0%;">
+												<span id="hp">0</span>/<span id="hpmax">0</span>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-xs-1">
+										<p>MP:</p>
+									</div>
+									<div class="col-xs-10">
+										<div class="progress">
+											<div id="mpbar" class="progress-bar progress-bar-info" role="progressbar" style="width: 0%;">
+												<span id="mp">0</span>/<span id="mpmax">0</span>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-xs-4">
+										<p>STR: <span id="str">0</span></p>
+									</div>
+									<div class="col-xs-7">
+										<div class="progress">
+											<div id="strprog" class="progress-bar" role="progressbar" style="width: 0%;">
+												<span id="strper">0%</span>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-xs-4">
+										<p>DEX: <span id="dex">0</span></p>
+									</div>
+									<div class="col-xs-7">
+										<div class="progress">
+											<div id="dexprog" class="progress-bar" role="progressbar" style="width: 0%;">
+												<span id="dexper">0%</span>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-xs-4">
+										<p>CON: <span id="con">0</span></p>
+									</div>
+									<div class="col-xs-7">
+										<div class="progress">
+											<div id="conprog" class="progress-bar" role="progressbar" style="width: 0%;">
+												<span id="conper">0%</span>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-xs-4">
+										<p>SPD: <span id="spd">0</span></p>
+									</div>
+									<div class="col-xs-7">
+										<div class="progress">
+											<div id="spdprog" class="progress-bar" role="progressbar" style="width: 0%;">
+												<span id="spdper">0%</span>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-xs-4">
+										<p>MGC: <span id="mgc">0</span></p>
+									</div>
+									<div class="col-xs-7">
+										<div class="progress">
+											<div id="mgcprog" class="progress-bar" role="progressbar" style="width: 0%;">
+												<span id="mgcper">0%</span>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-12">
+							<div class="well well-sm">
+								<div class="row">
+									<div class="col-xs-12">
+										<p class="text-danger">Buffs</p>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-xs-12">
+										<p class="text-success">Permanent Buffs:</p>
+										<ul class="list-group">
+											<span id="permanent">
+											</span>
+										<ul>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-xs-12">
+										<p class="text-warning">Temporary Buffs:</p>
+										<ul class="list-group">
+											<span id="temporary">
+											</span>
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-6">
+					<div class="row">
+						<div class="well well-sm">
+							<div class="row">
+								<div class="col-xs-3">
+									<p class="text-danger">Time Controls</p>
+									<p>Time speed: x<span id="speed">1</span></p> 
+								</div>
+								<div class="col-xs-9">
+									<div class="row">
+										<div class="col-xs-12">
+											<p class="text-right">Time left: <span id="days">0</span> days, <span id="hours">0</span> hours, <span id="minutes">0</span> minutes, <span id="seconds">0</span> seconds</p>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-xs-12">
+											<button class="btn btn-primary" onClick="gameSpeed(1000)">x1</button>
+											<span id="speed2"></span>
+											<span id="speed5"></span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="well well-sm">
+							<p class="text-danger">The Tower</p>
+							<p>You are currently at Floor <span id="floor">0</span>.</p>
+							<div class="row" style="height: 10px;"></div>
+							<div class="row">
+								<div class="col-xs-4">
+									<span id="advbut"></span>
+									<span id="retbut"></span>
+								</div>
+								<div class="col-xs-8">
+									<p>Floor explored:</p>
+									<div class="progress">
+										<div id="floorbar" class="progress-bar" role="progressbar" style="width: 0%;">
+											<span id="explperc">0</span>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-xs-4">
+									<span id="restwalk"></span>
+								</div>
+								<div class="col-xs-3">
+									<span id="action"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="well well-sm">
+							<p class="text-danger">Battle Screen</p>
+							<div class="row">
+								<div class="col-xs-3">
+									Monster: <span id="monstername">None</span><br>
+									STR: <span id="monsterstr">0</span><br>
+									DEX: <span id="monsterdex">0</span><br>
+									CON: <span id="monstercon">0</span>
+								</div>
+								<div class="col-xs-8">
+									<div class="progress">
+										<div id="monsterbar" class="progress-bar progress-bar-danger" role="progressbar" style="width: 0%;">
+											<span id="monsterhp">0</span>
+										</div>
+									</div>
+									<p><span id="battlestatus">Not in battle.</span></p>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="well well-sm">
+							<div class="row">
+								<div class="col-xs-12">
+									<p class="text-danger">Coming Soon:</p>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-xs-6">
+									<p>Higher Priority: More Spells, More Monsters, More Upgrades</p>
+									<p>Lower Priority: Achievements, Equipments</p>
+								</div>
+								<div class="col-xs-3 col-xs-offset-2">
+									<button class="btn btn-danger btn-block" onClick="hardReset()">Hard Reset!</button>
+									<p>If everything is bugged, please hard reset.</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="row">
+						<div class="col-xs-12">
+							<div class="well well-sm">
+								<div class="row">
+									<div class="col-xs-12">
+										<p class="text-danger">Spellbook</p>
+									</div>
+								</div>
+								<span id="spellbook">
+									<!--<div class="row">
+										<div class="col-xs-5">
+											<button class="btn btn-info btn-block">Spellname</button>
+										</div>
+										<div class="col-xs-7">
+											<div class="progress">
+												<div id="spellidxp" class="progress-bar" role="progressbar" style="width: 100%;">
+													<span id="spellidprog">0%</span>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-xs-5">
+											Level: <span id="spellidlevel">0</span><br>
+										</div>
+										<div class="col-xs-6">
+											<p class="text-right">Mana Cost: <span id="spellidcost">10</span></p>
+										</div>
+									</div>-->
+								</span>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-12">
+							<div class="well well-sm">
+								<div class="row">
+									<div class="col-xs-3">
+										<p class="text-danger">Upgrades</p>
+									</div>
+									<div class="col-xs-9">
+										<p class="text-right">Excelia: <span id="excelia">0</span></p>
+									</div>
+								</div>
+								<span id="upgrades">
+									<!--<div class="row">
+										<div class="col-xs-12">
+											<button class="btn btn-primary btn-block"><span class="idname">Upgrade Name</span></button>
+											<p><span class="iddesc">Upgrade Description</span> (Cost: <span class="idcost">0</span>)</p>
+										</div>
+									</div>-->
+								</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
