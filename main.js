@@ -322,9 +322,13 @@ var load = function() {
 
 //Hard resetting is hard!
 var hardReset = function() {
+	theGame = window.clearInterval(theGame);
 	if (confirm("Are you sure? You will lose ALL your progress!")) {
-		localStorage.removeItem("saved");
+		localStorage.clear();
 		location.reload();
+	}
+	else {
+		runGame();
 	}
 };
 
