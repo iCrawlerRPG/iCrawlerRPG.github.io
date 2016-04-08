@@ -21,7 +21,7 @@ var game = {
 var player = {
 	name:"placeholder",
 	hp: {id: "hp", curval: 100, maxval: 100},
-	mp: {id: "mp", curval: 10, maxval: 10},
+	mp: {id: "mp", curval: 50, maxval: 50},
 	str: {id: "str", val: 5, xp: 0, next: 90},
 	dex: {id: "dex", val: 5, xp: 0, next: 90},
 	con: {id: "con", val: 5, xp: 0, next: 90},
