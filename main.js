@@ -554,9 +554,9 @@ var updateMaxCondition = function(arg) {
 		arg.maxval = Math.pow(player.con.val, 2) * 4;
 	}
 	
-	//Max MP is 2*(MGC^2)/5
+	//Max MP is 2*(MGC^2)
 	else if (arg.id == "mp") {
-		arg.maxval = Math.floor(2 * Math.pow(player.mgc.val, 2) / 5);
+		arg.maxval = Math.pow(player.mgc.val, 2) * 2;
 	}
 };
 
@@ -1083,7 +1083,7 @@ var castAegis = function(arg) {
 //How long do I have magic star?
 var aegisPotency = function(arg) {
 	return Math.floor(5 + 5*arg.level + (1*player.mgc.val)-50);
-}
+};
 
 //The monsters are gonna get behind
 var castSlow = function(arg) {
