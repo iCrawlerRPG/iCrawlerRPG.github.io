@@ -340,7 +340,7 @@ var main = function() {
 				game.queued = false;
 			}
 		}
-		else if (percentage(player.hp.curval, player.hp.maxval) <= buffs.autoCrawlPercentrawl) {
+		else if (percentage(player.hp.curval, player.hp.maxval) <= buffs.autoCrawlPercent) {
 			explore();
 			explore();
 		}
@@ -692,7 +692,7 @@ var playerDeath = function(arg) {
 	game.inbattle = false;
 	document.getElementById("battlestatus").innerHTML = "You have been defeated by the " + arg.name + "!";
 	changeFloor(-player.curfloor);
-	updateExcelia(-player.excelia);
+	updateExcelia(-resources.excelia);
 	player.str.val -= Math.floor(player.str.val/10);
 	player.dex.val -= Math.floor(player.dex.val/10);
 	player.con.val -= Math.floor(player.con.val/10);
@@ -858,7 +858,6 @@ var buyUpgrade = function(upgradeId) {
 		//You don't even need any higher than that.
 		if (upgrades[i].id == "autocrawl1") {
 			setAutoCrawl(10);
-			upgrade[i].purchased = true;
 		}
 		else if (upgrades[i].id == "timewarp1") {
 			document.getElementById("speed2").innerHTML = '<button class="btn btn-primary" onClick="gameSpeed(500)">x2</button>';
