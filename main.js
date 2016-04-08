@@ -998,7 +998,7 @@ var castFireball = function(arg) {
 
 //Gain a shield.
 var castBarrier = function(arg) {
-	var potency = 50 * Math.pow(1.5, arg.level) * Math.pow(1.1, player.mgc.val);
+	var potency = Math.floor(50 + 50*arg.level + (10*player.mgc.val)-10);
 	if (buffs.barrier == potency) {
 		return false;
 	}
@@ -1015,7 +1015,7 @@ var castAegis = function(arg) {
 		return false;
 	}
 	else {
-		buffs.aegis += 5 * Math.pow(1.5, arg.level) * Math.pow(1.1, player.mgc.val);
+		buffs.aegis = Math.floor(5 + 5*arg.level + (1*player.mgc.val)-50);
 		readTempBuffs(false);
 		return true;
 	}
