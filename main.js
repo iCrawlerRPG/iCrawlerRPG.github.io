@@ -45,7 +45,7 @@ spellbook.push({name: "Aegis", id: "aegis", type: 0, requiredmgc: 50, learned: f
 
 //Excelia Upgrades:
 var upgrades = [];
-upgrades.push({name: "Time Warp 1", id: "timewarp1", exceliacost: 100, shown: false, purchased: false, desc:"Progress too slow? Make everything go at twice the speed!"});
+upgrades.push({name: "Time Warp 1", id: "timewarp1", exceliacost: 10, shown: false, purchased: false, desc:"Progress too slow? Make everything go at twice the speed!"});
 upgrades.push({name: "Aetheric Attunement", id:"aetheric", exceliacost: 100, shown: false, purchased: false, desc:"Tap into the mana around you. Recover +1 MP per second while exploring."});
 upgrades.push({name: "Time Warp 2", id: "timewarp2", exceliacost: 1000, shown: false, purchased: false, desc:"Change to the next gear! With this, everything is five times faster!"});
 upgrades.push({name: "Auto Crawl 1", id: "autocrawl1", exceliacost: 1000, shown: false, purchased: false, desc:"Rest whenever you're below 10% health. Start exploring again when completely healed."});
