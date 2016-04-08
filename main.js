@@ -413,6 +413,7 @@ var startTheEngine = function() {
 //Let's read our spellbook!
 var readSpells = function() {
 	//First we must clear our mind...
+	document.getElementById("spellbook").innerHTML = '';
 	for (i = 0; i <= 2; i++) {
 		document.getElementById("spellbook" + i).innerHTML = '';
 	}
