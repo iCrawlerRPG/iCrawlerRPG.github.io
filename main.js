@@ -597,7 +597,7 @@ var spellCost = function(arg) {
 		return Math.floor(arg.baseMP - Math.pow(arg.level, 2));
 	}
 	else {
-		return Math.floor(arg.baseMP + arg.level*arg.baseMP/2 + Math.pow(arg.level*arg.baseMP, 2))/arg.baseMP;
+		return Math.floor(arg.baseMP + arg.level*arg.baseMP/2 + (Math.pow(arg.level*arg.baseMP, 2))/arg.baseMP);
 	}
 };
 
