@@ -393,7 +393,7 @@ var startTheEngine = function() {
 	readSpells();
 	readUpgrades();
 	readPermBuffs();
-	readTempBuffs();
+	readTempBuffs(false);
 	if (upgrades[0].purchased) {
 		document.getElementById("speed2").innerHTML = '<button class="btn btn-primary" onClick="gameSpeed(500)">x2</button>'
 	}
@@ -468,12 +468,12 @@ var readTempBuffs = function(decrease) {
 		if (decrease) {
 			buffs.aegis--;
 		}
-		document.getElementById("temporary").innerHTML += '<li class="list-group-item"><span class="badge">' + buffs.aegis + '</span>Aegis</li>';
+		document.getElementById("temporary").innerHTML += '<li class="list-group-item"><span class="badge">' + Math.round(buffs.aegis) + '</span>Aegis</li>';
 	}
 	
 	//Puny shield
 	if (buffs.barrier !== 0) {
-		document.getElementById("temporary").innerHTML += '<li class="list-group-item"><span class="badge">' + buffs.barier + '</span>Barrier</li>';
+		document.getElementById("temporary").innerHTML += '<li class="list-group-item"><span class="badge">' + Math.round(buffs.barrier) + '</span>Barrier</li>';
 	}
 };
 
@@ -621,11 +621,12 @@ var battle = function(arg) {
 				if (monsterAttackDamage > buffs.barrier) {
 					monsterAttackDamage -= buffs.barrier;
 					updateCondition(player.hp, -monsterAttackDamage);
+					buffs.barrier = 0;
 				}
 				else {
-					monsterAttackDamage -= buffs.barrier;
+					buffs.barrier -= monsterAttackDamage;
 				}
-				readTempBuffs();
+				readTempBuffs(false);
 			}
 			else {
 				updateCondition(player.hp, -monsterAttackDamage);
