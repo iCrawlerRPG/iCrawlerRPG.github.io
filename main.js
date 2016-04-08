@@ -488,7 +488,12 @@ var percentage = function(val, maxval) {
 
 //How much does a spellcast cost?
 var spellCost = function(arg) {
-	return Math.floor(arg.baseMP + Math.pow(arg.level, 2));
+	if (arg.type == 2) {
+		return Math.floor(arg.baseMP - Math.pow(arg.level, 2));
+	}
+	else {
+		return Math.floor(arg.baseMP + Math.pow(arg.level, 2));
+	}
 };
 
 //This is how much we hit
@@ -565,6 +570,7 @@ var updateStat = function(arg, number) {
 		}
 		else if (arg.id == "mgc") {
 			updateMaxCondition(player.mp);
+			readSpells();
 		}
 	}
 	
@@ -665,7 +671,11 @@ var monsterDeath = function(arg) {
 	updateStat(player.dex, arg.dex);
 	arg.killed += 1;
 	gainExcelia(arg);
+	
+	//Restoring monster to default
 	arg.curhp = arg.hp;
+	arg.status = 0;
+	
 	if (game.resting) {
 		if (tower[player.curfloor].size == tower[player.curfloor].explored && player.curfloor !== 0) {
 			document.getElementById("restwalk").innerHTML = '<button class="btn btn-default btn-block" onClick="explore()">Search for Monsters</button>';
@@ -1029,6 +1039,7 @@ var castSlow = function(arg) {
 	}
 	else {
 		monster[game.found].status = 1;
+		document.getElementById("monsterdex").innerHTML = monster[game.found].dex/2;
 		return true;
 	}
 };
