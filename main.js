@@ -436,7 +436,7 @@ var readUpgrades = function() {
 	for (var i = 0; i < upgrades.length; i++) {
 		if ((resources.excelia >= upgrades[i].exceliacost || upgrades[i].shown === true) && upgrades[i].purchased === false) {
 			upgrades[i].shown = true;
-			document.getElementById("upgrades").innerHTML += '<div class="row"><div class="col-xs-12"><button class="btn btn-primary btn-block" onClick="buyUpgrade(' + upgrades[i].id + ')">' + upgrades[i].name + '</button><p>' + upgrades[i].desc + ' (Cost: ' + upgrades[i].exceliacost + ')</p></div></div>';
+			document.getElementById("upgrades").innerHTML += '<div class="row"><div class="col-xs-12"><button class="btn btn-primary btn-block" onClick="buyUpgrade(\'' + upgrades[i].id + '\')">' + upgrades[i].name + '</button><p>' + upgrades[i].desc + ' (Cost: ' + upgrades[i].exceliacost + ')</p></div></div>';
 		}
 	}
 };
