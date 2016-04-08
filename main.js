@@ -48,13 +48,14 @@ spellbook.push({name: "Aegis", id: "aegis", type: 0, requiredmgc: 50, learned: f
 //Excelia Upgrades:
 var upgrades = [];
 //upgrades.push({name: "Time Warp 1", id: "timewarp1", exceliacost: 10, shown: false, purchased: false, desc:"Progress too slow? Make everything go at twice the speed!"});
-upgrades.push({name: "Aetheric Attunement", id:"aetheric", exceliacost: 100, shown: false, purchased: false, desc:"Tap into the mana around you. Recover +1 MP per second while exploring."});
+upgrades.push({name: "Aetheric Attunement", id: "aetheric", exceliacost: 100, shown: false, purchased: false, desc:"Tap into the mana around you. Recover +1 MP per second while exploring."});
 //upgrades.push({name: "Time Warp 2", id: "timewarp2", exceliacost: 100, shown: false, purchased: false, desc:"Change to the next gear! With this, everything is five times faster!"});
+upgrades.push({name: "Auto-Shooting", id: "autoshoot", exceliacost: 500, shown: false, purchased: false, desc:"Shoot a fireball at the start of every battle!"});
 upgrades.push({name: "Auto Crawl 1", id: "autocrawl1", exceliacost: 1000, shown: false, purchased: false, desc:"Rest whenever you're below 10% health. Start exploring again when completely healed."});
-upgrades.push({name: "Excelia x2", id:"doubleexcelia", exceliacost: 2000, shown: false, purchased: false, desc:"Double the amount of Excelia you gain per monster."});
-upgrades.push({name: "Adept Mage", id:"adeptmage", exceliacost: 5000, shown: false, purchased: false, desc:"Master spells twice as fast. Blow yourself up twice as much."});
-upgrades.push({name: "Battle Healing", id:"battlehealing", exceliacost: 5000, shown: false, purchased: false, desc:"Cast Cure whenever you get under 50% HP during battle."});
-upgrades.push({name: "Blessings", id:"blessings", exceliacost: 10000, shown:false, purchased: false, desc:"Keep 10% of your excelia upon death."});
+upgrades.push({name: "Excelia x2", id: "doubleexcelia", exceliacost: 2000, shown: false, purchased: false, desc:"Double the amount of Excelia you gain per monster."});
+upgrades.push({name: "Adept Mage", id: "adeptmage", exceliacost: 5000, shown: false, purchased: false, desc:"Master spells twice as fast. Blow yourself up twice as much."});
+upgrades.push({name: "Battle Healing", id: "battlehealing", exceliacost: 5000, shown: false, purchased: false, desc:"Cast Cure whenever you get under 50% HP during battle."});
+upgrades.push({name: "Blessings", id: "blessings", exceliacost: 10000, shown:false, purchased: false, desc:"Keep 10% of your excelia upon death."});
 
 //Buffs
 var buffs = {
@@ -66,7 +67,8 @@ var buffs = {
 	aethericLevel: 0,
 	battleHealing: false,
 	exceliaBless: 0,
-	rage: 0
+	rage: 0,
+	autoFireball: false
 };
 
 //Monster List:
@@ -288,6 +290,9 @@ var load = function() {
 			if (savegame.savedBuffs.exceliaBless != undefined) {
 				buffs.exceliaBless = savegame.savedBuffs.exceliaBless;
 			}
+			if (savegame.savedBuffs.autoFireball != undefined) {
+				buffs.autoFireball = savegame.savedBuffs.autoFireball;
+			}
 		}
 		if (savegame.savedMonster != undefined) {
 			for (i = 0; i < savegame.savedMonster.length; i++) {
@@ -501,17 +506,29 @@ var readToggBuffs = function() {
 	//Clean whatever is there
 	document.getElementById("toggleable").innerHTML = '';
 	
-	//Can I healz?
-	var bhStatus = findUpgrade("battlehealing");
-	if (buffs.battleHealing == true || bhStatus.purchased == true) {
-		var bhOnOff;
-		if (buffs.battleHealing) {
-			bhOnOff = "ON";
+	//Can I shoot?
+	var upStatus = findUpgrade("autoshoot");
+	if (buffs.autoFireball == true || upStatus.purchased == true) {
+		if (buffs.autoFireball) {
+			togText = "ON";
 		}
 		else {
-			bhOnOff = "OFF";
+			togText = "OFF";
 		}
-		document.getElementById("toggleable").innerHTML += '<button type="button" class="list-group-item" onClick="setBattleHealing()"><span class="badge">' + bhOnOff + '</span>Battle Healing</button>';
+		document.getElementById("toggleable").innerHTML += '<button type="button" class="list-group-item" onClick="switchToggBuff(\'autoshoot\')"><span class="badge">' + togText + '</span>Auto-Shooting</button>';
+	}
+	
+	//Can I healz?
+	var togText;
+	var upStatus = findUpgrade("battlehealing");
+	if (buffs.battleHealing == true || upStatus.purchased == true) {
+		if (buffs.battleHealing) {
+			togText = "ON";
+		}
+		else {
+			togText = "OFF";
+		}
+		document.getElementById("toggleable").innerHTML += '<button type="button" class="list-group-item" onClick="switchToggBuff(\'battlehealing\')"><span class="badge">' + togText + '</span>Battle Healing</button>';
 	}
 }
 
@@ -695,6 +712,9 @@ var battle = function(arg) {
 	//What am I battling against?
 	if (game.inbattle === false) {
 		loadMonsterInfo(arg);
+		if (buffs.autoFireball == true) {
+			castSpell("fireball");
+		}
 	}
 	
 	//The intense battle continues
@@ -999,14 +1019,22 @@ var buyUpgrade = function(upgradeId) {
 		else if (upgrades[i].id == "blessings") {
 			buffs.exceliaBless += 10;
 		}
+		else if (upgrades[i].id == "autoshoot") {
+			buffs.autoFireball = true;
+		}
 	}
 	
 	readPermBuffs();
 	readToggBuffs();
 };
 
-var setBattleHealing = function() {
-	buffs.battleHealing = !buffs.battleHealing;
+var switchToggBuff = function(buffId) {
+	if (buffId == "battlehealing") {
+		buffs.battleHealing = !buffs.battleHealing;
+	}
+	else if (buffId == "autoshoot") {
+		buffs.autoFireball = !buffs.autoFireball;
+	}
 	readToggBuffs();
 }
 
