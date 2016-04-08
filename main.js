@@ -434,11 +434,14 @@ var readSpells = function() {
 			var btncolor = spellType(spellbook[i].type);
 			
 			//Let's write down what we learned:
-			document.getElementById("spellbook").innerHTML += '<div class="row"><div class="col-xs-5"><button class="btn ' + btncolor + ' btn-block" data-toggle="tooltip" data-placement="top" title="' + spellbook[i].desc + '" onClick="castSpell(\'' + spellbook[i].id + '\')">' + spellbook[i].name + '</button></div><div class="col-xs-7"><div class="progress"><div id="' + spellbook[i].id + 'xp" class="progress-bar" role="progressbar" style="width: ' + 100*spellbook[i].xp/spellbook[i].next + '%;"><span id="' + spellbook[i].id + 'prog">' + 100*spellbook[i].xp/spellbook[i].next + '%</span></div></div></div></div><div class="row"><div class="col-xs-5">Level: <span id="' + spellbook[i].id + 'level">0</span></div><div class="col-xs-6"><p class="text-right">Mana Cost: <span id="' + spellbook[i].id + 'cost">0</span></p></div></div>';
+			document.getElementById("spellbook").innerHTML += '<div class="row"><div class="col-xs-5"><button class="btn ' + btncolor + ' btn-block" data-toggle="tooltip" data-placement="top" title="' + spellbook[i].desc + '" onClick="castSpell(\'' + spellbook[i].id + '\')">' + spellbook[i].name + '</button></div><div class="col-xs-7"><div class="progress"><div id="' + spellbook[i].id + 'xpall" class="progress-bar" role="progressbar" style="width: ' + 100*spellbook[i].xp/spellbook[i].next + '%;"><span id="' + spellbook[i].id + 'progall">' + 100*spellbook[i].xp/spellbook[i].next + '%</span></div></div></div></div><div class="row"><div class="col-xs-5">Level: <span id="' + spellbook[i].id + 'levelall">0</span></div><div class="col-xs-6"><p class="text-right">Mana Cost: <span id="' + spellbook[i].id + 'costall">0</span></p></div></div>';
 			document.getElementById("spellbook" + spellbook[i].type).innerHTML += '<div class="row"><div class="col-xs-5"><button class="btn ' + btncolor + ' btn-block" data-toggle="tooltip" data-placement="top" title="' + spellbook[i].desc + '" onClick="castSpell(\'' + spellbook[i].id + '\')">' + spellbook[i].name + '</button></div><div class="col-xs-7"><div class="progress"><div id="' + spellbook[i].id + 'xp" class="progress-bar" role="progressbar" style="width: ' + 100*spellbook[i].xp/spellbook[i].next + '%;"><span id="' + spellbook[i].id + 'prog">' + 100*spellbook[i].xp/spellbook[i].next + '%</span></div></div></div></div><div class="row"><div class="col-xs-5">Level: <span id="' + spellbook[i].id + 'level">0</span></div><div class="col-xs-6"><p class="text-right">Mana Cost: <span id="' + spellbook[i].id + 'cost">0</span></p></div></div>';
 			spellbook[i].learned = true;
 			
 			//Now we update our HTML:
+			document.getElementById(spellbook[i].id + "progall").innerHTML = Math.round(100 * percentage(spellbook[i].xp, spellbook[i].next))/100 + "%";
+			document.getElementById(spellbook[i].id + "costall").innerHTML = spellCost(spellbook[i]);
+			document.getElementById(spellbook[i].id + "levelall").innerHTML = spellbook[i].level;
 			document.getElementById(spellbook[i].id + "prog").innerHTML = Math.round(100 * percentage(spellbook[i].xp, spellbook[i].next))/100 + "%";
 			document.getElementById(spellbook[i].id + "cost").innerHTML = spellCost(spellbook[i]);
 			document.getElementById(spellbook[i].id + "level").innerHTML = spellbook[i].level;
@@ -966,11 +969,15 @@ var spellLevel = function(arg, number) {
 		arg.level++;
 		arg.xp -= arg.next;
 		arg.next = (arg.level+1) * arg.baseNext;
+		document.getElementById(arg.id + "costall").innerHTML = Math.floor(arg.baseMP + Math.pow(arg.level, 2));
 		document.getElementById(arg.id + "cost").innerHTML = Math.floor(arg.baseMP + Math.pow(arg.level, 2));
 		readSpells();
 	}
 	
 	//Dynamic HTML is our friend
+	document.getElementById(arg.id + "xpall").style.width = percentage(arg.xp, arg.next) + "%";
+	document.getElementById(arg.id + "progall").innerHTML = Math.round(100 * percentage(arg.xp, arg.next))/100 + "%";
+	document.getElementById(arg.id + "levelall").innerHTML = arg.level;
 	document.getElementById(arg.id + "xp").style.width = percentage(arg.xp, arg.next) + "%";
 	document.getElementById(arg.id + "prog").innerHTML = Math.round(100 * percentage(arg.xp, arg.next))/100 + "%";
 	document.getElementById(arg.id + "level").innerHTML = arg.level;
