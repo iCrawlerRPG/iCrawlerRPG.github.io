@@ -679,7 +679,7 @@ var battleChance = function() {
 	
 	//BATTLE MUSIC INTENSIFIES
 	if (check <= tower[player.curfloor].density) {
-		game.found = player.curfloor + (Math.floor(Math.random()*6))-4;
+		game.found = player.curfloor + (Math.floor(Math.random()*3))-1;
 		if (game.found < 0) {
 			game.found = 0;
 		}
