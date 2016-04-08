@@ -1160,7 +1160,7 @@ var castSpell = function(spellId) {
 		if (castSuccess === true) {
 			updateCondition(player.mp, -mpCost);
 			spellLevel(spellbook[i], mpCost);
-			updateStat(player.mgc, buffs.spellMasteryMultiplier * (spellbook[i].level + 1 + mpCost/10));
+			updateStat(player.mgc, buffs.spellMasteryMultiplier * (spellbook[i].level + 1 + mpCost/2));
 			updateCondition(player.mp, 0);
 		}
 	}
