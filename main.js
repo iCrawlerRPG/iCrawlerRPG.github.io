@@ -46,7 +46,7 @@ spellbook.push({name: "Aegis", id: "aegis", type: 0, requiredmgc: 50, learned: f
 //Excelia Upgrades:
 var upgrades = [];
 upgrades.push({name: "Time Warp 1", id: "timewarp1", exceliacost: 100, shown: false, purchased: false, desc:"Progress too slow? Make everything go at twice the speed!"});
-//upgrades.push({name: "Aetheric Attunement", id:"aetheric", exceliacost: 100, shown: false, purchased: false, desc:"Tap into the mana around you. Recover +1 MP per second while exploring."});
+upgrades.push({name: "Aetheric Attunement", id:"aetheric", exceliacost: 100, shown: false, purchased: false, desc:"Tap into the mana around you. Recover +1 MP per second while exploring."});
 upgrades.push({name: "Time Warp 2", id: "timewarp2", exceliacost: 1000, shown: false, purchased: false, desc:"Change to the next gear! With this, everything is five times faster!"});
 upgrades.push({name: "Auto Crawl 1", id: "autocrawl1", exceliacost: 1000, shown: false, purchased: false, desc:"Rest whenever you're below 10% health. Start exploring again when completely healed."});
 upgrades.push({name: "Excelia x2", id:"doubleexcelia", exceliacost: 2000, shown: false, purchased: false, desc:"Double the amount of Excelia you gain per monster."});
@@ -58,7 +58,8 @@ var buffs = {
 	exceliaMultiplier: 1,
 	spellMasteryMultiplier: 1,
 	aegis: 0,
-	barrier: 0
+	barrier: 0,
+	aethericLevel: 0
 };
 
 //Monster List:
@@ -124,8 +125,8 @@ var saving = function() {
 var load = function() {
   var savegame = JSON.parse(localStorage.getItem("saved"));
 	if (savegame) {
-		if (savegame.savedGame != "undefined") {
-			if (savegame.savedGame.ticks != "undefined") {
+		if (savegame.savedGame != undefined) {
+			if (savegame.savedGame.ticks != undefined) {
 				if (savegame.savedGame.ticks > 30000000) {
 					game.ticks = 31536000 - savegame.savedGame.ticks;
 				}
@@ -133,166 +134,169 @@ var load = function() {
 					game.ticks = savegame.savedGame.ticks;
 				}
 			}
-			if (savegame.savedGame.gameSpeed != "undefined") {
+			if (savegame.savedGame.gameSpeed != undefined) {
 				game.gameSpeed = savegame.savedGame.gameSpeed;
 			}
-			if (savegame.savedGame.refreshSpeed != "undefined") {
+			if (savegame.savedGame.refreshSpeed != undefined) {
 				game.refreshSpeed = savegame.savedGame.refreshSpeed;
 			}
 		}
-		if (savegame.savedPlayer != "undefined") {
-			if (savegame.savedPlayer.name != "undefined") {
+		if (savegame.savedPlayer != undefined) {
+			if (savegame.savedPlayer.name != undefined) {
 				player.name = savegame.savedPlayer.name;
 			}
-			if (savegame.savedPlayer.hp != "undefined") {
-				if (savegame.savedPlayer.hp.curval != "undefined") {
+			if (savegame.savedPlayer.hp != undefined) {
+				if (savegame.savedPlayer.hp.curval != undefined) {
 					player.hp.curval = savegame.savedPlayer.hp.curval;
 				}
-				if (savegame.savedPlayer.hp.maxval != "undefined") {
+				if (savegame.savedPlayer.hp.maxval != undefined) {
 					player.hp.maxval = savegame.savedPlayer.hp.maxval;
 				}
 			}
-			if (savegame.savedPlayer.mp != "undefined") {
-				if (savegame.savedPlayer.mp.curval != "undefined") {
+			if (savegame.savedPlayer.mp != undefined) {
+				if (savegame.savedPlayer.mp.curval != undefined) {
 					player.mp.curval = savegame.savedPlayer.mp.curval;
 				}
-				if (savegame.savedPlayer.mp.maxval != "undefined") {
+				if (savegame.savedPlayer.mp.maxval != undefined) {
 					player.mp.maxval = savegame.savedPlayer.mp.maxval;
 				}
 			}
-			if (savegame.savedPlayer.str != "undefined") {
-				if (savegame.savedPlayer.str.val != "undefined") {
+			if (savegame.savedPlayer.str != undefined) {
+				if (savegame.savedPlayer.str.val != undefined) {
 					player.str.val = savegame.savedPlayer.str.val;
 				}
-				if (savegame.savedPlayer.str.xp != "undefined") {
+				if (savegame.savedPlayer.str.xp != undefined) {
 					player.str.xp = savegame.savedPlayer.str.xp;
 				}
-				if (savegame.savedPlayer.str.next != "undefined") {
+				if (savegame.savedPlayer.str.next != undefined) {
 					player.str.next = savegame.savedPlayer.str.next;
 				}
 			}
-			if (savegame.savedPlayer.dex != "undefined") {
-				if (savegame.savedPlayer.dex.val != "undefined") {
+			if (savegame.savedPlayer.dex != undefined) {
+				if (savegame.savedPlayer.dex.val != undefined) {
 					player.dex.val = savegame.savedPlayer.dex.val;
 				}
-				if (savegame.savedPlayer.dex.xp != "undefined") {
+				if (savegame.savedPlayer.dex.xp != undefined) {
 					player.dex.xp = savegame.savedPlayer.dex.xp;
 				}
-				if (savegame.savedPlayer.dex.next != "undefined") {
+				if (savegame.savedPlayer.dex.next != undefined) {
 					player.dex.next = savegame.savedPlayer.dex.next;
 				}
 			}
-			if (savegame.savedPlayer.con != "undefined") {
-				if (savegame.savedPlayer.con.val != "undefined") {
+			if (savegame.savedPlayer.con != undefined) {
+				if (savegame.savedPlayer.con.val != undefined) {
 					player.con.val = savegame.savedPlayer.con.val;
 				}
-				if (savegame.savedPlayer.con.xp != "undefined") {
+				if (savegame.savedPlayer.con.xp != undefined) {
 					player.con.xp = savegame.savedPlayer.con.xp;
 				}
-				if (savegame.savedPlayer.con.next != "undefined") {
+				if (savegame.savedPlayer.con.next != undefined) {
 					player.con.next = savegame.savedPlayer.con.next;
 				}
 			}
-			if (savegame.savedPlayer.spd != "undefined") {
-				if (savegame.savedPlayer.spd.val != "undefined") {
+			if (savegame.savedPlayer.spd != undefined) {
+				if (savegame.savedPlayer.spd.val != undefined) {
 					player.spd.val = savegame.savedPlayer.spd.val;
 				}
-				if (savegame.savedPlayer.spd.xp != "undefined") {
+				if (savegame.savedPlayer.spd.xp != undefined) {
 					player.spd.xp = savegame.savedPlayer.spd.xp;
 				}
-				if (savegame.savedPlayer.spd.next != "undefined") {
+				if (savegame.savedPlayer.spd.next != undefined) {
 					player.spd.next = savegame.savedPlayer.spd.next;
 				}
 			}
-			if (savegame.savedPlayer.mgc != "undefined") {
-				if (savegame.savedPlayer.mgc.val != "undefined") {
+			if (savegame.savedPlayer.mgc != undefined) {
+				if (savegame.savedPlayer.mgc.val != undefined) {
 					player.mgc.val = savegame.savedPlayer.mgc.val;
 				}
-				if (savegame.savedPlayer.mgc.xp != "undefined") {
+				if (savegame.savedPlayer.mgc.xp != undefined) {
 					player.mgc.xp = savegame.savedPlayer.mgc.xp;
 				}
-				if (savegame.savedPlayer.mgc.next != "undefined") {
+				if (savegame.savedPlayer.mgc.next != undefined) {
 					player.mgc.next = savegame.savedPlayer.mgc.next;
 				}
 			}
-			if (savegame.savedPlayer.curfloor != "undefined") {
+			if (savegame.savedPlayer.curfloor != undefined) {
 				player.curfloor = savegame.savedPlayer.curfloor;
 			}
 		}
-		if (savegame.savedResources != "undefined") {
-			if (savegame.savedResources.excelia != "undefined") {
+		if (savegame.savedResources != undefined) {
+			if (savegame.savedResources.excelia != undefined) {
 				resources.excelia = savegame.savedResources.excelia;
 			}
-			if (savegame.savedResources.exceliaMultiplier != "undefined") {
+			if (savegame.savedResources.exceliaMultiplier != undefined) {
 				resources.exceliaMultiplier = savegame.savedResources.exceliaMultiplier;
 			}
 		}
-		if (savegame.savedSpellbook != "undefined") {
+		if (savegame.savedSpellbook != undefined) {
 			for (i = 0; i < savegame.savedSpellbook.length; i++) {
 				if (i == spellbook.length) break;
-				if (savegame.savedSpellbook[i].learned != "undefined") {
+				if (savegame.savedSpellbook[i].learned != undefined) {
 					spellbook[i].learned = savegame.savedSpellbook[i].learned;
 				}
-				if (savegame.savedSpellbook[i].xp != "undefined") {
+				if (savegame.savedSpellbook[i].xp != undefined) {
 					spellbook[i].xp = savegame.savedSpellbook[i].xp;
 				}
-				if (savegame.savedSpellbook[i].next != "undefined") {
+				if (savegame.savedSpellbook[i].next != undefined) {
 					spellbook[i].next = savegame.savedSpellbook[i].next;
 				}
-				if (savegame.savedSpellbook[i].level != "undefined") {
+				if (savegame.savedSpellbook[i].level != undefined) {
 					spellbook[i].level = savegame.savedSpellbook[i].level;
 				}
 			}
 		}
-		if (savegame.savedUpgrades != "undefined") {
+		if (savegame.savedUpgrades != undefined) {
 			for (i = 0; i < savegame.savedUpgrades.length; i++) {
 				if (i == upgrades.length) break;
-				if (savegame.savedUpgrades[i].shown != "undefined") {
+				if (savegame.savedUpgrades[i].shown != undefined) {
 					upgrades[i].shown = savegame.savedUpgrades[i].shown;
 				}
-				if (savegame.savedUpgrades[i].purchased != "undefined") {
+				if (savegame.savedUpgrades[i].purchased != undefined) {
 					upgrades[i].purchased = savegame.savedUpgrades[i].purchased;
 				}
 			}
 		}
-		if (savegame.savedBuffs != "undefined") {
-			if (savegame.savedBuffs.autoCrawlPercent != "undefined") {
+		if (savegame.savedBuffs != undefined) {
+			if (savegame.savedBuffs.autoCrawlPercent != undefined) {
 				buffs.autoCrawlPercent = savegame.savedBuffs.autoCrawlPercent;
 			}
-			if (savegame.savedBuffs.barrier != "undefined") {
+			if (savegame.savedBuffs.barrier != undefined) {
 				buffs.barrier = savegame.savedBuffs.barrier;
 			}
-			if (savegame.savedBuffs.aegis != "undefined") {
+			if (savegame.savedBuffs.aegis != undefined) {
 				buffs.aegis = savegame.savedBuffs.aegis;
 			}
-			if (savegame.savedBuffs.spellMasteryMultiplier != "undefined") {
+			if (savegame.savedBuffs.spellMasteryMultiplier != undefined) {
 				buffs.spellMasteryMultiplier = savegame.savedBuffs.spellMasteryMultiplier;
 			}
-			if (savegame.savedBuffs.exceliaMultiplier != "undefined") {
+			if (savegame.savedBuffs.exceliaMultiplier != undefined) {
 				buffs.exceliaMultiplier = savegame.savedBuffs.exceliaMultiplier;
 			}
+			if (savegame.savedBuffs.aethericLevel != undefined) {
+				buffs.aethericLevel = savegame.savedBuffs.aethericLevel;
+			}
 		}
-		if (savegame.savedMonster != "undefined") {
+		if (savegame.savedMonster != undefined) {
 			for (i = 0; i < savegame.savedMonster.length; i++) {
 				if (i == monster.length) break;
-				if (savegame.savedMonster[i].killed != "undefined") {
+				if (savegame.savedMonster[i].killed != undefined) {
 					monster[i].killed = savegame.savedMonster[i].killed;
 				}
 			}
 		}
-		if (savegame.savedTower != "undefined") {
+		if (savegame.savedTower != undefined) {
 			for (i = 0; i < savegame.savedTower.length; i++) {
 				if (i == tower.length) break;
-				if (savegame.savedTower[i].explored != "undefined") {
+				if (savegame.savedTower[i].explored != undefined) {
 					tower[i].explored = savegame.savedTower[i].explored;
 				}
-				if (savegame.savedTower[i].advallowed != "undefined") {
+				if (savegame.savedTower[i].advallowed != undefined) {
 					tower[i].advallowed = savegame.savedTower[i].advallowed;
 				}
-				if (savegame.savedTower[i].stairpos != "undefined") {
+				if (savegame.savedTower[i].stairpos != undefined) {
 					tower[i].stairpos = savegame.savedTower[i].stairpos;
 				}
-				if (savegame.savedTower[i].density != "undefined") {
+				if (savegame.savedTower[i].density != undefined) {
 					tower[i].density = savegame.savedTower[i].density;
 				}
 			}
@@ -351,6 +355,7 @@ var main = function() {
 			explore();
 		}
 		else {
+			updateCondition(player.mp, buffs.aethericLevel);
 			exploreFloor();
 		}
 	}
@@ -402,11 +407,13 @@ var startTheEngine = function() {
 	readUpgrades();
 	readPermBuffs();
 	readTempBuffs(false);
-	if (upgrades[0].purchased) {
-		document.getElementById("speed2").innerHTML = '<button class="btn btn-primary" onClick="gameSpeed(500)">x2</button>';
-	}
-	if (upgrades[1].purchased) {
-		document.getElementById("speed5").innerHTML = '<button class="btn btn-primary" onClick="gameSpeed(200)">x5</button>';
+	for (i = 0; i < upgrades.length; i++) {
+		if (upgrades[i].id == "timewarp1" && upgrades[i].purchased == true) {
+			document.getElementById("speed2").innerHTML = '<button class="btn btn-primary" onClick="gameSpeed(500)">x2</button>';
+		}
+		else if (upgrades[i].id == "timewarp2" && upgrades[i].purchased == true) {
+			document.getElementById("speed5").innerHTML = '<button class="btn btn-primary" onClick="gameSpeed(200)">x5</button>';
+		}
 	}
 	game.refreshSpeed = 1000;
 	theGame = window.clearInterval(theGame);
@@ -480,7 +487,16 @@ var readPermBuffs = function() {
 	if (buffs.autoCrawlPercent !== 0) {
 		document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">' + buffs.autoCrawlPercent + '%</span>Auto Crawl</li>';
 	}
-}	;
+	if (buffs.aethericLevel !== 0) {
+		document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">+' + buffs.aethericLevel + '</span>Exploration Mana per Second</li>';
+	}
+	if (buffs.exceliaMultiplier !== 1) {
+		document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">x' + buffs.exceliaMultiplier + '</span>Excelia Gain</li>';
+	}
+	if (buffs.spellMasteryMultiplier !== 1) {
+		document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">x' + buffs.spellMasteryMultiplier + '</span>Spell Level Gain</li>';
+	}
+};
 
 //Steroids aren't forever!
 var readTempBuffs = function(decrease) {
@@ -898,6 +914,9 @@ var buyUpgrade = function(upgradeId) {
 		else if (upgrades[i].id == "timewarp1") {
 			document.getElementById("speed2").innerHTML = '<button class="btn btn-primary" onClick="gameSpeed(500)">x2</button>';
 		}
+		else if (upgrades[i].id == "aetheric") {
+			buffs.aethericLevel += 1;
+		}
 		else if (upgrades[i].id == "timewarp2") {
 			document.getElementById("speed5").innerHTML = '<button class="btn btn-primary" onClick="gameSpeed(200)">x5</button>';
 		}
@@ -908,6 +927,8 @@ var buyUpgrade = function(upgradeId) {
 			buffs.spellMasteryMultiplier *= 2;
 		}
 	}
+	
+	readPermBuffs();
 };
 
 //How far are you willing to go?
