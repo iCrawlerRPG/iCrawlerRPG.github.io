@@ -37,11 +37,11 @@ var resources = {
 
 //Spellbook:
 var spellbook = [];
-spellbook.push({name: "Cure", id: "cure", type: 0, requiredmgc: 5, learned: false, baseMP: 5, xp: 0, next: 50, baseNext: 50, level: 0, desc:""});
-spellbook.push({name: "Fireball", id: "fireball", type: 1, requiredmgc: 5, learned: false, baseMP: 2, xp: 0, next: 20, baseNext: 50, level: 0, desc:""});
-spellbook.push({name: "Barrier", id: "barrier", type: 0, requiredmgc: 10, learned: false, baseMP: 40, xp: 0, next: 400, baseNext: 400, level: 0, desc: ""});
-spellbook.push({name: "Slow", id: "slow", type: 2, requiredmgc: 20, learned: false, baseMP: 100, xp: 0, next: 1000, baseNext: 1000, level: 0, desc: ""});
-spellbook.push({name: "Aegis", id: "aegis", type: 0, requiredmgc: 50, learned: false, baseMP: 1000, xp: 0, next: 10000, baseNext: 10000, level: 0, desc: ""});
+spellbook.push({name: "Cure", id: "cure", type: 0, requiredmgc: 5, learned: false, baseMP: 15, xp: 0, next: 150, baseNext: 150, level: 0, desc:""});
+spellbook.push({name: "Fireball", id: "fireball", type: 1, requiredmgc: 5, learned: false, baseMP: 10, xp: 0, next: 100, baseNext: 100, level: 0, desc:""});
+spellbook.push({name: "Barrier", id: "barrier", type: 0, requiredmgc: 10, learned: false, baseMP: 100, xp: 0, next: 1000, baseNext: 1000, level: 0, desc: ""});
+spellbook.push({name: "Slow", id: "slow", type: 2, requiredmgc: 20, learned: false, baseMP: 400, xp: 0, next: 4000, baseNext: 4000, level: 0, desc: ""});
+spellbook.push({name: "Aegis", id: "aegis", type: 0, requiredmgc: 50, learned: false, baseMP: 5000, xp: 0, next: 50000, baseNext: 50000, level: 0, desc: ""});
 
 //Excelia Upgrades:
 var upgrades = [];
