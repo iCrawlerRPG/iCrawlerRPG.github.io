@@ -40,7 +40,9 @@ var spellbook = [];
 spellbook.push({name: "Cure", id: "cure", type: 0, requiredmgc: 5, learned: false, baseMP: 15, xp: 0, next: 150, baseNext: 150, level: 0, desc:""});
 spellbook.push({name: "Fireball", id: "fireball", type: 1, requiredmgc: 5, learned: false, baseMP: 10, xp: 0, next: 100, baseNext: 100, level: 0, desc:""});
 spellbook.push({name: "Barrier", id: "barrier", type: 0, requiredmgc: 10, learned: false, baseMP: 100, xp: 0, next: 1000, baseNext: 1000, level: 0, desc: ""});
+spellbook.push({name: "Clairvoyance", id:"clairvoyance", type: 3, requiredmgc: 10, learned: false, baseMP: 100, xp: 0, next: 1000, baseNext: 1000, level: 0, desc: ""});
 spellbook.push({name: "Slow", id: "slow", type: 2, requiredmgc: 20, learned: false, baseMP: 400, xp: 0, next: 4000, baseNext: 4000, level: 0, desc: ""});
+spellbook.push({name: "Rage", id: "rage", type: 1, requiredmgc: 25, learned: false, baseMP: 1250, xp: 0, next: 12500, baseNext: 12500, level: 0, desc: ""});
 spellbook.push({name: "Aegis", id: "aegis", type: 0, requiredmgc: 50, learned: false, baseMP: 5000, xp: 0, next: 50000, baseNext: 50000, level: 0, desc: ""});
 
 //Excelia Upgrades:
@@ -51,6 +53,8 @@ upgrades.push({name: "Aetheric Attunement", id:"aetheric", exceliacost: 100, sho
 upgrades.push({name: "Auto Crawl 1", id: "autocrawl1", exceliacost: 1000, shown: false, purchased: false, desc:"Rest whenever you're below 10% health. Start exploring again when completely healed."});
 upgrades.push({name: "Excelia x2", id:"doubleexcelia", exceliacost: 2000, shown: false, purchased: false, desc:"Double the amount of Excelia you gain per monster."});
 upgrades.push({name: "Adept Mage", id:"adeptmage", exceliacost: 5000, shown: false, purchased: false, desc:"Master spells twice as fast. Blow yourself up twice as much."});
+upgrades.push({name: "Battle Healing", id:"battlehealing", exceliacost: 5000, shown: false, purchased: false, desc:"Cast Cure whenever you get under 50% HP during battle."});
+upgrades.push({name: "Blessings", id:"blessings", exceliacost: 10000, shown:false, purchased: false, desc:"Keep 10% of your excelia upon death."});
 
 //Buffs
 var buffs = {
@@ -59,7 +63,10 @@ var buffs = {
 	spellMasteryMultiplier: 1,
 	aegis: 0,
 	barrier: 0,
-	aethericLevel: 0
+	aethericLevel: 0,
+	battleHealing: false,
+	exceliaBless: 0,
+	rage: 0
 };
 
 //Monster List:
@@ -275,6 +282,12 @@ var load = function() {
 			if (savegame.savedBuffs.aethericLevel != undefined) {
 				buffs.aethericLevel = savegame.savedBuffs.aethericLevel;
 			}
+			if (savegame.savedBuffs.battleHealing != undefined) {
+				buffs.battleHealing = savegame.savedBuffs.battleHealing;
+			}
+			if (savegame.savedBuffs.exceliaBless != undefined) {
+				buffs.exceliaBless = savegame.savedBuffs.exceliaBless;
+			}
 		}
 		if (savegame.savedMonster != undefined) {
 			for (i = 0; i < savegame.savedMonster.length; i++) {
@@ -406,6 +419,7 @@ var startTheEngine = function() {
 	readSpells();
 	readUpgrades();
 	readPermBuffs();
+	readToggBuffs();
 	readTempBuffs(false);
 	for (i = 0; i < upgrades.length; i++) {
 		if (upgrades[i].id == "timewarp1" && upgrades[i].purchased == true) {
@@ -478,6 +492,25 @@ var readUpgrades = function() {
 	});
 };
 
+//Are we buffed or not?
+var readToggBuffs = function() {
+	//Clean whatever is there
+	document.getElementById("toggleable").innerHTML = '';
+	
+	//Can I healz?
+	var bhStatus = findUpgrade("battlehealing");
+	if (buffs.battleHealing == true || bhStatus.purchased == true) {
+		var bhOnOff;
+		if (buffs.battleHealing) {
+			bhOnOff = "ON";
+		}
+		else {
+			bhOnOff = "OFF";
+		}
+		document.getElementById("toggleable").innerHTML += '<button type="button" class="list-group-item" onClick="setBattleHealing()"><span class="badge">' + bhOnOff + '</span>Battle Healing</button>';
+	}
+}
+
 //Let's get buffed!
 var readPermBuffs = function() {
 	//Our body is a clean slate
@@ -487,11 +520,14 @@ var readPermBuffs = function() {
 	if (buffs.autoCrawlPercent !== 0) {
 		document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">' + buffs.autoCrawlPercent + '%</span>Auto Crawl</li>';
 	}
-	if (buffs.aethericLevel !== 0) {
-		document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">+' + buffs.aethericLevel + '</span>Exploration Mana per Second</li>';
-	}
 	if (buffs.exceliaMultiplier !== 1) {
 		document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">x' + buffs.exceliaMultiplier + '</span>Excelia Gain</li>';
+	}
+	if (buffs.exceliaBless !== 0) {
+		document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">' + buffs.exceliaBless + '%</span>Excelia Saved Upon Death</li>';
+	}
+	if (buffs.aethericLevel !== 0) {
+		document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">+' + buffs.aethericLevel + '</span>Exploration Mana per Second</li>';
 	}
 	if (buffs.spellMasteryMultiplier !== 1) {
 		document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">x' + buffs.spellMasteryMultiplier + '</span>Spell Level Gain</li>';
@@ -514,6 +550,14 @@ var readTempBuffs = function(decrease) {
 	//Puny shield
 	if (buffs.barrier !== 0) {
 		document.getElementById("temporary").innerHTML += '<li class="list-group-item"><span class="badge">' + Math.round(buffs.barrier) + '</span>Barrier</li>';
+	}
+	
+	//HULK SMASH
+	if (buffs.rage !== 0) {
+		if (decrease) {
+			buffs.rage--;
+		}
+		document.getElementById("temporary").innerHTML += '<li class="list-group-item"><span class="badge">' + Math.round(buffs.rage) + '</span>Rage</li>';
 	}
 };
 
@@ -654,11 +698,25 @@ var battle = function(arg) {
 		//This is how much I hit
 		var playerAttackDamage = damageFormula(player.str.val, player.dex.val, arg.con, arg.curhp);
 		var monsterAttackDamage;
+		if (buffs.rage !== 0) {
+			playerAttackDamage *= 5;
+			monsterAttackDamage *= 2;
+			if (playerAttackDamage > arg.curhp) {
+				playerAttackDamage = arg.curhp;
+			}
+			if (monsterAttackDamage > player.hp.cur) {
+				monsterAttackDamage = player.hp.cur;
+			}
+		}
 		if (arg.status == 1) {
 			monsterAttackDamage = damageFormula(arg.str, arg.dex/2, player.con.val, player.hp.curhp);
 		}
 		else {
 			monsterAttackDamage = damageFormula(arg.str, arg.dex, player.con.val, player.hp.curhp);
+		}
+		
+		if (buffs.battleHealing && player.hp.curval <= player.hp.maxval/2 && buffs.rage === 0) {
+			castSpell("cure");
 		}
 		
 		//Damage makes me stronger
@@ -743,7 +801,7 @@ var playerDeath = function(arg) {
 	game.inbattle = false;
 	document.getElementById("battlestatus").innerHTML = "You have been defeated by the " + arg.name + "!";
 	changeFloor(-player.curfloor);
-	updateExcelia(-resources.excelia);
+	updateExcelia(-((100-buffs.exceliaBless)*resources.excelia/100));
 	player.str.val -= Math.floor(player.str.val/10);
 	player.dex.val -= Math.floor(player.dex.val/10);
 	player.con.val -= Math.floor(player.con.val/10);
@@ -817,10 +875,7 @@ var exploreFloor = function() {
 	}
 	
 	//My calfs are getting tougher
-	if (tower[player.curfloor].explored == tower[player.curfloor].size) {
-		updateStat(player.spd, player.spd.val/20);
-	}
-	else {
+	if (tower[player.curfloor].explored != tower[player.curfloor].size) {
 		updateStat(player.spd, player.spd.val/10);
 	}
 	battleChance();
@@ -893,6 +948,14 @@ var updateExcelia = function(number) {
 //----------------------- UPGRADE FUNCTIONS ----------------------//
 //----------------------------------------------------------------//
 
+//Where is our upgrade?
+var findUpgrade = function(upgradeId) {
+	for (i = 0; i < upgrades.length; i++) {
+		if (upgrades[i].id == upgradeId) break;
+	}
+	return upgrades[i];
+}
+
 //Let's cheat our way up!
 var buyUpgrade = function(upgradeId) {
 	//Where's the one we want?
@@ -920,16 +983,28 @@ var buyUpgrade = function(upgradeId) {
 		else if (upgrades[i].id == "timewarp2") {
 			document.getElementById("speed5").innerHTML = '<button class="btn btn-primary" onClick="gameSpeed(200)">x5</button>';
 		}
+		else if (upgrades[i].id == "battlehealing") {
+			buffs.battleHealing = true;
+		}
 		else if (upgrades[i].id == "doubleexcelia") {
 			buffs.exceliaMultiplier *= 2;
 		}
 		else if (upgrades[i].id == "adeptmage") {
 			buffs.spellMasteryMultiplier *= 2;
 		}
+		else if (upgrades[i].id == "blessings") {
+			buffs.exceliaBless += 10;
+		}
 	}
 	
 	readPermBuffs();
+	readToggBuffs();
 };
+
+var setBattleHealing = function() {
+	buffs.battleHealing = !buffs.battleHealing;
+	readToggBuffs();
+}
 
 //How far are you willing to go?
 var setAutoCrawl = function(number) {
@@ -958,6 +1033,12 @@ var addSpellDescriptions = function() {
 		else if (spellbook[i].id == "slow") {
 			spellbook[i].desc = "Halve an enemy's DEX.";
 		}
+		else if (spellbook[i].id == "rage") {
+			spellbook[i].desc = "Fill yourself with rage for " + ragePotency(spellbook[i]) + " seconds. You deal 5x damage, however, you take 2x damage and cannot cast other spells."
+		}
+		else if (spellbook[i].id == "clairvoyance") {
+			spellbook[i].desc = "Project your mind further into the tower, and see areas you have not yet explored.";
+		}
 	}
 };
 
@@ -977,6 +1058,11 @@ var spellType = function(number) {
 	else if (number == 2) {
 		return "btn-warning";
 	}
+	
+	//Hacker
+	else if (number == 3) {
+		return "btn-success";
+	}
 };
 
 //The more we cast, the better we get
@@ -989,7 +1075,7 @@ var spellLevel = function(arg, number) {
 	while (arg.xp >= arg.next) {
 		arg.level++;
 		arg.xp -= arg.next;
-		arg.next = (arg.level+1) * arg.baseNext;
+		arg.next = Math.pow(2,arg.level) * arg.baseNext;
 		document.getElementById(arg.id + "costall").innerHTML = Math.floor(arg.baseMP + Math.pow(arg.level, 2));
 		document.getElementById(arg.id + "cost").innerHTML = Math.floor(arg.baseMP + Math.pow(arg.level, 2));
 		readSpells();
@@ -1013,7 +1099,7 @@ var castSpell = function(spellId) {
 	
 	//Go away, Anna
 	var mpCost = spellCost(spellbook[i]);
-	if (player.mp.curval >= mpCost) {
+	if (player.mp.curval >= mpCost && buffs.rage === 0) {
 		//Let it cast! Let it cast! Can't hold it back anymore!
     var castSuccess;
 		if (spellbook[i].id == "cure") {
@@ -1030,6 +1116,12 @@ var castSpell = function(spellId) {
 		}
 		else if (spellbook[i].id == "aegis") {
 			castSuccess = castAegis(spellbook[i]);
+		}
+		else if (spellbook[i].id == "rage") {
+			castSuccess = castRage(spellbook[i]);
+		}
+		else if (spellbook[i].id == "clairvoyance") {
+			castSuccess = castClairvoyance(spellbook[i]);
 		}
 		
 		//These spells never bothered me anyway.
@@ -1134,6 +1226,39 @@ var castSlow = function(arg) {
 		return true;
 	}
 };
+
+//I'M SO MAD RIGHT NOW
+var castRage = function(arg) {
+	if (game.inbattle === false) {
+		return false;
+	}
+	else {
+		buffs.rage = ragePotency(arg);
+		readTempBuffs(false);
+		return true;
+	}
+}
+
+//Count to 10
+var ragePotency = function(arg) {
+	return Math.floor(5 + 1*arg.level + (0.2*player.mgc.val)-5);
+};
+
+//Look deep into the dungeon
+var castClairvoyance = function(arg) {
+	if (tower[player.curfloor].explored == tower[player.curfloor].size) {
+		return false;
+	}
+	else {
+		tower[player.curfloor].explored += (10 + 2*arg.level + (0.4*player.mgc.val)-4);
+		if (tower[player.curfloor].explored >= tower[player.curfloor].size) {
+			tower[player.curfloor].explored = tower[player.curfloor].size;
+		}
+		document.getElementById("floorbar").style.width = percentage(tower[player.curfloor].explored, tower[player.curfloor].size) + "%";
+		document.getElementById("explperc").innerHTML = Math.round(100 * percentage(tower[player.curfloor].explored, tower[player.curfloor].size))/100 + "%";
+		return true;
+	}
+}
 
 //Now all that is left...
 runGame();

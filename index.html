@@ -14,7 +14,7 @@
 		</script>
 		<div class="container-fluid">
 			<div class="row">
-				<p class="text-center h1">ICrawler <small>alpha ver0.7.3</small></p>
+				<p class="text-center h1">ICrawler <small>alpha ver0.7.4</small></p>
 			</div>
 			<div class="row" style="height: 30px;"></div>
 			<div class="row">
@@ -125,20 +125,29 @@
 								</div>
 								<div class="row">
 									<div class="col-xs-12">
+										<p class="text-success">Temporary Buffs:</p>
+										<ul class="list-group">
+											<span id="temporary">
+											</span>
+										</ul>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-xs-12">
+										<p class="text-success">Toggleable Buffs:</p>
+										<div class="list-group">
+											<span id="toggleable">
+											</span>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-xs-12">
 										<p class="text-success">Permanent Buffs:</p>
 										<ul class="list-group">
 											<span id="permanent">
 											</span>
 										<ul>
-									</div>
-								</div>
-								<div class="row">
-									<div class="col-xs-12">
-										<p class="text-warning">Temporary Buffs:</p>
-										<ul class="list-group">
-											<span id="temporary">
-											</span>
-										</ul>
 									</div>
 								</div>
 							</div>
@@ -234,7 +243,8 @@
 							</div>
 							<div class="row">
 								<div class="col-xs-9">
-									<p>v0.7.3 - New upgrades. Save/load bug fixed. Spellbook fixed. Several other minor bugs fixed (really, how many of them are?)</p>
+									<p>v0.7.4 - New upgrades and spells. Many formulas adjusted, time controls back as not-upgrade (for now).</p>
+									<p>v0.7.3 - New upgrades. Save/load bug fixed. Spellbook fixed. Several other minor bugs fixed (really, how many of them are?).</p>
 									<p>v0.7.2 - New spellbook layout. Added tooltips to spells and upgrades. A few minor bug fixes.</p>
 									<p>v0.7.1 - Fixed NaN excelia. Fixed barrier spell. Several minor bug fixes.</p>
 								</div>
@@ -269,6 +279,9 @@
 											<li role="presentation">
 												<a href="#debuff" aria-controls="debuff" role="tab" data-toggle="tab">Debuff</a>
 											</li>
+											<li role="presentation">
+												<a href="#utility" aria-controls="utility" role="tab" data-toggle="tab">Utility</a>
+											</li>
 										</ul>
 									</div>
 								</div>
@@ -287,6 +300,9 @@
 											</div>
 											<div role="tabpanel" class="tab-pane" id="debuff">
 												<span id="spellbook2"></span>
+											</div>
+											<div role="tabpanel" class="tab-pane" id="utility">
+												<span id="spellbook3"></span>
 											</div>
 										</div>
 									</div>
