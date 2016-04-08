@@ -7,7 +7,7 @@ var theGame;
 
 //Game controllers:
 var game = {
-	ticks: 31536000,
+	ticks: 0,
 	gameSpeed: 1,
 	refreshSpeed: 1000,
 	inbattle: false,
@@ -45,11 +45,12 @@ spellbook.push({name: "Aegis", id: "aegis", type: 0, requiredmgc: 50, learned: f
 
 //Excelia Upgrades:
 var upgrades = [];
-upgrades.push({name: "Time Warp 1", id: "timewarp1", desc:"Progress too slow? Make everything go at twice the speed!", exceliacost: 100, shown: false, purchased: false});
-upgrades.push({name: "Time Warp 2", id: "timewarp2", desc:"Change to the next gear! With this, everything is five times faster!", exceliacost: 1000, shown: false, purchased: false});
-upgrades.push({name: "Auto Crawl 1", id: "autocrawl1", desc:"Rest whenever you're below 10% health. Start exploring again when completely healed.", exceliacost: 1000, shown: false, purchased: false});
-upgrades.push({name: "Excelia x2", id:"doubleexcelia", desc:"Double the amount of Excelia you gain per monster.", exceliacost: 2000, shown: false, purchased: false});
-upgrades.push({name: "Adept Mage", id:"adeptmage", desc:"Master spells twice as fast. Blow yourself up twice as much.", exceliacost: 5000, shown: false, purchased: false});
+upgrades.push({name: "Time Warp 1", id: "timewarp1", exceliacost: 100, shown: false, purchased: false, desc:"Progress too slow? Make everything go at twice the speed!"});
+//upgrades.push({name: "Aetheric Attunement", id:"aetheric", exceliacost: 100, shown: false, purchased: false, desc:"Tap into the mana around you. Recover +1 MP per second while exploring."});
+upgrades.push({name: "Time Warp 2", id: "timewarp2", exceliacost: 1000, shown: false, purchased: false, desc:"Change to the next gear! With this, everything is five times faster!"});
+upgrades.push({name: "Auto Crawl 1", id: "autocrawl1", exceliacost: 1000, shown: false, purchased: false, desc:"Rest whenever you're below 10% health. Start exploring again when completely healed."});
+upgrades.push({name: "Excelia x2", id:"doubleexcelia", exceliacost: 2000, shown: false, purchased: false, desc:"Double the amount of Excelia you gain per monster."});
+upgrades.push({name: "Adept Mage", id:"adeptmage", exceliacost: 5000, shown: false, purchased: false, desc:"Master spells twice as fast. Blow yourself up twice as much."});
 
 //Buffs
 var buffs = {
@@ -125,7 +126,12 @@ var load = function() {
 	if (savegame) {
 		if (savegame.savedGame != "undefined") {
 			if (savegame.savedGame.ticks != "undefined") {
-				game.ticks = savegame.savedGame.ticks;
+				if (savegame.savedGame.ticks > 30000000) {
+					game.ticks = 31536000 - savegame.savedGame.ticks;
+				}
+				else {
+					game.ticks = savegame.savedGame.ticks;
+				}
 			}
 			if (savegame.savedGame.gameSpeed != "undefined") {
 				game.gameSpeed = savegame.savedGame.gameSpeed;
@@ -329,7 +335,7 @@ var main = function() {
 	if (game.init === false) {
 		startTheEngine();
 	}
-	game.ticks -= 1;
+	game.ticks += 1;
 	if (game.inbattle === false) {
 		if (game.resting) {
 			updateCondition(player.hp, 1*player.con.val);
@@ -367,6 +373,8 @@ var startTheEngine = function() {
 	updateStat(player.mgc, 0);
 	updateCondition(player.hp, 0);
 	updateCondition(player.mp, 0);
+	updateMaxCondition(player.hp);
+	updateMaxCondition(player.mp);
 	document.getElementById("floor").innerHTML = player.curfloor;
 	document.getElementById("explperc").innerHTML = Math.round(percentage(tower[player.curfloor].explored, tower[player.curfloor].size)*100)/100 + "%";
 	document.getElementById("floorbar").style.width = percentage(tower[player.curfloor].explored, tower[player.curfloor].size) + "%";
