@@ -394,6 +394,12 @@ var startTheEngine = function() {
 	readUpgrades();
 	readPermBuffs();
 	readTempBuffs();
+	if (upgrade[0].purchased) {
+		document.getElementById("speed2").innerHTML = '<button class="btn btn-primary" onClick="gameSpeed(500)">x2</button>'
+	}
+	if (upgrade[1].purchased) {
+		document.getElementById("speed5").innerHTML = '<button class="btn btn-primary" onClick="gameSpeed(200)">x5</button>'
+	}
 	game.refreshSpeed = 1000;
 	theGame = window.clearInterval(theGame);
 	runGame();
@@ -852,18 +858,23 @@ var buyUpgrade = function(upgradeId) {
 		//You don't even need any higher than that.
 		if (upgrades[i].id == "autocrawl1") {
 			setAutoCrawl(10);
+			upgrade[i].purchased = true;
 		}
 		else if (upgrades[i].id == "timewarp1") {
 			document.getElementById("speed2").innerHTML = '<button class="btn btn-primary" onClick="gameSpeed(500)">x2</button>';
+			upgrade[i].purchased = true;
 		}
 		else if (upgrades[i].id == "timewarp2") {
 			document.getElementById("speed5").innerHTML = '<button class="btn btn-primary" onClick="gameSpeed(200)">x5</button>';
+			upgrade[i].purchased = true;
 		}
 		else if (upgrades[i].id == "doubleexcelia") {
 			buffs.exceliaMultiplier *= 2;
+			upgrade[i].purchased = true;
 		}
 		else if (upgrades[i].id == "adeptmage") {
 			buffs.spellMasteryMultiplier *= 2;
+			upgrade[i].purchased = true;
 		}
 	}
 };
