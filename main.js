@@ -37,11 +37,11 @@ var resources = {
 
 //Spellbook:
 var spellbook = [];
-spellbook.push({name: "Cure", id: "cure", type: 0, requiredmgc: 5, learned: false, baseMP: 5, xp: 0, next: 100, level: 0});
-spellbook.push({name: "Fireball", id: "fireball", type: 1, requiredmgc: 5, learned: false, baseMP: 2, xp: 0, next: 100, level: 0});
-spellbook.push({name: "Barrier", id: "barrier", type: 0, requiredmgc: 10, learned: false, baseMP: 40, xp: 0, next: 100, level: 0});
-spellbook.push({name: "Slow", id: "slow", type: 2, requiredmgc: 20, learned: false, baseMP: 100, xp: 0, next: 100, level: 0});
-spellbook.push({name: "Aegis", id: "aegis", type: 0, requiredmgc: 50, learned: false, baseMP: 1000, xp: 0, next: 100, level: 0});
+spellbook.push({name: "Cure", id: "cure", type: 0, requiredmgc: 5, learned: false, baseMP: 5, xp: 0, next: 50, baseNext: 50, level: 0});
+spellbook.push({name: "Fireball", id: "fireball", type: 1, requiredmgc: 5, learned: false, baseMP: 2, xp: 0, next: 20, baseNext: 50, level: 0});
+spellbook.push({name: "Barrier", id: "barrier", type: 0, requiredmgc: 10, learned: false, baseMP: 40, xp: 0, next: 400, baseNext: 400, level: 0});
+spellbook.push({name: "Slow", id: "slow", type: 2, requiredmgc: 20, learned: false, baseMP: 100, xp: 0, next: 1000, baseNext: 1000, level: 0});
+spellbook.push({name: "Aegis", id: "aegis", type: 0, requiredmgc: 50, learned: false, baseMP: 1000, xp: 0, next: 10000, baseNext: 10000, level: 0});
 
 //Excelia Upgrades:
 var upgrades = [];
@@ -715,6 +715,7 @@ var playerDeath = function(arg) {
 	updateStat(player.spd, -player.spd.xp);
 	updateStat(player.mgc, -player.mgc.xp);
 	arg.curhp = arg.hp;
+	readSpells();
 };
 
 //----------------------------------------------------------------//
@@ -922,7 +923,7 @@ var spellLevel = function(arg, number) {
 	while (arg.xp >= arg.next) {
 		arg.level++;
 		arg.xp -= arg.next;
-		arg.next = 2 * arg.next;
+		arg.next = (arg.level+1) * arg.baseNext;
 		document.getElementById(arg.id + "cost").innerHTML = Math.floor(arg.baseMP + Math.pow(arg.level, 2));
 		readSpells();
 	}
