@@ -37,11 +37,11 @@ var resources = {
 
 //Spellbook:
 var spellbook = [];
-spellbook.push({name: "Cure", id: "cure", type: 0, requiredmgc: 5, learned: false, baseMP: 5, xp: 0, next: 50, baseNext: 50, level: 0});
-spellbook.push({name: "Fireball", id: "fireball", type: 1, requiredmgc: 5, learned: false, baseMP: 2, xp: 0, next: 20, baseNext: 50, level: 0});
-spellbook.push({name: "Barrier", id: "barrier", type: 0, requiredmgc: 10, learned: false, baseMP: 40, xp: 0, next: 400, baseNext: 400, level: 0});
-spellbook.push({name: "Slow", id: "slow", type: 2, requiredmgc: 20, learned: false, baseMP: 100, xp: 0, next: 1000, baseNext: 1000, level: 0});
-spellbook.push({name: "Aegis", id: "aegis", type: 0, requiredmgc: 50, learned: false, baseMP: 1000, xp: 0, next: 10000, baseNext: 10000, level: 0});
+spellbook.push({name: "Cure", id: "cure", type: 0, requiredmgc: 5, learned: false, baseMP: 5, xp: 0, next: 50, baseNext: 50, level: 0, desc:""});
+spellbook.push({name: "Fireball", id: "fireball", type: 1, requiredmgc: 5, learned: false, baseMP: 2, xp: 0, next: 20, baseNext: 50, level: 0, desc:""});
+spellbook.push({name: "Barrier", id: "barrier", type: 0, requiredmgc: 10, learned: false, baseMP: 40, xp: 0, next: 400, baseNext: 400, level: 0, desc: ""});
+spellbook.push({name: "Slow", id: "slow", type: 2, requiredmgc: 20, learned: false, baseMP: 100, xp: 0, next: 1000, baseNext: 1000, level: 0, desc: ""});
+spellbook.push({name: "Aegis", id: "aegis", type: 0, requiredmgc: 50, learned: false, baseMP: 1000, xp: 0, next: 10000, baseNext: 10000, level: 0, desc: ""});
 
 //Excelia Upgrades:
 var upgrades = [];
@@ -395,10 +395,10 @@ var startTheEngine = function() {
 	readPermBuffs();
 	readTempBuffs(false);
 	if (upgrades[0].purchased) {
-		document.getElementById("speed2").innerHTML = '<button class="btn btn-primary" onClick="gameSpeed(500)">x2</button>'
+		document.getElementById("speed2").innerHTML = '<button class="btn btn-primary" onClick="gameSpeed(500)">x2</button>';
 	}
 	if (upgrades[1].purchased) {
-		document.getElementById("speed5").innerHTML = '<button class="btn btn-primary" onClick="gameSpeed(200)">x5</button>'
+		document.getElementById("speed5").innerHTML = '<button class="btn btn-primary" onClick="gameSpeed(200)">x5</button>';
 	}
 	game.refreshSpeed = 1000;
 	theGame = window.clearInterval(theGame);
@@ -413,16 +413,19 @@ var startTheEngine = function() {
 //Let's read our spellbook!
 var readSpells = function() {
 	//First we must clear our mind...
-	document.getElementById("spellbook").innerHTML = '';
+	for (i = 0; i <= 2; i++) {
+		document.getElementById("spellbook" + i).innerHTML = '';
+	}
 	
 	//Now CHECK ALL THE SPELLS o/
+	addSpellDescriptions();
 	for (var i = 0; i < spellbook.length; i++) {
 		if (player.mgc.val >= spellbook[i].requiredmgc) {
 			//Are you a goody-shiny or a baddy-hurty spell?
 			var btncolor = spellType(spellbook[i].type);
 			
 			//Let's write down what we learned:
-			document.getElementById("spellbook").innerHTML += '<div class="row"><div class="col-xs-5"><button class="btn ' + btncolor + ' btn-block" onClick="castSpell(\'' + spellbook[i].id + '\')">' + spellbook[i].name + '</button></div><div class="col-xs-7"><div class="progress"><div id="' + spellbook[i].id + 'xp" class="progress-bar" role="progressbar" style="width: ' + 100*spellbook[i].xp/spellbook[i].next + '%;"><span id="' + spellbook[i].id + 'prog">' + 100*spellbook[i].xp/spellbook[i].next + '%</span></div></div></div></div><div class="row"><div class="col-xs-5">Level: <span id="' + spellbook[i].id + 'level">0</span></div><div class="col-xs-6"><p class="text-right">Mana Cost: <span id="' + spellbook[i].id + 'cost">0</span></p></div></div>';
+			document.getElementById("spellbook" + spellbook[i].type).innerHTML += '<div class="row"><div class="col-xs-5"><button class="btn ' + btncolor + ' btn-block" data-toggle="tooltip" data-placement="top" title="' + spellbook[i].desc + '" onClick="castSpell(\'' + spellbook[i].id + '\')">' + spellbook[i].name + '</button></div><div class="col-xs-7"><div class="progress"><div id="' + spellbook[i].id + 'xp" class="progress-bar" role="progressbar" style="width: ' + 100*spellbook[i].xp/spellbook[i].next + '%;"><span id="' + spellbook[i].id + 'prog">' + 100*spellbook[i].xp/spellbook[i].next + '%</span></div></div></div></div><div class="row"><div class="col-xs-5">Level: <span id="' + spellbook[i].id + 'level">0</span></div><div class="col-xs-6"><p class="text-right">Mana Cost: <span id="' + spellbook[i].id + 'cost">0</span></p></div></div>';
 			spellbook[i].learned = true;
 			
 			//Now we update our HTML:
@@ -431,6 +434,10 @@ var readSpells = function() {
 			document.getElementById(spellbook[i].id + "level").innerHTML = spellbook[i].level;
 		}
 	}
+
+	$(document).ready(function(){
+		$('[data-toggle="tooltip"]').tooltip(); 
+	});
 };
 
 //Take a look at our shopping list!
@@ -442,9 +449,13 @@ var readUpgrades = function() {
 	for (var i = 0; i < upgrades.length; i++) {
 		if ((resources.excelia >= upgrades[i].exceliacost || upgrades[i].shown === true) && upgrades[i].purchased === false) {
 			upgrades[i].shown = true;
-			document.getElementById("upgrades").innerHTML += '<div class="row"><div class="col-xs-12"><button class="btn btn-primary btn-block" onClick="buyUpgrade(\'' + upgrades[i].id + '\')">' + upgrades[i].name + '</button><p>' + upgrades[i].desc + ' (Cost: ' + upgrades[i].exceliacost + ')</p></div></div>';
+			document.getElementById("upgrades").innerHTML += '<div class="row"><div class="col-xs-7"><button class="btn btn-primary btn-block" data-toggle="tooltip" data-placement="top" title="' + upgrades[i].desc + '" onClick="buyUpgrade(\'' + upgrades[i].id + '\')">' + upgrades[i].name + '</button></div><div class="col-xs-5"><p>(Cost: ' + upgrades[i].exceliacost + ')</p></div></div><div class="row" style="height: 5px;"></div>';
 		}
 	}
+	
+	$(document).ready(function(){
+		$('[data-toggle="tooltip"]').tooltip(); 
+	});
 };
 
 //Let's get buffed!
@@ -895,6 +906,27 @@ var setAutoCrawl = function(number) {
 //------------------------ SPELL FUNCTIONS -----------------------//
 //----------------------------------------------------------------//
 
+//Describe Spells:
+var addSpellDescriptions = function() {
+	for (i = 0; i < spellbook.length; i++) {
+		if (spellbook[i].id == "cure") {
+			spellbook[i].desc = "Heal " + curePotency(spellbook[i]) + " HP";
+		}
+		else if (spellbook[i].id == "fireball") {
+			spellbook[i].desc = "Deal " + fireballPotency(spellbook[i]) + " fire damage.";
+		}
+		else if (spellbook[i].id == "barrier") {
+			spellbook[i].desc = "Put up a barrier that will protect you from " + barrierPotency(spellbook[i]) + " damage.";
+		}
+		else if (spellbook[i].id == "aegis") {
+			spellbook[i].desc = "Take no damage for " + aegisPotency(spellbook[i]) + " seconds.";
+		}
+		else if (spellbook[i].id == "slow") {
+			spellbook[i].desc = "Halve an enemy's DEX.";
+		}
+	}
+};
+
 //Spell, spell, which type are you?
 var spellType = function(number) {
 	//Good spell!
@@ -981,13 +1013,18 @@ var castCure = function(arg) {
 	
 	//Okay, time for your medicine.
 	else {
-		var cureValue = 25 * Math.pow(1.5, arg.level) * Math.pow(1.1, player.mgc.val);
+		var cureValue = curePotency(arg);
 		if (player.hp.maxval - player.hp.curval < cureValue) {
 			cureValue = player.hp.maxval - player.hp.curval;
 		}
 		updateCondition(player.hp, cureValue);
 		return true;
 	}
+};
+
+//How much will I heal?
+var curePotency = function(arg) {
+	return Math.floor(25 * Math.pow(1.5, arg.level) * Math.pow(1.1, player.mgc.val));
 };
 
 //Your own personal fireplace.
@@ -999,7 +1036,7 @@ var castFireball = function(arg) {
 	
 	//BURN IT!!!!
 	else {
-		var damageValue = 15 * Math.pow(1.5, arg.level) * Math.pow(1.1, player.mgc.val);
+		var damageValue = fireballPotency(arg);
 		if (monster[game.found].curhp <= damageValue) {
 			damageValue = monster[game.found].curhp;
 		}
@@ -1008,9 +1045,14 @@ var castFireball = function(arg) {
 	}
 };
 
+//How much will my fireball hit for?
+var fireballPotency = function(arg) {
+	return Math.floor(15 * Math.pow(1.5, arg.level) * Math.pow(1.1, player.mgc.val));
+};
+
 //Gain a shield.
 var castBarrier = function(arg) {
-	var potency = Math.floor(50 + 50*arg.level + (10*player.mgc.val)-10);
+	var potency = barrierPotency(arg);
 	if (buffs.barrier == potency) {
 		return false;
 	}
@@ -1021,17 +1063,27 @@ var castBarrier = function(arg) {
 	}
 };
 
+//How much will I block?
+var barrierPotency = function(arg) {
+	return Math.floor(50 + 50*arg.level + (10*player.mgc.val)-10);
+};
+
 //Become invulnerable
 var castAegis = function(arg) {
 	if (buffs.aegis !== 0) {
 		return false;
 	}
 	else {
-		buffs.aegis = Math.floor(5 + 5*arg.level + (1*player.mgc.val)-50);
+		buffs.aegis = aegisPotency(arg);
 		readTempBuffs(false);
 		return true;
 	}
 };
+
+//How long do I have magic star?
+var aegisPotency = function(arg) {
+	return Math.floor(5 + 5*arg.level + (1*player.mgc.val)-50);
+}
 
 //The monsters are gonna get behind
 var castSlow = function(arg) {
