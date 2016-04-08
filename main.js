@@ -997,8 +997,8 @@ var castSpell = function(spellId) {
 		//These spells never bothered me anyway.
 		if (castSuccess === true) {
 			updateCondition(player.mp, -mpCost);
-			spellLevel(spellbook[i], mpCost/5);
-			updateStat(player.mgc, buffs.spellMasteryMultiplier * (mpCost));
+			spellLevel(spellbook[i], mpCost);
+			updateStat(player.mgc, buffs.spellMasteryMultiplier * (spellbook[i].level + 1 + mpCost/10));
 			updateCondition(player.mp, 0);
 		}
 	}
