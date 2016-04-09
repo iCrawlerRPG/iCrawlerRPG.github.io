@@ -6,7 +6,7 @@ It is currently in a very early stage, but it's playable enough for me to be sat
 Link: http://shiroge.github.io/
 
 
-I'm currently looking for ideas for spells and upgrades. You can comment them here or send them to my inbox, please. If possible, tell me how far you have progressed into the tower.
+I'm currently looking for ideas for spells and upgrades. You can open an issue for that. If possible, tell me how far you have progressed into the tower.
 
 ## Changelog
 **Changes in alpha v0.8:**
