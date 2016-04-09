@@ -12,10 +12,11 @@ var game = {
 	gameSpeed: 1,
 	refreshSpeed: 1000,
 	inbattle: false,
-	resting: true,
+	resting: false,
 	queued: false,
 	init: false,
-	found: 0
+	found: 0,
+	idleMode: false
 };
 
 //Player Object:
@@ -70,7 +71,7 @@ var buffs = {
 	exceliaBless: 0,
 	rage: 0,
 	autoFireball: false,
-	exaustedMind: 0
+	exhaustedMind: 0
 };
 
 var hpCalc = function(number) {
@@ -337,8 +338,8 @@ var loadBuffs = function(savegame) {
 	if (savegame.savedBuffs.autoFireball !== undefined) {
 		buffs.autoFireball = savegame.savedBuffs.autoFireball;
 	}
-	if (savegame.savedBuffs.exaustedMind !== undefined) {
-		buffs.exaustedMind = savegame.savedBuffs.exaustedMind;
+	if (savegame.savedBuffs.exhaustedMind !== undefined) {
+		buffs.exhaustedMind = savegame.savedBuffs.exhaustedMind;
 	}
 };
 
@@ -445,24 +446,37 @@ var main = function() {
 		if (game.resting) {
 			updateCondition(player.hp, 1*player.con.val);
 			updateCondition(player.mp, 1*player.mgc.val);
-			if (game.queued && player.hp.curval == player.hp.maxval && player.mp.curval == player.mp.maxval) {
+			
+			if (fullyRested()) {
 				game.resting = false;
-				document.getElementById("restwalk").innerHTML = '<button class="btn btn-default btn-block" onClick="explore()">Rest</button>';
-				game.queued = false;
+				exploreRestButtonLoad();
 			}
-		}
-		else if (percentage(player.hp.curval, player.hp.maxval) <= buffs.autoCrawlPercent) {
-			explore();
-			explore();
-		}
-		else {
-			updateCondition(player.mp, buffs.aethericLevel);
-			exploreFloor();
 		}
 	}
 	readTempBuffs(true);
 	updateTime(game.ticks);
 	saving();
+};
+
+var exploreRestButtonLoad = function() {
+	if ((game.inbattle || game.resting) && player.curfloor !== 0) {
+		if (tower[player.curfloor].size == tower[player.curfloor].explored) {
+			document.getElementById("exploreButton").innerHTML = '<button class="btn btn-danger btn-block" disabled="disabled">Find Monster</button>';
+		}
+		else {
+			document.getElementById("exploreButton").innerHTML = '<button class="btn btn-danger btn-block" disabled="disabled">Explore</button>';
+		}
+		document.getElementById("restButton").innerHTML = '<button class="btn btn-danger btn-block" disabled="disabled">Rest</button>';
+	}
+	else if (player.curfloor !== 0) {
+		if (tower[player.curfloor].size == tower[player.curfloor].explored) {
+			document.getElementById("exploreButton").innerHTML = '<button class="btn btn-default btn-block" onClick="exploreFloor()">Find Monster</button>';
+		}
+		else {
+			document.getElementById("exploreButton").innerHTML = '<button class="btn btn-default btn-block" onClick="exploreFloor()">Explore</button>';
+		}
+		document.getElementById("restButton").innerHTML = '<button class="btn btn-default btn-block" onClick="startRest()">Rest</button>';
+	}
 };
 
 //Loading everything
@@ -482,24 +496,12 @@ var startTheEngine = function() {
 	document.getElementById("explperc").innerHTML = Math.round(percentage(tower[player.curfloor].explored, tower[player.curfloor].size)*100)/100 + "%";
 	document.getElementById("floorbar").style.width = percentage(tower[player.curfloor].explored, tower[player.curfloor].size) + "%";
 	if (tower[player.curfloor].advallowed == 1) {
-		document.getElementById("advbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(1)">Proceed to Floor <span id="nextfloor">0</span></button>';
-		document.getElementById("nextfloor").innerHTML = player.curfloor + 1;
+		document.getElementById("advbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(1)">Next Floor</button>';
 	}
 	if (player.curfloor !== 0) {
-		document.getElementById("retbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(-1)">Back to Floor <span id="prevfloor">0</span></button>';
-		document.getElementById("prevfloor").innerHTML = player.curfloor - 1;
+		document.getElementById("retbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(-1)">Previous Floor</button>';
 	}
-	if (game.resting) {
-		if (tower[player.curfloor].size == tower[player.curfloor].explored && player.curfloor !== 0) {
-			document.getElementById("restwalk").innerHTML = '<button class="btn btn-default btn-block" onClick="explore()">Search for Monsters</button>';
-		}
-		else if (player.curfloor !== 0) {
-			document.getElementById("restwalk").innerHTML = '<button class="btn btn-default btn-block" onClick="explore()">Explore Floor</button>';
-		}
-	}
-	else {
-		document.getElementById("restwalk").innerHTML = '<button class="btn btn-default btn-block" onClick="explore()">Rest</button>';
-	}
+	exploreRestButtonLoad();
 	document.getElementById("excelia").innerHTML = Math.round(100*resources.excelia)/100;
 	readSpells();
 	readUpgrades();
@@ -661,11 +663,11 @@ var readTempBuffs = function(decrease) {
 	}
 	
 	//Those debuffs are the shit
-	if (buffs.exaustedMind !== 0) {
+	if (buffs.exhaustedMind !== 0) {
 		if (decrease) {
-			buffs.exaustedMind--;
+			buffs.exhaustedMind--;
 		}
-		document.getElementById("temporary").innerHTML += '<li class="list-group-item list-group-item-danger"><span class="badge">' + Math.round(buffs.exaustedMind) + '</span>Exausted Mind</li>';
+		document.getElementById("temporary").innerHTML += '<li class="list-group-item list-group-item-danger"><span class="badge">' + Math.round(buffs.exhaustedMind) + '</span>exhausted Mind</li>';
 	}
 };
 
@@ -715,6 +717,14 @@ var damageFormula = function(str, dex, enemyCon, enemyHP) {
 //----------------------------------------------------------------//
 //----------------------- PLAYER FUNCTIONS -----------------------//
 //----------------------------------------------------------------//
+
+//Am I ready for punching?
+var fullyRested = function() {
+	if (player.hp.curval == player.hp.maxval && player.mp.curval == player.mp.maxval) {
+		return true;
+	}
+	return false;
+};
 
 //Update HP/MP values.
 //arg can be player.hp or player.mp
@@ -810,7 +820,10 @@ var battleChance = function() {
 			game.found = monster.length-1;
 		}
 		battle(monster[game.found], false);
+		exploreRestButtonLoad();
+		return true;
 	}
+	return false;
 };
 
 //It's my turn!
@@ -939,21 +952,13 @@ var monsterDeath = function(arg) {
 	arg.curhp = arg.hp;
 	arg.status = 0;
 	
-	if (game.resting) {
-		if (tower[player.curfloor].size == tower[player.curfloor].explored && player.curfloor !== 0) {
-			document.getElementById("restwalk").innerHTML = '<button class="btn btn-default btn-block" onClick="explore()">Search for Monsters</button>';
-		}
-		else if (player.curfloor !== 0) {
-			document.getElementById("restwalk").innerHTML = '<button class="btn btn-default btn-block" onClick="explore()">Explore Floor</button>';
-		}
-	}
-	
+	exploreRestButtonLoad();
 	loadMonsterInfo();
 };
 
 //I'm working on it!
 var loadMonsterInfo = function(arg) {
-	if (arg != undefined) {
+	if (arg !== undefined) {
 		document.getElementById("monstername").innerHTML = arg.name;
 		document.getElementById("monsterhp").innerHTML = Math.round(arg.curhp);
 		document.getElementById("monsterstr").innerHTML = arg.str;
@@ -1010,49 +1015,26 @@ var runAway = function() {
 		document.getElementById("combatlog").innerHTML += "You failed to run away.<br>";
 		battle(monster[game.found], true);
 	}
-}
+	exploreRestButtonLoad();
+};
 
 //----------------------------------------------------------------//
 //--------------------- EXPLORATION FUNCTIONS --------------------//
 //----------------------------------------------------------------//
 
-//Switch between rest/explore
-var explore = function() {
-	//I'm not fighting anything
-	if (game.inbattle === false) {
-		//I'm fully restored, let's go
-		if (game.resting && player.hp.curval == player.hp.maxval && player.mp.curval == player.mp.maxval) {
-			game.resting = false;
-			document.getElementById("restwalk").innerHTML = '<button class="btn btn-default btn-block" onClick="explore()">Rest</button>';
-		}
-		
-		//Wait, I'm almost done
-		else if (game.resting) {
-			game.queued = true;
-			document.getElementById("restwalk").innerHTML = '<button class="btn btn-success btn-block" onClick="explore()">Exploration Queued</button>';
-		}
-		
-		//Okay, time to rest
-		else {
-			game.resting = true;
-			if (tower[player.curfloor].size == tower[player.curfloor].explored && player.curfloor !== 0) {
-				document.getElementById("restwalk").innerHTML = '<button class="btn btn-default btn-block" onClick="explore()">Search for Monsters</button>';
-			}
-			else if (player.curfloor !== 0) {
-				document.getElementById("restwalk").innerHTML = '<button class="btn btn-default btn-block" onClick="explore()">Explore Floor</button>';
-			}
-		}
-	}
-	
-	//Down the rabbit hole we go
-	else {
+//A good night of sleep
+var startRest = function() {
+	if (player.hp.curval != player.hp.maxval && player.mp.curval != player.mp.maxval) {
 		game.resting = true;
-		document.getElementById("restwalk").innerHTML = '<button class="btn btn-success btn-block" onClick="explore()">Resting Queued</button>';
 	}
+	exploreRestButtonLoad();
 };
 
 //I'm walking down the street on the boulevard of broken dreams
 var exploreFloor = function() {
+	//Absorb the aether
+	updateCondition(player.mp, buffs.aethericLevel);
+	
 	//There is still more to see
 	if (tower[player.curfloor].explored < tower[player.curfloor].size) {
 		tower[player.curfloor].explored += player.spd.val/10;
@@ -1061,20 +1043,24 @@ var exploreFloor = function() {
 		}
 		document.getElementById("floorbar").style.width = percentage(tower[player.curfloor].explored, tower[player.curfloor].size) + "%";
 		document.getElementById("explperc").innerHTML = Math.round(100 * percentage(tower[player.curfloor].explored, tower[player.curfloor].size))/100 + "%";
+		
+		//Are we there yet?
+		if (tower[player.curfloor].stairpos <= tower[player.curfloor].explored && tower[player.curfloor].advallowed === 0 && player.curfloor < monster.length) {
+			tower[player.curfloor].advallowed = 1;
+			document.getElementById("advbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(1)">Next Floor</button>';
+		}
+		
+		//My calfs are getting tougher
+		if (tower[player.curfloor].explored != tower[player.curfloor].size) {
+			updateStat(player.spd, player.spd.val/10);
+		}
+		battleChance();
 	}
-	
-	//Are we there yet?
-	if (tower[player.curfloor].stairpos <= tower[player.curfloor].explored && tower[player.curfloor].advallowed === 0 && player.curfloor < monster.length) {
-		tower[player.curfloor].advallowed = 1;
-		document.getElementById("advbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(1)">Proceed to Floor <span id="nextfloor">0</span></button>';
-		document.getElementById("nextfloor").innerHTML = player.curfloor + 1;
+	else {
+		while(!battleChance()) {
+			updateCondition(player.mp, buffs.aethericLevel);
+		}
 	}
-	
-	//My calfs are getting tougher
-	if (tower[player.curfloor].explored != tower[player.curfloor].size) {
-		updateStat(player.spd, player.spd.val/10);
-	}
-	battleChance();
 };
 
 //I hate stairs so much
@@ -1087,8 +1073,7 @@ var changeFloor = function(number) {
 	
 	//I can go to the next floor
 	if (tower[player.curfloor].advallowed == 1 && player.curfloor < monster.length) {
-		document.getElementById("advbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(1)">Proceed to Floor <span id="nextfloor">0</span></button>';
-		document.getElementById("nextfloor").innerHTML = player.curfloor + 1;
+		document.getElementById("advbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(1)">Next Floor</button>';
 	}
 	else {
 		document.getElementById("advbut").innerHTML = '';
@@ -1096,8 +1081,8 @@ var changeFloor = function(number) {
 	
 	//If I'm not at the bottom, I can go down
 	if (player.curfloor !== 0) {
-		document.getElementById("retbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(-1)">Back to Floor <span id="prevfloor">0</span></button>';
-		document.getElementById("prevfloor").innerHTML = player.curfloor - 1;
+		document.getElementById("retbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(-1)">Previous Floor</button>';
+		game.resting = false;
 	}
 	else {
 		document.getElementById("retbut").innerHTML = '';
@@ -1106,21 +1091,11 @@ var changeFloor = function(number) {
 	//Have I reached the bottom?
 	if (player.curfloor === 0) {
 		game.resting = true;
-		document.getElementById("restwalk").innerHTML = '';
+		document.getElementById("exploreButton").innerHTML = '';
+		document.getElementById("restButton").innerHTML = '';
 	}
 	
-	//Am I resting?
-	if (game.resting) {
-		if (tower[player.curfloor].size == tower[player.curfloor].explored && player.curfloor !== 0) {
-			document.getElementById("restwalk").innerHTML = '<button class="btn btn-default btn-block" onClick="explore()">Search for Monsters</button>';
-		}
-		else if (player.curfloor !== 0) {
-			document.getElementById("restwalk").innerHTML = '<button class="btn btn-default btn-block" onClick="explore()">Explore Floor</button>';
-		}
-	}
-	else {
-		document.getElementById("restwalk").innerHTML = '<button class="btn btn-default btn-block" onClick="explore()">Rest</button>';
-	}
+	exploreRestButtonLoad();
 };
 
 //----------------------------------------------------------------//
@@ -1303,7 +1278,7 @@ var castSpell = function(spellId) {
 	
 	//Go away, Anna
 	var mpCost = spellCost(spellbook[i]);
-	if (player.mp.curval >= mpCost && buffs.rage === 0) {
+	if (player.mp.curval >= mpCost && buffs.rage === 0 && !game.resting) {
 		//Let it cast! Let it cast! Can't hold it back anymore!
 		var castSuccess;
 		if (spellbook[i].id == "cure") {
@@ -1381,10 +1356,11 @@ var castFireball = function(arg) {
 		if (monster[game.found].curhp <= damageValue) {
 			damageValue = monster[game.found].curhp;
 		}
-		monsterDamage(monster[game.found], damageValue);
 		document.getElementById("combatlog").innerHTML = '';
 		document.getElementById("combatlog").innerHTML += "Your fireball hit the " + monster[game.found].name + " for " + damageValue + " damage.<br>";
-		battle(monster[game.found], true);
+		if (!monsterDamage(monster[game.found], damageValue)) {
+			battle(monster[game.found], true);
+		}
 		return true;
 	}
 };
@@ -1476,17 +1452,17 @@ var ragePotency = function(arg) {
 
 //Look deep into the dungeon
 var castClairvoyance = function(arg) {
-	if (tower[player.curfloor].advallowed == 1 || player.curfloor >= monster.length || buffs.exaustedMind !== 0 || game.inbattle === true) {
+	if (tower[player.curfloor].advallowed == 1 || player.curfloor >= monster.length || buffs.exhaustedMind !== 0 || game.inbattle === true) {
 		return false;
 	}
 	else {
 		tower[player.curfloor].stairpos = Math.floor(Math.random() * Math.floor(tower[player.curfloor].size));
 		if (tower[player.curfloor].explored >= tower[player.curfloor].stairpos) {
 			tower[player.curfloor].advallowed = 1;
-			document.getElementById("advbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(1)">Proceed to Floor <span id="nextfloor">0</span></button>';
+			document.getElementById("advbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(1)">Next Floor</button>';
 			document.getElementById("nextfloor").innerHTML = player.curfloor + 1;
 		}
-		buffs.exaustedMind = 600 + 600*arg.level;
+		buffs.exhaustedMind = 600 + 600*arg.level;
 		readTempBuffs(false);
 		return true;
 	}
