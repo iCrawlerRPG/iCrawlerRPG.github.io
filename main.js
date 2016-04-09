@@ -1025,7 +1025,7 @@ var runAway = function() {
 
 //A good night of sleep
 var startRest = function() {
-	if (player.hp.curval != player.hp.maxval && player.mp.curval != player.mp.maxval) {
+	if (player.hp.curval != player.hp.maxval || player.mp.curval != player.mp.maxval) {
 		game.resting = true;
 	}
 	exploreRestButtonLoad();
