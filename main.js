@@ -925,12 +925,12 @@ var battleChance = function() {
 		while (game.found == 11) {
 			game.found = Math.floor(Math.random()*11);
 		}
-		/*var tier = 0;
-		for (i = player.curfloor-1; i < 10; i-10) {
+		var tier = 0;
+		for (i = player.curfloor-1; i > 10; i -= 10) {
 			tier++;
 		}
-		Math.floor(player.curfloor-1/10);*/
-		monsterInstance = createMonster(/*(tier*10)*/+game.found);
+		Math.floor((player.curfloor-1)/10);
+		monsterInstance = createMonster((tier*10)+game.found);
 		battle(monsterInstance, false);
 		exploreRestButtonLoad();
 		return true;
@@ -1095,7 +1095,9 @@ var loadMonsterInfo = function(arg) {
 var playerDeath = function(arg) {
 	game.inbattle = false;
 	document.getElementById("combatlog").innerHTML += "You have been defeated by the " + arg.name + "!";
-	toggleIdle();
+	if (game.idleMode) {
+		toggleIdle();
+	}
 	changeFloor(-player.curfloor);
 	updateExcelia(-((100-buffs.exceliaBless)*resources.excelia/100));
 	player.str.val -= Math.floor(player.str.val/10);
