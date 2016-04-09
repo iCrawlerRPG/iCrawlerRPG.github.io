@@ -68,7 +68,8 @@ var buffs = {
 	battleHealing: false,
 	exceliaBless: 0,
 	rage: 0,
-	autoFireball: false
+	autoFireball: false,
+	exaustedMind: 0
 };
 
 //Monster List:
@@ -292,6 +293,9 @@ var load = function() {
 			}
 			if (savegame.savedBuffs.autoFireball != undefined) {
 				buffs.autoFireball = savegame.savedBuffs.autoFireball;
+			}
+			if (savegame.savedBuffs.exaustedMind != undefined) {
+				buffs.exaustedMind = savegame.savedBuffs.exaustedMind;
 			}
 		}
 		if (savegame.savedMonster != undefined) {
@@ -565,12 +569,12 @@ var readTempBuffs = function(decrease) {
 		if (decrease) {
 			buffs.aegis--;
 		}
-		document.getElementById("temporary").innerHTML += '<li class="list-group-item"><span class="badge">' + Math.round(buffs.aegis) + '</span>Aegis</li>';
+		document.getElementById("temporary").innerHTML += '<li class="list-group-item list-group-item-info"><span class="badge">' + Math.round(buffs.aegis) + '</span>Aegis</li>';
 	}
 	
 	//Puny shield
 	if (buffs.barrier !== 0) {
-		document.getElementById("temporary").innerHTML += '<li class="list-group-item"><span class="badge">' + Math.round(buffs.barrier) + '</span>Barrier</li>';
+		document.getElementById("temporary").innerHTML += '<li class="list-group-item list-group-item-info"><span class="badge">' + Math.round(buffs.barrier) + '</span>Barrier</li>';
 	}
 	
 	//HULK SMASH
@@ -578,7 +582,15 @@ var readTempBuffs = function(decrease) {
 		if (decrease) {
 			buffs.rage--;
 		}
-		document.getElementById("temporary").innerHTML += '<li class="list-group-item"><span class="badge">' + Math.round(buffs.rage) + '</span>Rage</li>';
+		document.getElementById("temporary").innerHTML += '<li class="list-group-item list-group-item-info"><span class="badge">' + Math.round(buffs.rage) + '</span>Rage</li>';
+	}
+	
+	//Those debuffs are the shit
+	if (buffs.exaustedMind !== 0) {
+		if (decrease) {
+			buffs.exaustedMind--;
+		}
+		document.getElementById("temporary").innerHTML += '<li class="list-group-item list-group-item-danger"><span class="badge">' + Math.round(buffs.exaustedMind) + '</span>Exausted Mind</li>';
 	}
 };
 
@@ -593,11 +605,23 @@ var percentage = function(val, maxval) {
 
 //How much does a spellcast cost?
 var spellCost = function(arg) {
-	if (arg.type == 2) {
-		return Math.floor(arg.baseMP - arg.level*arg.baseMP/2 - (Math.pow(arg.level, 2)));
+	var castMP;
+	if (arg.type == 2 || arg.type == 3) {
+		castMP = arg.baseMP;
+		for (i = 1; i <= arg.level; i++) {
+			castMP -= 0.1*castMP;
+		}
+		if (castMP <= 10) {
+			castMP = 10;
+		}
+		return Math.round(castMP);
 	}
 	else {
-		return Math.floor(arg.baseMP + arg.level*arg.baseMP/2 + (Math.pow(arg.level, 2)));
+		castMP = arg.baseMP;
+		for (i = 1; i <= arg.level; i++) {
+			castMP += 0.1*castMP;
+		}
+		return Math.round(castMP);
 	}
 };
 
@@ -1069,7 +1093,7 @@ var addSpellDescriptions = function() {
 			spellbook[i].desc = "Fill yourself with rage for " + ragePotency(spellbook[i]) + " seconds. You deal 5x damage, however, you take 2x damage and cannot cast other spells."
 		}
 		else if (spellbook[i].id == "clairvoyance") {
-			spellbook[i].desc = "Project your mind further into the tower, and see areas you have not yet explored.";
+			spellbook[i].desc = "Project your mind further into the tower, trying to find the stairs. It's very exausting, so you can only do it so often.";
 		}
 	}
 };
@@ -1186,7 +1210,7 @@ var castCure = function(arg) {
 
 //How much will I heal?
 var curePotency = function(arg) {
-	return Math.floor(25 * Math.pow(1.5, arg.level) * Math.pow(1.1, player.mgc.val));
+	return Math.floor(25 * Math.pow(1.5, arg.level) + Math.pow(1.1, player.mgc.val)-1);
 };
 
 //Your own personal fireplace.
@@ -1209,7 +1233,7 @@ var castFireball = function(arg) {
 
 //How much will my fireball hit for?
 var fireballPotency = function(arg) {
-	return Math.floor(15 * Math.pow(1.5, arg.level) * Math.pow(1.1, player.mgc.val));
+	return Math.floor(15 * Math.pow(1.5, arg.level) + Math.pow(1.1, player.mgc.val)-1);
 };
 
 //Gain a shield.
@@ -1227,7 +1251,7 @@ var castBarrier = function(arg) {
 
 //How much will I block?
 var barrierPotency = function(arg) {
-	return Math.floor(50 + 50*arg.level + (10*player.mgc.val)-10);
+	return Math.floor(50 + 50*arg.level + (10*player.mgc.val)-100);
 };
 
 //Become invulnerable
@@ -1278,16 +1302,18 @@ var ragePotency = function(arg) {
 
 //Look deep into the dungeon
 var castClairvoyance = function(arg) {
-	if (tower[player.curfloor].explored == tower[player.curfloor].size) {
+	if (tower[player.curfloor].advallowed == 1 || player.curfloor >= monster.length || buffs.exaustedMind !== 0) {
 		return false;
 	}
 	else {
-		tower[player.curfloor].explored += (10 + 2*arg.level + (0.4*player.mgc.val)-4);
-		if (tower[player.curfloor].explored >= tower[player.curfloor].size) {
-			tower[player.curfloor].explored = tower[player.curfloor].size;
+		tower[player.curfloor].stairpos = Math.floor(Math.random() * Math.floor(tower[player.curfloor].size));
+		if (tower[player.curfloor].explored >= tower[player.curfloor].stairpos) {
+			tower[player.curfloor].advallowed = 1;
+			document.getElementById("advbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(1)">Proceed to Floor <span id="nextfloor">0</span></button>';
+			document.getElementById("nextfloor").innerHTML = player.curfloor + 1;
 		}
-		document.getElementById("floorbar").style.width = percentage(tower[player.curfloor].explored, tower[player.curfloor].size) + "%";
-		document.getElementById("explperc").innerHTML = Math.round(100 * percentage(tower[player.curfloor].explored, tower[player.curfloor].size))/100 + "%";
+		buffs.exaustedMind = 600 + 600*arg.level;
+		readTempBuffs(false);
 		return true;
 	}
 }
