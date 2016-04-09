@@ -194,46 +194,89 @@
 							<p>You are currently at Floor <span id="floor">0</span>.</p>
 							<div class="row" style="height: 10px;"></div>
 							<div class="row">
-								<div class="col-xs-4">
-									<span id="advbut"></span>
+								<div class="col-xs-3">
 									<span id="retbut"></span>
 								</div>
-								<div class="col-xs-8">
-									<p>Floor explored:</p>
-									<div class="progress">
-										<div id="floorbar" class="progress-bar" role="progressbar" style="width: 0%;">
-											<span id="explperc">0</span>
+								<div class="col-xs-6">
+									<div class="row">
+										<div class="col-xs-12">
+											Floor explored:
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-xs-12">
+											<div class="progress">
+												<div id="floorbar" class="progress-bar" role="progressbar" style="width: 0%;">
+													<span id="explperc">0</span>
+												</div>
+											</div>
 										</div>
 									</div>
 								</div>
+								<div class="col-xs-3">
+									<span id="advbut"></span>
+								</div>
 							</div>
 							<div class="row">
-								<div class="col-xs-4">
+								<div class="col-xs-6 col-xs-offset-3">
 									<span id="restwalk"></span>
-								</div>
-								<div class="col-xs-3">
-									<span id="action"></span>
 								</div>
 							</div>
 						</div>
 					</div>
 					<div class="row">
 						<div class="well well-sm">
-							<p class="text-danger">Battle Screen</p>
+							<div class="row">
+								<div class="col-xs-12">
+									<p class="text-danger">Battle Screen</p>
+								</div>
+							</div>
 							<div class="row">
 								<div class="col-xs-3">
-									Monster: <span id="monstername">None</span><br>
-									STR: <span id="monsterstr">0</span><br>
-									DEX: <span id="monsterdex">0</span><br>
-									CON: <span id="monstercon">0</span>
-								</div>
-								<div class="col-xs-8">
-									<div class="progress">
-										<div id="monsterbar" class="progress-bar progress-bar-danger" role="progressbar" style="width: 0%;">
-											<span id="monsterhp">0</span>
+									<div class="row">
+										<div class="col-xs-12">
+											Monster: <span id="monstername">None</span><br>
+										</div>
+										<div class="col-xs-12">
+											STR: <span id="monsterstr">0</span><br>
+										</div>
+										<div class="col-xs-12">
+											DEX: <span id="monsterdex">0</span><br>
+										</div>
+										<div class="col-xs-12">
+											CON: <span id="monstercon">0</span>
 										</div>
 									</div>
-									<p><span id="battlestatus">Not in battle.</span></p>
+								</div>
+								<div class="col-xs-9">
+									<div class="row">
+										<div class="col-xs-12">
+											<div class="progress">
+												<div id="monsterbar" class="progress-bar progress-bar-danger" role="progressbar" style="width: 0%;">
+													<span id="monsterhp">0</span>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-xs-6">
+											<button class="btn btn-block btn-danger" onClick="attackMelee()">Fight</button>
+										</div>
+										<div class="col-xs-6">
+											<button class="btn btn-block btn-warning" onClick="runAway()">Run</button>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row" style="height: 10px;"></div>
+							<div class="row">
+								<div class="col-xs-12">
+									<span class="text-success">Combat Log:</span>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-xs-12">
+									<span id="combatlog"></span>
 								</div>
 							</div>
 						</div>

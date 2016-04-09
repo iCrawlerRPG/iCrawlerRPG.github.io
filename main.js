@@ -2,7 +2,8 @@
 //---------------------------- OBJECTS ---------------------------//
 //----------------------------------------------------------------//
 
-//The most important one.
+//The most important ones.
+var i;
 var theGame;
 
 //Game controllers:
@@ -74,7 +75,7 @@ var buffs = {
 
 var hpCalc = function(number) {
 	return (Math.pow(number, 2)*4);
-}
+};
 
 //Monster List:
 var monster = [];
@@ -138,197 +139,257 @@ var saving = function() {
 	localStorage.setItem("saved",JSON.stringify(save));
 };
 
+var loadGame = function(savegame) {
+	if (savegame.savedGame.ticks !== undefined) {
+		if (savegame.savedGame.ticks > 30000000) {
+			game.ticks = 31536000 - savegame.savedGame.ticks;
+		}
+		else {
+			game.ticks = savegame.savedGame.ticks;
+		}
+	}
+	if (savegame.savedGame.gameSpeed !== undefined) {
+		game.gameSpeed = savegame.savedGame.gameSpeed;
+	}
+	if (savegame.savedGame.refreshSpeed !== undefined) {
+		game.refreshSpeed = savegame.savedGame.refreshSpeed;
+	}
+};
+
+var loadPlayerHP = function(savegame) {
+	if (savegame.savedPlayer.hp.curval !== undefined) {
+		player.hp.curval = savegame.savedPlayer.hp.curval;
+	}
+	if (savegame.savedPlayer.hp.maxval !== undefined) {
+		player.hp.maxval = savegame.savedPlayer.hp.maxval;
+	}
+};
+
+var loadPlayerMP = function(savegame) {
+	if (savegame.savedPlayer.mp.curval !== undefined) {
+		player.mp.curval = savegame.savedPlayer.mp.curval;
+	}
+	if (savegame.savedPlayer.mp.maxval !== undefined) {
+		player.mp.maxval = savegame.savedPlayer.mp.maxval;
+	}
+};
+
+var loadPlayerSTR = function(savegame) {
+	if (savegame.savedPlayer.str.val !== undefined) {
+		player.str.val = savegame.savedPlayer.str.val;
+	}
+	if (savegame.savedPlayer.str.xp !== undefined) {
+		player.str.xp = savegame.savedPlayer.str.xp;
+	}
+	if (savegame.savedPlayer.str.next !== undefined) {
+		player.str.next = savegame.savedPlayer.str.next;
+	}
+};
+
+var loadPlayerDEX = function(savegame) {
+	if (savegame.savedPlayer.dex.val !== undefined) {
+		player.dex.val = savegame.savedPlayer.dex.val;
+	}
+	if (savegame.savedPlayer.dex.xp !== undefined) {
+		player.dex.xp = savegame.savedPlayer.dex.xp;
+	}
+	if (savegame.savedPlayer.dex.next !== undefined) {
+		player.dex.next = savegame.savedPlayer.dex.next;
+	}
+};
+
+var loadPlayerCON = function(savegame) {
+	if (savegame.savedPlayer.con.val !== undefined) {
+		player.con.val = savegame.savedPlayer.con.val;
+	}
+	if (savegame.savedPlayer.con.xp !== undefined) {
+		player.con.xp = savegame.savedPlayer.con.xp;
+	}
+	if (savegame.savedPlayer.con.next !== undefined) {
+		player.con.next = savegame.savedPlayer.con.next;
+	}
+};
+
+var loadPlayerSPD = function(savegame) {
+	if (savegame.savedPlayer.spd.val !== undefined) {
+		player.spd.val = savegame.savedPlayer.spd.val;
+	}
+	if (savegame.savedPlayer.spd.xp !== undefined) {
+		player.spd.xp = savegame.savedPlayer.spd.xp;
+	}
+	if (savegame.savedPlayer.spd.next !== undefined) {
+		player.spd.next = savegame.savedPlayer.spd.next;
+	}
+};
+
+var loadPlayerMGC = function (savegame) {
+	if (savegame.savedPlayer.mgc.val !== undefined) {
+		player.mgc.val = savegame.savedPlayer.mgc.val;
+	}
+	if (savegame.savedPlayer.mgc.xp !== undefined) {
+		player.mgc.xp = savegame.savedPlayer.mgc.xp;
+	}
+	if (savegame.savedPlayer.mgc.next !== undefined) {
+		player.mgc.next = savegame.savedPlayer.mgc.next;
+	}
+};
+
+var loadPlayer = function(savegame) {
+	if (savegame.savedPlayer.name !== undefined) {
+		player.name = savegame.savedPlayer.name;
+	}
+	if (savegame.savedPlayer.hp !== undefined) {
+		loadPlayerHP(savegame);
+	}
+	if (savegame.savedPlayer.mp !== undefined) {
+		loadPlayerMP(savegame);
+	}
+	if (savegame.savedPlayer.str !== undefined) {
+		loadPlayerSTR(savegame);
+	}
+	if (savegame.savedPlayer.dex !== undefined) {
+		loadPlayerDEX(savegame);
+	}
+	if (savegame.savedPlayer.con !== undefined) {
+		loadPlayerCON(savegame);
+	}
+	if (savegame.savedPlayer.spd !== undefined) {
+		loadPlayerSPD(savegame);
+	}
+	if (savegame.savedPlayer.mgc !== undefined) {
+		loadPlayerMGC(savegame);
+	}
+	if (savegame.savedPlayer.curfloor !== undefined) {
+		player.curfloor = savegame.savedPlayer.curfloor;
+	}
+};
+
+var loadResources = function(savegame) {
+	if (savegame.savedResources.excelia !== undefined) {
+		resources.excelia = savegame.savedResources.excelia;
+	}
+	if (savegame.savedResources.exceliaMultiplier !== undefined) {
+		resources.exceliaMultiplier = savegame.savedResources.exceliaMultiplier;
+	}
+};
+
+var loadSpells = function(savegame) {
+	for (i = 0; i < savegame.savedSpellbook.length; i++) {
+		if (i == spellbook.length) break;
+		if (savegame.savedSpellbook[i].learned !== undefined) {
+			spellbook[i].learned = savegame.savedSpellbook[i].learned;
+		}
+		if (savegame.savedSpellbook[i].xp !== undefined) {
+			spellbook[i].xp = savegame.savedSpellbook[i].xp;
+		}
+		if (savegame.savedSpellbook[i].next !== undefined) {
+			spellbook[i].next = savegame.savedSpellbook[i].next;
+		}
+		if (savegame.savedSpellbook[i].level !== undefined) {
+			spellbook[i].level = savegame.savedSpellbook[i].level;
+		}
+	}
+};
+
+var loadUpgrades = function(savegame) {
+	for (i = 0; i < savegame.savedUpgrades.length; i++) {
+		if (i == upgrades.length) break;
+		if (savegame.savedUpgrades[i].shown !== undefined) {
+			upgrades[i].shown = savegame.savedUpgrades[i].shown;
+		}
+		if (savegame.savedUpgrades[i].purchased !== undefined) {
+			upgrades[i].purchased = savegame.savedUpgrades[i].purchased;
+		}
+	}
+};
+
+var loadBuffs = function(savegame) {
+	if (savegame.savedBuffs.autoCrawlPercent !== undefined) {
+		buffs.autoCrawlPercent = savegame.savedBuffs.autoCrawlPercent;
+	}
+	if (savegame.savedBuffs.barrier !== undefined) {
+		buffs.barrier = savegame.savedBuffs.barrier;
+	}
+	if (savegame.savedBuffs.aegis !== undefined) {
+		buffs.aegis = savegame.savedBuffs.aegis;
+	}
+	if (savegame.savedBuffs.spellMasteryMultiplier !== undefined) {
+		buffs.spellMasteryMultiplier = savegame.savedBuffs.spellMasteryMultiplier;
+	}
+	if (savegame.savedBuffs.exceliaMultiplier !== undefined) {
+		buffs.exceliaMultiplier = savegame.savedBuffs.exceliaMultiplier;
+	}
+	if (savegame.savedBuffs.aethericLevel !== undefined) {
+		buffs.aethericLevel = savegame.savedBuffs.aethericLevel;
+	}
+	if (savegame.savedBuffs.battleHealing !== undefined) {
+		buffs.battleHealing = savegame.savedBuffs.battleHealing;
+	}
+	if (savegame.savedBuffs.exceliaBless !== undefined) {
+		buffs.exceliaBless = savegame.savedBuffs.exceliaBless;
+	}
+	if (savegame.savedBuffs.autoFireball !== undefined) {
+		buffs.autoFireball = savegame.savedBuffs.autoFireball;
+	}
+	if (savegame.savedBuffs.exaustedMind !== undefined) {
+		buffs.exaustedMind = savegame.savedBuffs.exaustedMind;
+	}
+};
+
+var loadMonsters = function(savegame) {
+	for (i = 0; i < savegame.savedMonster.length; i++) {
+		if (i == monster.length) break;
+		if (savegame.savedMonster[i].killed !== undefined) {
+			monster[i].killed = savegame.savedMonster[i].killed;
+		}
+	}
+};
+
+var loadTower = function(savegame) {
+	for (i = 0; i < savegame.savedTower.length; i++) {
+		if (i == tower.length) break;
+		if (savegame.savedTower[i].explored !== undefined) {
+			tower[i].explored = savegame.savedTower[i].explored;
+		}
+		if (savegame.savedTower[i].advallowed !== undefined) {
+			tower[i].advallowed = savegame.savedTower[i].advallowed;
+		}
+		if (savegame.savedTower[i].stairpos !== undefined) {
+			tower[i].stairpos = savegame.savedTower[i].stairpos;
+		}
+		if (savegame.savedTower[i].density !== undefined) {
+			tower[i].density = savegame.savedTower[i].density;
+		}
+	}
+};
+
 //Load the game! If all goes well, retro-compatibility is forever!
 var load = function() {
   var savegame = JSON.parse(localStorage.getItem("saved"));
 	if (savegame) {
-		if (savegame.savedGame != undefined) {
-			if (savegame.savedGame.ticks != undefined) {
-				if (savegame.savedGame.ticks > 30000000) {
-					game.ticks = 31536000 - savegame.savedGame.ticks;
-				}
-				else {
-					game.ticks = savegame.savedGame.ticks;
-				}
-			}
-			if (savegame.savedGame.gameSpeed != undefined) {
-				game.gameSpeed = savegame.savedGame.gameSpeed;
-			}
-			if (savegame.savedGame.refreshSpeed != undefined) {
-				game.refreshSpeed = savegame.savedGame.refreshSpeed;
-			}
+		if (savegame.savedGame !== undefined) {
+			loadGame(savegame);
 		}
-		if (savegame.savedPlayer != undefined) {
-			if (savegame.savedPlayer.name != undefined) {
-				player.name = savegame.savedPlayer.name;
-			}
-			if (savegame.savedPlayer.hp != undefined) {
-				if (savegame.savedPlayer.hp.curval != undefined) {
-					player.hp.curval = savegame.savedPlayer.hp.curval;
-				}
-				if (savegame.savedPlayer.hp.maxval != undefined) {
-					player.hp.maxval = savegame.savedPlayer.hp.maxval;
-				}
-			}
-			if (savegame.savedPlayer.mp != undefined) {
-				if (savegame.savedPlayer.mp.curval != undefined) {
-					player.mp.curval = savegame.savedPlayer.mp.curval;
-				}
-				if (savegame.savedPlayer.mp.maxval != undefined) {
-					player.mp.maxval = savegame.savedPlayer.mp.maxval;
-				}
-			}
-			if (savegame.savedPlayer.str != undefined) {
-				if (savegame.savedPlayer.str.val != undefined) {
-					player.str.val = savegame.savedPlayer.str.val;
-				}
-				if (savegame.savedPlayer.str.xp != undefined) {
-					player.str.xp = savegame.savedPlayer.str.xp;
-				}
-				if (savegame.savedPlayer.str.next != undefined) {
-					player.str.next = savegame.savedPlayer.str.next;
-				}
-			}
-			if (savegame.savedPlayer.dex != undefined) {
-				if (savegame.savedPlayer.dex.val != undefined) {
-					player.dex.val = savegame.savedPlayer.dex.val;
-				}
-				if (savegame.savedPlayer.dex.xp != undefined) {
-					player.dex.xp = savegame.savedPlayer.dex.xp;
-				}
-				if (savegame.savedPlayer.dex.next != undefined) {
-					player.dex.next = savegame.savedPlayer.dex.next;
-				}
-			}
-			if (savegame.savedPlayer.con != undefined) {
-				if (savegame.savedPlayer.con.val != undefined) {
-					player.con.val = savegame.savedPlayer.con.val;
-				}
-				if (savegame.savedPlayer.con.xp != undefined) {
-					player.con.xp = savegame.savedPlayer.con.xp;
-				}
-				if (savegame.savedPlayer.con.next != undefined) {
-					player.con.next = savegame.savedPlayer.con.next;
-				}
-			}
-			if (savegame.savedPlayer.spd != undefined) {
-				if (savegame.savedPlayer.spd.val != undefined) {
-					player.spd.val = savegame.savedPlayer.spd.val;
-				}
-				if (savegame.savedPlayer.spd.xp != undefined) {
-					player.spd.xp = savegame.savedPlayer.spd.xp;
-				}
-				if (savegame.savedPlayer.spd.next != undefined) {
-					player.spd.next = savegame.savedPlayer.spd.next;
-				}
-			}
-			if (savegame.savedPlayer.mgc != undefined) {
-				if (savegame.savedPlayer.mgc.val != undefined) {
-					player.mgc.val = savegame.savedPlayer.mgc.val;
-				}
-				if (savegame.savedPlayer.mgc.xp != undefined) {
-					player.mgc.xp = savegame.savedPlayer.mgc.xp;
-				}
-				if (savegame.savedPlayer.mgc.next != undefined) {
-					player.mgc.next = savegame.savedPlayer.mgc.next;
-				}
-			}
-			if (savegame.savedPlayer.curfloor != undefined) {
-				player.curfloor = savegame.savedPlayer.curfloor;
-			}
+		if (savegame.savedPlayer !== undefined) {
+			loadPlayer(savegame);
 		}
-		if (savegame.savedResources != undefined) {
-			if (savegame.savedResources.excelia != undefined) {
-				resources.excelia = savegame.savedResources.excelia;
-			}
-			if (savegame.savedResources.exceliaMultiplier != undefined) {
-				resources.exceliaMultiplier = savegame.savedResources.exceliaMultiplier;
-			}
+		if (savegame.savedResources !== undefined) {
+			loadResources(savegame);
 		}
-		if (savegame.savedSpellbook != undefined) {
-			for (i = 0; i < savegame.savedSpellbook.length; i++) {
-				if (i == spellbook.length) break;
-				if (savegame.savedSpellbook[i].learned != undefined) {
-					spellbook[i].learned = savegame.savedSpellbook[i].learned;
-				}
-				if (savegame.savedSpellbook[i].xp != undefined) {
-					spellbook[i].xp = savegame.savedSpellbook[i].xp;
-				}
-				if (savegame.savedSpellbook[i].next != undefined) {
-					spellbook[i].next = savegame.savedSpellbook[i].next;
-				}
-				if (savegame.savedSpellbook[i].level != undefined) {
-					spellbook[i].level = savegame.savedSpellbook[i].level;
-				}
-			}
+		if (savegame.savedSpellbook !== undefined) {
+			loadSpells(savegame);
 		}
-		if (savegame.savedUpgrades != undefined) {
-			for (i = 0; i < savegame.savedUpgrades.length; i++) {
-				if (i == upgrades.length) break;
-				if (savegame.savedUpgrades[i].shown != undefined) {
-					upgrades[i].shown = savegame.savedUpgrades[i].shown;
-				}
-				if (savegame.savedUpgrades[i].purchased != undefined) {
-					upgrades[i].purchased = savegame.savedUpgrades[i].purchased;
-				}
-			}
+		if (savegame.savedUpgrades !== undefined) {
+			loadUpgrades(savegame);
 		}
-		if (savegame.savedBuffs != undefined) {
-			if (savegame.savedBuffs.autoCrawlPercent != undefined) {
-				buffs.autoCrawlPercent = savegame.savedBuffs.autoCrawlPercent;
-			}
-			if (savegame.savedBuffs.barrier != undefined) {
-				buffs.barrier = savegame.savedBuffs.barrier;
-			}
-			if (savegame.savedBuffs.aegis != undefined) {
-				buffs.aegis = savegame.savedBuffs.aegis;
-			}
-			if (savegame.savedBuffs.spellMasteryMultiplier != undefined) {
-				buffs.spellMasteryMultiplier = savegame.savedBuffs.spellMasteryMultiplier;
-			}
-			if (savegame.savedBuffs.exceliaMultiplier != undefined) {
-				buffs.exceliaMultiplier = savegame.savedBuffs.exceliaMultiplier;
-			}
-			if (savegame.savedBuffs.aethericLevel != undefined) {
-				buffs.aethericLevel = savegame.savedBuffs.aethericLevel;
-			}
-			if (savegame.savedBuffs.battleHealing != undefined) {
-				buffs.battleHealing = savegame.savedBuffs.battleHealing;
-			}
-			if (savegame.savedBuffs.exceliaBless != undefined) {
-				buffs.exceliaBless = savegame.savedBuffs.exceliaBless;
-			}
-			if (savegame.savedBuffs.autoFireball != undefined) {
-				buffs.autoFireball = savegame.savedBuffs.autoFireball;
-			}
-			if (savegame.savedBuffs.exaustedMind != undefined) {
-				buffs.exaustedMind = savegame.savedBuffs.exaustedMind;
-			}
+		if (savegame.savedBuffs !== undefined) {
+			loadBuffs(savegame);
 		}
-		if (savegame.savedMonster != undefined) {
-			for (i = 0; i < savegame.savedMonster.length; i++) {
-				if (i == monster.length) break;
-				if (savegame.savedMonster[i].killed != undefined) {
-					monster[i].killed = savegame.savedMonster[i].killed;
-				}
-			}
+		if (savegame.savedMonster !== undefined) {
+			loadMonsters(savegame);
 		}
-		if (savegame.savedTower != undefined) {
-			for (i = 0; i < savegame.savedTower.length; i++) {
-				if (i == tower.length) break;
-				if (savegame.savedTower[i].explored != undefined) {
-					tower[i].explored = savegame.savedTower[i].explored;
-				}
-				if (savegame.savedTower[i].advallowed != undefined) {
-					tower[i].advallowed = savegame.savedTower[i].advallowed;
-				}
-				if (savegame.savedTower[i].stairpos != undefined) {
-					tower[i].stairpos = savegame.savedTower[i].stairpos;
-				}
-				if (savegame.savedTower[i].density != undefined) {
-					tower[i].density = savegame.savedTower[i].density;
-				}
-			}
+		if (savegame.savedTower !== undefined) {
+			loadTower(savegame);
 		}
 	}
 	else {
@@ -392,9 +453,6 @@ var main = function() {
 			exploreFloor();
 		}
 	}
-	else {
-		battle(monster[game.found]);
-	}
 	readTempBuffs(true);
 	updateTime(game.ticks);
 	saving();
@@ -442,10 +500,10 @@ var startTheEngine = function() {
 	readToggBuffs();
 	readTempBuffs(false);
 	for (i = 0; i < upgrades.length; i++) {
-		if (upgrades[i].id == "timewarp1" && upgrades[i].purchased == true) {
+		if (upgrades[i].id == "timewarp1" && upgrades[i].purchased === true) {
 			document.getElementById("speed2").innerHTML = '<button class="btn btn-primary" onClick="gameSpeed(500)">x2</button>';
 		}
-		else if (upgrades[i].id == "timewarp2" && upgrades[i].purchased == true) {
+		else if (upgrades[i].id == "timewarp2" && upgrades[i].purchased === true) {
 			document.getElementById("speed5").innerHTML = '<button class="btn btn-primary" onClick="gameSpeed(200)">x5</button>';
 		}
 	}
@@ -519,7 +577,7 @@ var readToggBuffs = function() {
 	
 	//Can I shoot?
 	var upStatus = findUpgrade("autoshoot");
-	if (buffs.autoFireball == true || upStatus.purchased == true) {
+	if (buffs.autoFireball === true || upStatus.purchased === true) {
 		if (buffs.autoFireball) {
 			togText = "ON";
 		}
@@ -531,8 +589,8 @@ var readToggBuffs = function() {
 	
 	//Can I healz?
 	var togText;
-	var upStatus = findUpgrade("battlehealing");
-	if (buffs.battleHealing == true || upStatus.purchased == true) {
+	upStatus = findUpgrade("battlehealing");
+	if (buffs.battleHealing === true || upStatus.purchased === true) {
 		if (buffs.battleHealing) {
 			togText = "ON";
 		}
@@ -541,7 +599,7 @@ var readToggBuffs = function() {
 		}
 		document.getElementById("toggleable").innerHTML += '<button type="button" class="list-group-item" onClick="switchToggBuff(\'battlehealing\')"><span class="badge">' + togText + '</span>Battle Healing</button>';
 	}
-}
+};
 
 //Let's get buffed!
 var readPermBuffs = function() {
@@ -720,6 +778,13 @@ var updateStat = function(arg, number) {
 //----------------------- BATTLE FUNCTIONS -----------------------//
 //----------------------------------------------------------------//
 
+//Hit him in the head!
+var attackMelee = function() {
+	if (game.inbattle) {
+		battle(monster[game.found], false);
+	}
+};
+
 //Are we going to fight a monster?
 var battleChance = function() {
 	//Roll the dice!
@@ -734,73 +799,106 @@ var battleChance = function() {
 		else if (game.found >= monster.length) {
 			game.found = monster.length-1;
 		}
-		battle(monster[game.found]);
+		battle(monster[game.found], false);
 	}
 };
 
+//It's my turn!
+var playerAttack = function(arg) {
+	var damage = damageFormula(player.str.val, player.dex.val, arg.con, arg.curhp);
+	if (buffs.rage !== 0) {
+		damage *= 5;
+	}
+	if (damage > arg.curhp) {
+		damage = arg.curhp;
+	}
+	document.getElementById("combatlog").innerHTML += "You dealt " + Math.round(damage) + " damage to the " + arg.name + ".<br>";
+	return monsterDamage(arg, damage);
+};
+
+//Brace yourselves, the enemy is coming.
+var monsterAttack = function(arg) {
+	var damage;
+	
+	//Is the enemy slowed?
+	if (arg.status == 1) {
+		damage = damageFormula(arg.str, arg.dex/2, player.con.val, player.hp.curhp);
+	}
+	else {
+		damage = damageFormula(arg.str, arg.dex, player.con.val, player.hp.curhp);
+	}
+
+	//Am I invulnerable?
+	if (buffs.aegis === 0) {
+		//Do I have a barrier up?
+		if (buffs.barrier > 0) {
+			
+			//Is my barrier enough?
+			if (buffs.barrier >= damage) { 
+				buffs.barrier -= damage;
+				document.getElementById("combatlog").innerHTML += "Your barrier absorbed " + Math.round(damage) + " damage from " + arg.name + "'s attack.<br>";
+				readTempBuffs(false);
+				return false;
+			}
+			else {
+				damage -= buffs.barrier;
+				document.getElementById("combatlog").innerHTML += "Your barrier absorbed " + Math.round(damage) + " damage from " + arg.name + "'s attack.<br>";
+				document.getElementById("combatlog").innerHTML += "Your barrier has shattered.<br>";
+				readTempBuffs(false);
+			}
+		}
+		
+		//Remove my HP
+		updateCondition(player.hp, -damage);
+		document.getElementById("combatlog").innerHTML += "You took " + Math.round(damage) + " damage from the " + arg.name + "'s attack.<br>";
+		
+		//Am I still alive?
+		if (player.hp.curval === 0) {
+			playerDeath(arg);
+			return true;
+		}
+	}
+	else {
+		document.getElementById("combatlog").innerHTML += "Aegis absorbed " + Math.round(damage) + " damage from " + arg.name + "'s attack.<br>";
+	}
+	return false;
+};
+
 //This is where the real fun is
-var battle = function(arg) {
+var battle = function(arg, spellCast) {
 	//What am I battling against?
 	if (game.inbattle === false) {
 		loadMonsterInfo(arg);
-		if (buffs.autoFireball == true) {
+		if (buffs.autoFireball === true) {
 			castSpell("fireball");
 		}
 	}
 	
 	//The intense battle continues
 	else {
-		//This is how much I hit
-		var playerAttackDamage = damageFormula(player.str.val, player.dex.val, arg.con, arg.curhp);
-		var monsterAttackDamage;
-		if (buffs.rage !== 0) {
-			playerAttackDamage *= 5;
-			monsterAttackDamage *= 2;
-			if (playerAttackDamage > arg.curhp) {
-				playerAttackDamage = arg.curhp;
-			}
-			if (monsterAttackDamage > player.hp.cur) {
-				monsterAttackDamage = player.hp.cur;
-			}
-		}
-		if (arg.status == 1) {
-			monsterAttackDamage = damageFormula(arg.str, arg.dex/2, player.con.val, player.hp.curhp);
-		}
-		else {
-			monsterAttackDamage = damageFormula(arg.str, arg.dex, player.con.val, player.hp.curhp);
-		}
-		
-		if (buffs.battleHealing && player.hp.curval <= player.hp.maxval/2 && buffs.rage === 0) {
-			castSpell("cure");
-		}
-		
-		//Damage makes me stronger
-		if (buffs.aegis === 0) {
-			if (buffs.barrier > 0) {
-				if (monsterAttackDamage > buffs.barrier) {
-					monsterAttackDamage -= buffs.barrier;
-					updateCondition(player.hp, -monsterAttackDamage);
-					buffs.barrier = 0;
+		var isDead = false;
+		if (!spellCast) {
+			document.getElementById("combatlog").innerHTML = '';
+			if (buffs.battleHealing && player.hp.curval <= player.hp.maxval/2) {
+				if(!castSpell("cure")) {
+					isDead = playerAttack(arg);
 				}
-				else {
-					buffs.barrier -= monsterAttackDamage;
-				}
-				readTempBuffs(false);
 			}
 			else {
-				updateCondition(player.hp, -monsterAttackDamage);
+				isDead = playerAttack(arg);
 			}
 		}
-		updateStat(player.str, (arg.str/player.str.val));
-		updateStat(player.con, (arg.con/player.con.val));
-		updateStat(player.dex, (arg.dex/player.dex.val));
 		
-		//Weak monster is dying
-		monsterDamage(arg, playerAttackDamage);
-		
-		//Am I still alive?
-		if (player.hp.curval <= 0) {
-			playerDeath(arg);
+		//If the enemy is not dead, it's their turn
+		if (!isDead) {
+			isDead = monsterAttack(arg);
+			
+			//If I'm not dead, I gain expz!!!
+			if (!isDead) {
+				updateStat(player.str, (arg.str/player.str.val));
+				updateStat(player.con, (arg.con/player.con.val));
+				updateStat(player.dex, (arg.dex/player.dex.val));
+			}
 		}
 	}
 };
@@ -812,13 +910,15 @@ var monsterDamage = function(arg, damage) {
 	document.getElementById("monsterbar").style.width = percentage(arg.curhp, arg.hp) + "%";
 	if (arg.curhp <= 0) {
 		monsterDeath(arg);
+		return true;
 	}
+	return false;
 };
 
 //Cry me a river
 var monsterDeath = function(arg) {
 	game.inbattle = false;
-	document.getElementById("battlestatus").innerHTML = "You have defeated the " + arg.name + "!";
+	document.getElementById("combatlog").innerHTML += "You have defeated the " + arg.name + "!";
 	updateStat(player.str, arg.str);
 	updateStat(player.con, arg.con);
 	updateStat(player.dex, arg.dex);
@@ -847,14 +947,14 @@ var loadMonsterInfo = function(arg) {
 	document.getElementById("monsterdex").innerHTML = arg.dex;
 	document.getElementById("monstercon").innerHTML = arg.con;
 	document.getElementById("monsterbar").style.width = percentage(arg.curhp, arg.hp) + "%";
-	document.getElementById("battlestatus").innerHTML = "You are attacked by a " + arg.name + "!";
+	document.getElementById("combatlog").innerHTML = "You are attacked by a " + arg.name + "!<br>";
 	game.inbattle = true;
 };
 
 //RIP me
 var playerDeath = function(arg) {
 	game.inbattle = false;
-	document.getElementById("battlestatus").innerHTML = "You have been defeated by the " + arg.name + "!";
+	document.getElementById("combatlog").innerHTML += "You have been defeated by the " + arg.name + "!";
 	changeFloor(-player.curfloor);
 	updateExcelia(-((100-buffs.exceliaBless)*resources.excelia/100));
 	player.str.val -= Math.floor(player.str.val/10);
@@ -870,6 +970,10 @@ var playerDeath = function(arg) {
 	arg.curhp = arg.hp;
 	readSpells();
 };
+
+//Coward, lol
+var runAway = function() {
+}
 
 //----------------------------------------------------------------//
 //--------------------- EXPLORATION FUNCTIONS --------------------//
@@ -1009,7 +1113,7 @@ var findUpgrade = function(upgradeId) {
 		if (upgrades[i].id == upgradeId) break;
 	}
 	return upgrades[i];
-}
+};
 
 //Let's cheat our way up!
 var buyUpgrade = function(upgradeId) {
@@ -1067,7 +1171,7 @@ var switchToggBuff = function(buffId) {
 		buffs.autoFireball = !buffs.autoFireball;
 	}
 	readToggBuffs();
-}
+};
 
 //How far are you willing to go?
 var setAutoCrawl = function(number) {
@@ -1097,7 +1201,7 @@ var addSpellDescriptions = function() {
 			spellbook[i].desc = "Halve an enemy's DEX.";
 		}
 		else if (spellbook[i].id == "rage") {
-			spellbook[i].desc = "Fill yourself with rage for " + ragePotency(spellbook[i]) + " seconds. You deal 5x damage, however, you take 2x damage and cannot cast other spells."
+			spellbook[i].desc = "Fill yourself with rage for " + ragePotency(spellbook[i]) + " seconds. You deal 5x damage, however, you take 2x damage and cannot cast other spells.";
 		}
 		else if (spellbook[i].id == "clairvoyance") {
 			spellbook[i].desc = "Project your mind further into the tower, trying to find the stairs. It's very exausting, so you can only do it so often.";
@@ -1164,7 +1268,7 @@ var castSpell = function(spellId) {
 	var mpCost = spellCost(spellbook[i]);
 	if (player.mp.curval >= mpCost && buffs.rage === 0) {
 		//Let it cast! Let it cast! Can't hold it back anymore!
-    var castSuccess;
+		var castSuccess;
 		if (spellbook[i].id == "cure") {
 			castSuccess = castCure(spellbook[i]);
 		}
@@ -1193,8 +1297,10 @@ var castSpell = function(spellId) {
 			spellLevel(spellbook[i], mpCost);
 			updateStat(player.mgc, buffs.spellMasteryMultiplier * (spellbook[i].level + 1 + mpCost/2));
 			updateCondition(player.mp, 0);
+			return true;
 		}
 	}
+	return false;
 };
 
 //Voodoo magic!
@@ -1211,6 +1317,11 @@ var castCure = function(arg) {
 			cureValue = player.hp.maxval - player.hp.curval;
 		}
 		updateCondition(player.hp, cureValue);
+		if (game.inbattle) {
+			document.getElementById("combatlog").innerHTML = '';
+			document.getElementById("combatlog").innerHTML += "You healed yourself for " + Math.round(cureValue) + " HP with Cure.<br>";
+			battle(monster[game.found], true);
+		}
 		return true;
 	}
 };
@@ -1234,6 +1345,9 @@ var castFireball = function(arg) {
 			damageValue = monster[game.found].curhp;
 		}
 		monsterDamage(monster[game.found], damageValue);
+		document.getElementById("combatlog").innerHTML = '';
+		document.getElementById("combatlog").innerHTML += "Your fireball hit the " + monster[game.found].name + " for " + damageValue + " damage.<br>";
+		battle(monster[game.found], true);
 		return true;
 	}
 };
@@ -1252,6 +1366,11 @@ var castBarrier = function(arg) {
 	else {
 		buffs.barrier = potency;
 		readTempBuffs(false);
+		if (game.inbattle) {
+			document.getElementById("combatlog").innerHTML = '';
+			document.getElementById("combatlog").innerHTML += "You created a magical barrier.<br>";
+			battle(monster[game.found], true);
+		}
 		return true;
 	}
 };
@@ -1269,6 +1388,11 @@ var castAegis = function(arg) {
 	else {
 		buffs.aegis = aegisPotency(arg);
 		readTempBuffs(false);
+		if (game.inbattle) {
+			document.getElementById("combatlog").innerHTML = '';
+			document.getElementById("combatlog").innerHTML += "You summon the heavenly shield, Aegis.<br>";
+			battle(monster[game.found], true);
+		}
 		return true;
 	}
 };
@@ -1286,6 +1410,9 @@ var castSlow = function(arg) {
 	else {
 		monster[game.found].status = 1;
 		document.getElementById("monsterdex").innerHTML = monster[game.found].dex/2;
+		document.getElementById("combatlog").innerHTML = '';
+		document.getElementById("combatlog").innerHTML += "You have cast slow on the " + monster[game.found].name + ". Its DEX has been halved.<br>";
+		battle(monster[game.found], true);
 		return true;
 	}
 };
@@ -1298,9 +1425,12 @@ var castRage = function(arg) {
 	else {
 		buffs.rage = ragePotency(arg);
 		readTempBuffs(false);
+		document.getElementById("combatlog").innerHTML = '';
+		document.getElementById("combatlog").innerHTML += "You have entered a state of frenzy!<br>";
+		battle(monster[game.found], true);
 		return true;
 	}
-}
+};
 
 //Count to 10
 var ragePotency = function(arg) {
@@ -1309,7 +1439,7 @@ var ragePotency = function(arg) {
 
 //Look deep into the dungeon
 var castClairvoyance = function(arg) {
-	if (tower[player.curfloor].advallowed == 1 || player.curfloor >= monster.length || buffs.exaustedMind !== 0) {
+	if (tower[player.curfloor].advallowed == 1 || player.curfloor >= monster.length || buffs.exaustedMind !== 0 || game.inbattle === true) {
 		return false;
 	}
 	else {
@@ -1323,7 +1453,7 @@ var castClairvoyance = function(arg) {
 		readTempBuffs(false);
 		return true;
 	}
-}
+};
 
 //Now all that is left...
 runGame();
