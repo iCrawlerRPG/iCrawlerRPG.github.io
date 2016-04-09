@@ -605,7 +605,7 @@ var startTheEngine = function() {
 var readSpells = function() {
 	//First we must clear our mind...
 	document.getElementById("spellbook").innerHTML = '';
-	for (i = 0; i <= 2; i++) {
+	for (i = 0; i <= 3; i++) {
 		document.getElementById("spellbook" + i).innerHTML = '';
 	}
 	
