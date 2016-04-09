@@ -865,6 +865,7 @@ var monsterAttack = function(arg) {
 			}
 			else {
 				damage -= buffs.barrier;
+				buffs.barrier = 0;
 				document.getElementById("combatlog").innerHTML += "Your barrier absorbed " + Math.round(damage) + " damage from " + arg.name + "'s attack.<br>";
 				document.getElementById("combatlog").innerHTML += "Your barrier has shattered.<br>";
 				readTempBuffs(false);
