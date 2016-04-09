@@ -53,7 +53,7 @@ upgrades.push({name: "Time Warp 1", id: "timewarp1", exceliacost: 10, shown: fal
 upgrades.push({name: "Aetheric Attunement", id: "aetheric", exceliacost: 100, shown: false, purchased: false, desc:"Tap into the mana around you. Recover +1 MP per second while exploring."});
 upgrades.push({name: "Time Warp 2", id: "timewarp2", exceliacost: 100, shown: false, purchased: false, desc:"Change to the next gear! With this, everything is five times faster!"});
 upgrades.push({name: "Blessings", id: "blessings", exceliacost: 100, shown:false, purchased: false, desc:"Keep 10% of your excelia upon death."});
-upgrades.push({name: "Auto-Shooting", id: "autoshoot", exceliacost: 500, shown: false, purchased: false, desc:"Shoot a fireball at the start of every battle!"});
+upgrades.push({name: "Auto-Shooting", id: "autoshoot", exceliacost: 500, shown: false, purchased: false, desc:"Shoot a fireball at the start of every battle without losing a turn!"});
 upgrades.push({name: "Excelia x2", id: "doubleexcelia", exceliacost: 2000, shown: false, purchased: false, desc:"Double the amount of Excelia you gain per monster."});
 upgrades.push({name: "Adept Mage", id: "adeptmage", exceliacost: 5000, shown: false, purchased: false, desc:"Master spells twice as fast. Blow yourself up twice as much."});
 upgrades.push({name: "Battle Healing", id: "battlehealing", exceliacost: 5000, shown: false, purchased: false, desc:"Cast Cure whenever you get under 50% HP during battle."});
@@ -77,31 +77,20 @@ var hpCalc = function(number) {
 };
 
 //Monster List:
-var monster = [];
-monster.push({name: "Rat", curhp: hpCalc(5), hp: hpCalc(5), str: 5, dex: 5, con: 5, status: 0, killed: 0});	//15 stat points
-monster.push({name: "Bat", curhp: hpCalc(4), hp: hpCalc(4), str: 4, dex: 7, con: 4, status: 0, killed: 0}); //15 stat points
-monster.push({name: "Slime", curhp: hpCalc(7), hp: hpCalc(7), str: 6, dex: 2, con: 7, status: 0, killed: 0}); //15 stat points
-monster.push({name: "Kobold", curhp: hpCalc(9), hp: hpCalc(9), str: 12, dex: 9, con: 9, status: 0, killed: 0}); //30 stat points
-monster.push({name: "Wolf", curhp: hpCalc(15), hp: hpCalc(15), str: 15, dex: 30, con: 15, status: 0, killed: 0}); //60 stat points
-monster.push({name: "Lizard", curhp: 710, hp: 710, str: 28, dex: 20, con: 25, status: 0, killed: 0}); //120 stat points
-monster.push({name: "Goblin", curhp: 1400, hp: 1400, str: 45, dex: 32, con: 40, status: 0, killed: 0});
-monster.push({name: "Bandit", curhp: 2850, hp: 2850, str: 48, dex: 72, con: 35, status: 0, killed: 0});
-monster.push({name: "Giant Wolf", curhp: 5000, hp: 5000, str: 104, dex: 78, con: 80, status: 0, killed: 0});
-monster.push({name: "Armored Slime", curhp: 12430, hp: 12430, str: 172, dex: 50, con: 340, status: 0, killed: 0});
-monster.push({name: "Kobold Leader", curhp: 22000, hp: 22000, str: 150, dex: 124, con: 165, status: 0, killed: 0});
-monster.push({name: "Weakened Minotaur", curhp: 47320, hp: 47320, str: 226, dex: 160, con: 189, status: 0, killed: 0});
-monster.push({name: "Dragon Cub", curhp: 101000, hp: 101000, str: 402, dex: 216, con: 287, status: 0, killed: 0});
-monster.push({name: "Giant Snake", curhp: 183200, hp: 183200, str: 521, dex: 674, con: 195, status: 0, killed: 0});
-monster.push({name: "Living Armor", curhp: 321950, hp: 321950, str: 832, dex: 420, con: 1229, status: 0, killed: 0});
-monster.push({name: "Beholder", curhp: 623900, hp: 623900, str: 1047, dex: 500, con: 986, status: 0, killed: 0});
-monster.push({name: "Shadow Killer", curhp: 1178000, hp: 1178000, str: 1870, dex: 2500, con: 320, status: 0, killed: 0});
-monster.push({name: "Giant Lizard", curhp: 2542900, hp: 2542900, str: 3150, dex: 3100, con: 3200, status: 0, killed: 0});
-monster.push({name: "Elder Kobold", curhp: 5140000, hp: 5140000, str: 5200, dex: 4600, con: 5000, status: 0, killed: 0});
-monster.push({name: "Orc", curhp: 24234900, hp: 24234900, str: 13250, dex: 9810, con: 11200, status: 0, killed: 0});
+var monsterList = [{name:"Rat", killed:0}, {name:"Bat", killed:0}, {name:"Slime", killed:0}, {name:"Kobold", killed:0}, {name:"Wolf", killed:0}, {name:"Lizard", killed:0}, {name:"Goblin", killed:0}, {name:"Bandit", killed:0}, {name:"Spider", killed:0}, {name:"Eagle", killed:0}];
+var monsterInstance = {
+	name: "",
+	curhp: 0,
+	hp: 0,
+	str: 0,
+	dex: 0,
+	con: 0,
+	status: 0
+};
 
 //Tower
 var tower = [];
-for (i = 0; i <= monster.length; i++) { //It has as many floors as monsters
+for (i = 0; i <= monsterList.length; i++) { //It has as many floors as monsters
 	if (i === 0) {
 		tower.push({size:100, explored:100, advallowed:1, stairpos: 0, density: 0});
 	}
@@ -132,7 +121,8 @@ var saving = function() {
 		savedSpellbook: spellbook,
 		savedUpgrades: upgrades,
 		savedBuffs: buffs,
-		savedMonster: monster,
+		savedMonsterList: monsterList,
+		savedMonsterInstance: monsterInstance,
 		savedTower: tower
 	};
 	localStorage.setItem("saved",JSON.stringify(save));
@@ -338,13 +328,36 @@ var loadBuffs = function(savegame) {
 	}
 };
 
-var loadMonsters = function(savegame) {
-	for (i = 0; i < savegame.savedMonster.length; i++) {
-		if (i == monster.length) break;
-		if (savegame.savedMonster[i].killed !== undefined) {
-			monster[i].curhp = savegame.savedMonster[i].curhp;
-			monster[i].killed = savegame.savedMonster[i].killed;
+var loadMonsterList = function(savegame) {
+	for (i = 0; i < savegame.savedMonsterList.length; i++) {
+		if (i == monsterList.length) break;
+		if (savegame.savedMonsterList[i].killed !== undefined) {
+			monsterList[i].killed = savegame.savedMonsterList[i].killed;
 		}
+	}
+};
+
+var loadMonsterInstance = function(savegame) {
+	if (savegame.savedMonsterInstance.name !== undefined) {
+		monsterInstance.name = savegame.savedMonsterInstance.name;
+	}
+	if (savegame.savedMonsterInstance.curhp !== undefined) {
+		monsterInstance.curhp = savegame.savedMonsterInstance.curhp;
+	}
+	if (savegame.savedMonsterInstance.hp !== undefined) {
+		monsterInstance.hp = savegame.savedMonsterInstance.hp;
+	}
+	if (savegame.savedMonsterInstance.str !== undefined) {
+		monsterInstance.str = savegame.savedMonsterInstance.str;
+	}
+	if (savegame.savedMonsterInstance.dex !== undefined) {
+		monsterInstance.dex = savegame.savedMonsterInstance.dex;
+	}
+	if (savegame.savedMonsterInstance.con !== undefined) {
+		monsterInstance.con = savegame.savedMonsterInstance.con;
+	}
+	if (savegame.savedMonsterInstance.status !== undefined) {
+		monsterInstance.status = savegame.savedMonsterInstance.status;
 	}
 };
 
@@ -388,8 +401,11 @@ var load = function() {
 		if (savegame.savedBuffs !== undefined) {
 			loadBuffs(savegame);
 		}
-		if (savegame.savedMonster !== undefined) {
-			loadMonsters(savegame);
+		if (savegame.savedMonsterList !== undefined) {
+			loadMonsterList(savegame);
+		}
+		if (savegame.savedMonsterInstance !== undefined) {
+			loadMonsterInstance(savegame);
 		}
 		if (savegame.savedTower !== undefined) {
 			loadTower(savegame);
@@ -425,10 +441,12 @@ var updateTime = function(number) {
 
 //How fast can we go?
 var gameSpeed = function(number) {
-	game.refreshSpeed = number;
-	theGame = window.clearInterval(theGame);
-	runGame();
-	document.getElementById("speed").innerHTML = 1000/number;
+	if (game.idleMode) {
+		game.refreshSpeed = number;
+		theGame = window.clearInterval(theGame);
+		runGame();
+		document.getElementById("speed").innerHTML = 1000/number;
+	}
 };
 
 //I am the Alpha and the Omega
@@ -500,12 +518,13 @@ var toggleIdle = function() {
 	if (game.idleMode) {
 		game.idleMode = false;
 		document.getElementById("idleSwitch").innerHTML = '<button class="btn btn-danger" onClick="toggleIdle()">Idle OFF</button>';
+		gameSpeed(1000);
 	}
 	else {
 		game.idleMode = true;
 		document.getElementById("idleSwitch").innerHTML = '<button class="btn btn-success" onClick="toggleIdle()">Idle ON</button>';
 	}
-}
+};
 
 //Loading everything
 var startTheEngine = function() {
@@ -568,7 +587,7 @@ var startTheEngine = function() {
 	
 	//Load Battle Screen
 	if (game.inbattle) {
-		loadMonsterInfo(monster[game.found]);
+		loadMonsterInfo(monsterInstance);
 	}
 	
 	//Engine has been started
@@ -851,8 +870,45 @@ var updateStat = function(arg, number) {
 //Hit him in the head!
 var attackMelee = function() {
 	if (game.inbattle) {
-		battle(monster[game.found], false);
+		battle(monsterInstance, false);
 	}
+};
+
+//Let's create a monster!
+var createMonster = function(number) {
+  var tempMonster = {name: "", curhp: 0, hp:0 , str: 0, dex: 0, con: 0, status: 0};
+	
+	tempMonster.name = monsterList[number].name;
+	var statPool = player.curfloor * 15;
+	tempMonster.str++;
+	tempMonster.dex++;
+	tempMonster.con++;
+	statPool -= 3;
+	
+	var statChoice;
+	while (statPool !== 0) {
+		statChoice = Math.floor(Math.random()*3);
+		while (statChoice == 3) {
+			statChoice = Math.floor(Math.random()*3);
+		}
+		
+		if (statChoice === 0) {
+			tempMonster.str++;
+		}
+		else if (statChoice == 1) {
+			tempMonster.dex++;
+		}
+		else if (statChoice == 2) {
+			tempMonster.con++;
+		}
+		statPool--;
+	}
+	
+	tempMonster.hp = hpCalc(tempMonster.con);
+	tempMonster.curhp = tempMonster.hp;
+	tempMonster.status = 0;
+	
+	return tempMonster;
 };
 
 //Are we going to fight a monster?
@@ -862,14 +918,12 @@ var battleChance = function() {
 	
 	//BATTLE MUSIC INTENSIFIES
 	if (check <= tower[player.curfloor].density) {
-		game.found = player.curfloor + (Math.floor(Math.random()*3))-1;
-		if (game.found < 0) {
-			game.found = 0;
+		game.found = Math.floor(Math.random()*11);
+		while (game.found == 11) {
+			game.found = Math.floor(Math.random()*11);
 		}
-		else if (game.found >= monster.length) {
-			game.found = monster.length-1;
-		}
-		battle(monster[game.found], false);
+		monsterInstance = createMonster(game.found);
+		battle(monsterInstance, false);
 		exploreRestButtonLoad();
 		return true;
 	}
@@ -996,7 +1050,7 @@ var monsterDeath = function(arg) {
 	updateStat(player.str, arg.str);
 	updateStat(player.con, arg.con);
 	updateStat(player.dex, arg.dex);
-	arg.killed += 1;
+	monsterList[game.found].killed += 1;
 	gainExcelia(arg);
 	
 	//Restoring monster to default
@@ -1033,6 +1087,7 @@ var loadMonsterInfo = function(arg) {
 var playerDeath = function(arg) {
 	game.inbattle = false;
 	document.getElementById("combatlog").innerHTML += "You have been defeated by the " + arg.name + "!";
+	toggleIdle();
 	changeFloor(-player.curfloor);
 	updateExcelia(-((100-buffs.exceliaBless)*resources.excelia/100));
 	player.str.val -= Math.floor(player.str.val/10);
@@ -1052,11 +1107,10 @@ var playerDeath = function(arg) {
 
 //Coward, lol
 var runAway = function() {
-	var runRoll = Math.random() * (monster[game.found].str + monster[game.found].dex + monster[game.found].con);
+	var runRoll = Math.random() * (monsterInstance.str + monsterInstance.dex + monsterInstance.con);
 	if (runRoll < player.spd.val*3) {
 		document.getElementById("combatlog").innerHTML = "";
-		document.getElementById("combatlog").innerHTML += "You escaped from the battle against " + monster[game.found].name + ".";
-		monster[game.found].curhp = monster[game.found].hp;
+		document.getElementById("combatlog").innerHTML += "You escaped from the battle against " + monsterInstance.name + ".";
 		updateStat(player.spd, runRoll);
 		loadMonsterInfo();
 		game.inbattle = false;
@@ -1064,7 +1118,7 @@ var runAway = function() {
 	else {
 		document.getElementById("combatlog").innerHTML = "";
 		document.getElementById("combatlog").innerHTML += "You failed to run away.<br>";
-		battle(monster[game.found], true);
+		battle(monsterInstance, true);
 	}
 	exploreRestButtonLoad();
 };
@@ -1096,7 +1150,7 @@ var exploreFloor = function() {
 		document.getElementById("explperc").innerHTML = Math.round(100 * percentage(tower[player.curfloor].explored, tower[player.curfloor].size))/100 + "%";
 		
 		//Are we there yet?
-		if (tower[player.curfloor].stairpos <= tower[player.curfloor].explored && tower[player.curfloor].advallowed === 0 && player.curfloor < monster.length) {
+		if (tower[player.curfloor].stairpos <= tower[player.curfloor].explored && tower[player.curfloor].advallowed === 0 && player.curfloor < monsterList.length) {
 			tower[player.curfloor].advallowed = 1;
 			document.getElementById("advbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(1)">Next Floor</button>';
 		}
@@ -1116,37 +1170,39 @@ var exploreFloor = function() {
 
 //I hate stairs so much
 var changeFloor = function(number) {
-	//This many floors!
-	player.curfloor += number;
-	document.getElementById("floor").innerHTML = player.curfloor;
-	document.getElementById("floorbar").style.width = percentage(tower[player.curfloor].explored, tower[player.curfloor].size) + "%";
-	document.getElementById("explperc").innerHTML = Math.round(100 * percentage(tower[player.curfloor].explored, tower[player.curfloor].size))/100 + "%";
-	
-	//I can go to the next floor
-	if (tower[player.curfloor].advallowed == 1 && player.curfloor < monster.length) {
-		document.getElementById("advbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(1)">Next Floor</button>';
+	if (!game.inbattle) {
+		//This many floors!
+		player.curfloor += number;
+		document.getElementById("floor").innerHTML = player.curfloor;
+		document.getElementById("floorbar").style.width = percentage(tower[player.curfloor].explored, tower[player.curfloor].size) + "%";
+		document.getElementById("explperc").innerHTML = Math.round(100 * percentage(tower[player.curfloor].explored, tower[player.curfloor].size))/100 + "%";
+		
+		//I can go to the next floor
+		if (tower[player.curfloor].advallowed == 1 && player.curfloor < monsterList.length) {
+			document.getElementById("advbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(1)">Next Floor</button>';
+		}
+		else {
+			document.getElementById("advbut").innerHTML = '';
+		}
+		
+		//If I'm not at the bottom, I can go down
+		if (player.curfloor !== 0) {
+			document.getElementById("retbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(-1)">Previous Floor</button>';
+			game.resting = false;
+		}
+		else {
+			document.getElementById("retbut").innerHTML = '';
+		}
+		
+		//Have I reached the bottom?
+		if (player.curfloor === 0) {
+			game.resting = true;
+			document.getElementById("exploreButton").innerHTML = '';
+			document.getElementById("restButton").innerHTML = '';
+		}
+		
+		exploreRestButtonLoad();
 	}
-	else {
-		document.getElementById("advbut").innerHTML = '';
-	}
-	
-	//If I'm not at the bottom, I can go down
-	if (player.curfloor !== 0) {
-		document.getElementById("retbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(-1)">Previous Floor</button>';
-		game.resting = false;
-	}
-	else {
-		document.getElementById("retbut").innerHTML = '';
-	}
-	
-	//Have I reached the bottom?
-	if (player.curfloor === 0) {
-		game.resting = true;
-		document.getElementById("exploreButton").innerHTML = '';
-		document.getElementById("restButton").innerHTML = '';
-	}
-	
-	exploreRestButtonLoad();
 };
 
 //----------------------------------------------------------------//
@@ -1375,7 +1431,7 @@ var castCure = function(arg) {
 		if (game.inbattle) {
 			document.getElementById("combatlog").innerHTML = '';
 			document.getElementById("combatlog").innerHTML += "You healed yourself for " + Math.round(cureValue) + " HP with Cure.<br>";
-			battle(monster[game.found], true);
+			battle(monsterInstance, true);
 		}
 		return true;
 	}
@@ -1396,13 +1452,13 @@ var castFireball = function(arg) {
 	//BURN IT!!!!
 	else {
 		var damageValue = fireballPotency(arg);
-		if (monster[game.found].curhp <= damageValue) {
-			damageValue = monster[game.found].curhp;
+		if (monsterInstance.curhp <= damageValue) {
+			damageValue = monsterInstance.curhp;
 		}
 		document.getElementById("combatlog").innerHTML = '';
-		document.getElementById("combatlog").innerHTML += "Your fireball hit the " + monster[game.found].name + " for " + damageValue + " damage.<br>";
-		if (!monsterDamage(monster[game.found], damageValue)) {
-			battle(monster[game.found], true);
+		document.getElementById("combatlog").innerHTML += "Your fireball hit the " + monsterInstance.name + " for " + Math.floor(damageValue) + " damage.<br>";
+		if (!monsterDamage(monsterInstance, damageValue)) {
+			battle(monsterInstance, true);
 		}
 		return true;
 	}
@@ -1425,7 +1481,7 @@ var castBarrier = function(arg) {
 		if (game.inbattle) {
 			document.getElementById("combatlog").innerHTML = '';
 			document.getElementById("combatlog").innerHTML += "You created a magical barrier.<br>";
-			battle(monster[game.found], true);
+			battle(monsterInstance, true);
 		}
 		return true;
 	}
@@ -1447,7 +1503,7 @@ var castAegis = function(arg) {
 		if (game.inbattle) {
 			document.getElementById("combatlog").innerHTML = '';
 			document.getElementById("combatlog").innerHTML += "You summon the heavenly shield, Aegis.<br>";
-			battle(monster[game.found], true);
+			battle(monsterInstance, true);
 		}
 		return true;
 	}
@@ -1460,15 +1516,15 @@ var aegisPotency = function(arg) {
 
 //The monsters are gonna get behind
 var castSlow = function(arg) {
-	if (game.inbattle === false || monster[game.found].status !== 0) {
+	if (game.inbattle === false || monsterInstance.status !== 0) {
 		return false;
 	}
 	else {
-		monster[game.found].status = 1;
-		document.getElementById("monsterdex").innerHTML = monster[game.found].dex/2;
+		monsterInstance.status = 1;
+		document.getElementById("monsterdex").innerHTML = monsterInstance.dex/2;
 		document.getElementById("combatlog").innerHTML = '';
-		document.getElementById("combatlog").innerHTML += "You have cast slow on the " + monster[game.found].name + ". Its DEX has been halved.<br>";
-		battle(monster[game.found], true);
+		document.getElementById("combatlog").innerHTML += "You have cast slow on the " + monsterInstance.name + ". Its DEX has been halved.<br>";
+		battle(monsterInstance, true);
 		return true;
 	}
 };
@@ -1483,7 +1539,7 @@ var castRage = function(arg) {
 		readTempBuffs(false);
 		document.getElementById("combatlog").innerHTML = '';
 		document.getElementById("combatlog").innerHTML += "You have entered a state of frenzy!<br>";
-		battle(monster[game.found], true);
+		battle(monsterInstance, true);
 		return true;
 	}
 };
@@ -1495,7 +1551,7 @@ var ragePotency = function(arg) {
 
 //Look deep into the dungeon
 var castClairvoyance = function(arg) {
-	if (tower[player.curfloor].advallowed == 1 || player.curfloor >= monster.length || buffs.exhaustedMind !== 0 || game.inbattle === true) {
+	if (tower[player.curfloor].advallowed == 1 || player.curfloor >= monsterList.length || buffs.exhaustedMind !== 0 || game.inbattle === true) {
 		return false;
 	}
 	else {
