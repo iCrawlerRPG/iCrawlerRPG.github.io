@@ -169,16 +169,19 @@
 							<div class="row">
 								<div class="col-xs-3">
 									<p class="text-danger">Time Controls</p>
-									<p>Time speed: x<span id="speed">1</span></p> 
 								</div>
 								<div class="col-xs-9">
+									<p class="text-right">Current Run: <span id="days">0</span> days, <span id="hours">0</span> hours, <span id="minutes">0</span> minutes, <span id="seconds">0</span> seconds</p>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-xs-2">
+									Time speed: x<span id="speed">1</span>
+								</div>
+								<div class="col-xs-10">
 									<div class="row">
 										<div class="col-xs-12">
-											<p class="text-right">Current Run: <span id="days">0</span> days, <span id="hours">0</span> hours, <span id="minutes">0</span> minutes, <span id="seconds">0</span> seconds</p>
-										</div>
-									</div>
-									<div class="row">
-										<div class="col-xs-12">
+											<span id="idleSwitch"></span>
 											<button class="btn btn-primary" onClick="gameSpeed(1000)">x1</button>
 											<span id="speed2"></span>
 											<span id="speed5"></span>
@@ -302,6 +305,14 @@
 											<li>Click the "Explore" button to explore some of the floor.</li>
 											<li>If a battle start, you cannot neither explore nor rest until it ends.</li>
 											<li>You can't cast spells when resting anymore, either.</li>
+										</ul>
+										<li>Idle Mode!</li>
+										<ul>
+											<li>For those who are not fans of clicking, Idle Mode makes the game work just as before!</li>
+											<li>Whenever you're not in battle, floor will be explored automatically.</li>
+											<li>In battle, melee attacks only will be used (unless upgraded)!</li>
+											<li>You can still manually cast spells, or melee/run during battle.</li>
+											<li>When the battle ends, auto rest kicks in, so you don't even need to worry about dying!</li>
 										</ul>
 									</ul>
 								</div>

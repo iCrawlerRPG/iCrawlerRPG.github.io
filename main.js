@@ -54,14 +54,12 @@ upgrades.push({name: "Aetheric Attunement", id: "aetheric", exceliacost: 100, sh
 upgrades.push({name: "Time Warp 2", id: "timewarp2", exceliacost: 100, shown: false, purchased: false, desc:"Change to the next gear! With this, everything is five times faster!"});
 upgrades.push({name: "Blessings", id: "blessings", exceliacost: 100, shown:false, purchased: false, desc:"Keep 10% of your excelia upon death."});
 upgrades.push({name: "Auto-Shooting", id: "autoshoot", exceliacost: 500, shown: false, purchased: false, desc:"Shoot a fireball at the start of every battle!"});
-upgrades.push({name: "Auto Crawl 1", id: "autocrawl1", exceliacost: 1000, shown: false, purchased: false, desc:"Rest whenever you're below 10% health. Start exploring again when completely healed."});
 upgrades.push({name: "Excelia x2", id: "doubleexcelia", exceliacost: 2000, shown: false, purchased: false, desc:"Double the amount of Excelia you gain per monster."});
 upgrades.push({name: "Adept Mage", id: "adeptmage", exceliacost: 5000, shown: false, purchased: false, desc:"Master spells twice as fast. Blow yourself up twice as much."});
 upgrades.push({name: "Battle Healing", id: "battlehealing", exceliacost: 5000, shown: false, purchased: false, desc:"Cast Cure whenever you get under 50% HP during battle."});
 
 //Buffs
 var buffs = {
-	autoCrawlPercent: 0,
 	exceliaMultiplier: 1,
 	spellMasteryMultiplier: 1,
 	aegis: 0,
@@ -311,9 +309,6 @@ var loadUpgrades = function(savegame) {
 };
 
 var loadBuffs = function(savegame) {
-	if (savegame.savedBuffs.autoCrawlPercent !== undefined) {
-		buffs.autoCrawlPercent = savegame.savedBuffs.autoCrawlPercent;
-	}
 	if (savegame.savedBuffs.barrier !== undefined) {
 		buffs.barrier = savegame.savedBuffs.barrier;
 	}
@@ -438,11 +433,11 @@ var gameSpeed = function(number) {
 
 //I am the Alpha and the Omega
 var main = function() {
-	if (game.init === false) {
+	if (!game.init) {
 		startTheEngine();
 	}
 	game.ticks += 1;
-	if (game.inbattle === false) {
+	if (!game.inbattle) {
 		if (game.resting) {
 			updateCondition(player.hp, 1*player.con.val);
 			updateCondition(player.mp, 1*player.mgc.val);
@@ -453,6 +448,24 @@ var main = function() {
 			}
 		}
 	}
+	
+	//Here's my bot!
+	if (player.curfloor === 0) {
+		toggleIdle();
+	}
+	
+	if (game.idleMode) {
+		if (!game.inbattle && fullyRested()) {
+			exploreFloor();
+		}
+		else if (!game.inbattle && !fullyRested()) {
+			startRest();
+		}
+		else {
+			attackMelee();
+		}
+	}
+	
 	readTempBuffs(true);
 	updateTime(game.ticks);
 	saving();
@@ -479,9 +492,27 @@ var exploreRestButtonLoad = function() {
 	}
 };
 
+var toggleIdle = function() {
+	if (player.curfloor === 0) {
+		return false;
+	}
+	
+	if (game.idleMode) {
+		game.idleMode = false;
+		document.getElementById("idleSwitch").innerHTML = '<button class="btn btn-danger" onClick="toggleIdle()">Idle OFF</button>';
+	}
+	else {
+		game.idleMode = true;
+		document.getElementById("idleSwitch").innerHTML = '<button class="btn btn-success" onClick="toggleIdle()">Idle ON</button>';
+	}
+}
+
 //Loading everything
 var startTheEngine = function() {
+	//Load Saved Game
 	load();
+	
+	//Load Player Screen
 	document.getElementById("name").innerHTML = player.name;
 	updateStat(player.str, 0);
 	updateStat(player.dex, 0);
@@ -495,6 +526,16 @@ var startTheEngine = function() {
 	document.getElementById("floor").innerHTML = player.curfloor;
 	document.getElementById("explperc").innerHTML = Math.round(percentage(tower[player.curfloor].explored, tower[player.curfloor].size)*100)/100 + "%";
 	document.getElementById("floorbar").style.width = percentage(tower[player.curfloor].explored, tower[player.curfloor].size) + "%";
+	
+	//Load Idle Button
+	if (game.idleMode) {
+		document.getElementById("idleSwitch").innerHTML = '<button class="btn btn-success" onClick="toggleIdle()">Idle ON</button>';
+	}
+	else {
+		document.getElementById("idleSwitch").innerHTML = '<button class="btn btn-danger" onClick="toggleIdle()">Idle OFF</button>';
+	}
+	
+	//Load The Tower
 	if (tower[player.curfloor].advallowed == 1) {
 		document.getElementById("advbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(1)">Next Floor</button>';
 	}
@@ -502,12 +543,15 @@ var startTheEngine = function() {
 		document.getElementById("retbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(-1)">Previous Floor</button>';
 	}
 	exploreRestButtonLoad();
-	document.getElementById("excelia").innerHTML = Math.round(100*resources.excelia)/100;
+	
+	//Load Spellbook
 	readSpells();
+	
+	//Load Upgrade Screen
+	document.getElementById("excelia").innerHTML = Math.round(100*resources.excelia)/100;
 	readUpgrades();
-	readPermBuffs();
-	readToggBuffs();
-	readTempBuffs(false);
+	
+	//Load any upgrade related button
 	for (i = 0; i < upgrades.length; i++) {
 		if (upgrades[i].id == "timewarp1" && upgrades[i].purchased === true) {
 			document.getElementById("speed2").innerHTML = '<button class="btn btn-primary" onClick="gameSpeed(500)">x2</button>';
@@ -516,9 +560,18 @@ var startTheEngine = function() {
 			document.getElementById("speed5").innerHTML = '<button class="btn btn-primary" onClick="gameSpeed(200)">x5</button>';
 		}
 	}
+	
+	//Load Buff Screen
+	readPermBuffs();
+	readToggBuffs();
+	readTempBuffs(false);
+	
+	//Load Battle Screen
 	if (game.inbattle) {
 		loadMonsterInfo(monster[game.found]);
 	}
+	
+	//Engine has been started
 	game.refreshSpeed = 1000;
 	theGame = window.clearInterval(theGame);
 	runGame();
@@ -619,9 +672,6 @@ var readPermBuffs = function() {
 	document.getElementById("permanent").innerHTML = '';
 	
 	//You don't even need to play anymore
-	if (buffs.autoCrawlPercent !== 0) {
-		document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">' + buffs.autoCrawlPercent + '%</span>Auto Crawl</li>';
-	}
 	if (buffs.exceliaMultiplier !== 1) {
 		document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">x' + buffs.exceliaMultiplier + '</span>Excelia Gain</li>';
 	}
@@ -1143,10 +1193,7 @@ var buyUpgrade = function(upgradeId) {
 		
 		//Let's activate it!
 		//You don't even need any higher than that.
-		if (upgrades[i].id == "autocrawl1") {
-			setAutoCrawl(10);
-		}
-		else if (upgrades[i].id == "timewarp1") {
+		if (upgrades[i].id == "timewarp1") {
 			document.getElementById("speed2").innerHTML = '<button class="btn btn-primary" onClick="gameSpeed(500)">x2</button>';
 		}
 		else if (upgrades[i].id == "aetheric") {
@@ -1184,11 +1231,6 @@ var switchToggBuff = function(buffId) {
 		buffs.autoFireball = !buffs.autoFireball;
 	}
 	readToggBuffs();
-};
-
-//How far are you willing to go?
-var setAutoCrawl = function(number) {
-	buffs.autoCrawlPercent = number;
 };
 
 //----------------------------------------------------------------//
