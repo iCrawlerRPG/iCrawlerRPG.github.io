@@ -925,12 +925,12 @@ var battleChance = function() {
 		while (game.found == 11) {
 			game.found = Math.floor(Math.random()*11);
 		}
-		var tier;
+		/*var tier = 0;
 		for (i = player.curfloor-1; i < 10; i-10) {
 			tier++;
 		}
-		Math.floor(player.curfloor-1/10);
-		monsterInstance = createMonster((tier*10)+game.found);
+		Math.floor(player.curfloor-1/10);*/
+		monsterInstance = createMonster(/*(tier*10)*/+game.found);
 		battle(monsterInstance, false);
 		exploreRestButtonLoad();
 		return true;
