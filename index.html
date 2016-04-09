@@ -23,7 +23,7 @@
 		</script>
 		<div class="container-fluid">
 			<div class="row">
-				<p class="text-center h1">ICrawler <small>alpha ver0.7.4</small></p>
+				<p class="text-center h1">ICrawler <small>alpha ver0.8</small></p>
 			</div>
 			<div class="row" style="height: 30px;"></div>
 			<div class="row">
@@ -169,24 +169,22 @@
 							<div class="row">
 								<div class="col-xs-3">
 									<p class="text-danger">Time Controls</p>
-									<p>Time speed: x<span id="speed">1</span></p> 
 								</div>
 								<div class="col-xs-9">
+									<p class="text-right">Current Run: <span id="days">0</span> days, <span id="hours">0</span> hours, <span id="minutes">0</span> minutes, <span id="seconds">0</span> seconds</p>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-xs-2">
+									Time speed: x<span id="speed">1</span>
+								</div>
+								<div class="col-xs-10">
 									<div class="row">
 										<div class="col-xs-12">
-											<p class="text-right">Current Run: <span id="days">0</span> days, <span id="hours">0</span> hours, <span id="minutes">0</span> minutes, <span id="seconds">0</span> seconds</p>
-										</div>
-									</div>
-									<div class="row">
-										<div class="col-xs-12">
+											<span id="idleSwitch"></span>
 											<button class="btn btn-primary" onClick="gameSpeed(1000)">x1</button>
-											<button class="btn btn-primary" onClick="gameSpeed(500)">x2</button>
-											<button class="btn btn-primary" onClick="gameSpeed(200)">x5</button>
-											<button class="btn btn-primary" onClick="gameSpeed(100)">x10</button>
-											<button class="btn btn-primary" onClick="gameSpeed(40)">x25</button>
-											<button class="btn btn-primary" onClick="gameSpeed(20)">x50</button>
-											<button class="btn btn-primary" onClick="gameSpeed(10)">x100</button>
-											<button class="btn btn-primary" onClick="gameSpeed(4)">x250</button>
+											<span id="speed2"></span>
+											<span id="speed5"></span>
 										</div>
 									</div>
 								</div>
@@ -199,12 +197,12 @@
 							<p>You are currently at Floor <span id="floor">0</span>.</p>
 							<div class="row" style="height: 10px;"></div>
 							<div class="row">
-								<div class="col-xs-4">
-									<span id="advbut"></span>
-									<span id="retbut"></span>
+								<div class="col-xs-12">
+									Floor explored:
 								</div>
-								<div class="col-xs-8">
-									<p>Floor explored:</p>
+							</div>
+							<div class="row">
+								<div class="col-xs-12">
 									<div class="progress">
 										<div id="floorbar" class="progress-bar" role="progressbar" style="width: 0%;">
 											<span id="explperc">0</span>
@@ -213,32 +211,74 @@
 								</div>
 							</div>
 							<div class="row">
-								<div class="col-xs-4">
-									<span id="restwalk"></span>
+								<div class="col-xs-3">
+									<span id="retbut"></span>
 								</div>
 								<div class="col-xs-3">
-									<span id="action"></span>
+									<span id="exploreButton"></span>
+								</div>
+								<div class="col-xs-3">
+									<span id="restButton"></span>
+								</div>
+								<div class="col-xs-3">
+									<span id="advbut"></span>
 								</div>
 							</div>
 						</div>
 					</div>
 					<div class="row">
 						<div class="well well-sm">
-							<p class="text-danger">Battle Screen</p>
+							<div class="row">
+								<div class="col-xs-12">
+									<p class="text-danger">Battle Screen</p>
+								</div>
+							</div>
 							<div class="row">
 								<div class="col-xs-3">
-									Monster: <span id="monstername">None</span><br>
-									STR: <span id="monsterstr">0</span><br>
-									DEX: <span id="monsterdex">0</span><br>
-									CON: <span id="monstercon">0</span>
-								</div>
-								<div class="col-xs-8">
-									<div class="progress">
-										<div id="monsterbar" class="progress-bar progress-bar-danger" role="progressbar" style="width: 0%;">
-											<span id="monsterhp">0</span>
+									<div class="row">
+										<div class="col-xs-12">
+											Monster: <span id="monstername">None</span><br>
+										</div>
+										<div class="col-xs-12">
+											STR: <span id="monsterstr">0</span><br>
+										</div>
+										<div class="col-xs-12">
+											DEX: <span id="monsterdex">0</span><br>
+										</div>
+										<div class="col-xs-12">
+											CON: <span id="monstercon">0</span>
 										</div>
 									</div>
-									<p><span id="battlestatus">Not in battle.</span></p>
+								</div>
+								<div class="col-xs-9">
+									<div class="row">
+										<div class="col-xs-12">
+											<div class="progress">
+												<div id="monsterbar" class="progress-bar progress-bar-danger" role="progressbar" style="width: 0%;">
+													<span id="monsterhp">0</span>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-xs-6">
+											<button class="btn btn-block btn-danger" onClick="attackMelee()">Fight</button>
+										</div>
+										<div class="col-xs-6">
+											<button class="btn btn-block btn-warning" onClick="runAway()">Run</button>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row" style="height: 10px;"></div>
+							<div class="row">
+								<div class="col-xs-12">
+									<span class="text-success">Combat Log:</span>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-xs-12">
+									<span id="combatlog"></span>
 								</div>
 							</div>
 						</div>
@@ -252,10 +292,37 @@
 							</div>
 							<div class="row">
 								<div class="col-xs-9">
-									<p>v0.7.4 - New upgrades and spells. Many formulas adjusted, time controls back as not-upgrade (for now).</p>
-									<p>v0.7.3 - New upgrades. Save/load bug fixed. Spellbook fixed. Several other minor bugs fixed (really, how many of them are?).</p>
-									<p>v0.7.2 - New spellbook layout. Added tooltips to spells and upgrades. A few minor bug fixes.</p>
-									<p>v0.7.1 - Fixed NaN excelia. Fixed barrier spell. Several minor bug fixes.</p>
+									v0.8:<br>
+									<ul>
+										<li>New active turn-combat system!</li>
+										<ul>
+											<li>Attack by clicking the "Fight" button.</li>
+											<li>Or you can cast a spell from your spellbook.</li>
+											<li>If things get too rough, there's no shame in running away with the "Run" button!</li>
+										</ul>
+										<li>New active exploration system</li>
+										<ul>
+											<li>Click the "Explore" button to explore some of the floor.</li>
+											<li>If a battle start, you cannot neither explore nor rest until it ends.</li>
+											<li>You can't cast spells when resting anymore, either.</li>
+										</ul>
+										<li>Idle Mode!</li>
+										<ul>
+											<li>For those who are not fans of clicking, Idle Mode makes the game work just as before!</li>
+											<li>Whenever you're not in battle, floor will be explored automatically.</li>
+											<li>In battle, melee attacks only will be used (unless upgraded)!</li>
+											<li>You can still manually cast spells, or melee/run during battle.</li>
+											<li>When the battle ends, auto rest kicks in, so you don't even need to worry about dying!</li>
+											<li>Time speed may only be changed with Idle Mode ON</li>
+										</ul>
+										<li>Dynamic Monsters!</li>
+										<ul>
+											<li>Monsters are now generated dynamically, with various stat distributions.</li>
+											<li>That make every monster encounter different, even if they're the same type!</li>
+											<li>At each floor, monsters get stronger.</li>
+											<li>Don't think you'll beat a floor 5 Rat easily just because you beat a floor 1 one.</li>
+										</ul>
+									</ul>
 								</div>
 								<div class="col-xs-3">
 									<button class="btn btn-danger btn-block" onClick="hardReset()">Hard Reset!</button>

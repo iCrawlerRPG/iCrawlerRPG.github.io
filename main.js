@@ -2,7 +2,8 @@
 //---------------------------- OBJECTS ---------------------------//
 //----------------------------------------------------------------//
 
-//The most important one.
+//The most important ones.
+var i;
 var theGame;
 
 //Game controllers:
@@ -11,10 +12,11 @@ var game = {
 	gameSpeed: 1,
 	refreshSpeed: 1000,
 	inbattle: false,
-	resting: true,
+	resting: false,
 	queued: false,
 	init: false,
-	found: 0
+	found: 0,
+	idleMode: false
 };
 
 //Player Object:
@@ -47,19 +49,17 @@ spellbook.push({name: "Aegis", id: "aegis", type: 0, requiredmgc: 50, learned: f
 
 //Excelia Upgrades:
 var upgrades = [];
-//upgrades.push({name: "Time Warp 1", id: "timewarp1", exceliacost: 10, shown: false, purchased: false, desc:"Progress too slow? Make everything go at twice the speed!"});
+upgrades.push({name: "Time Warp 1", id: "timewarp1", exceliacost: 10, shown: false, purchased: false, desc:"Progress too slow? Make everything go at twice the speed!"});
 upgrades.push({name: "Aetheric Attunement", id: "aetheric", exceliacost: 100, shown: false, purchased: false, desc:"Tap into the mana around you. Recover +1 MP per second while exploring."});
-//upgrades.push({name: "Time Warp 2", id: "timewarp2", exceliacost: 100, shown: false, purchased: false, desc:"Change to the next gear! With this, everything is five times faster!"});
-upgrades.push({name: "Auto-Shooting", id: "autoshoot", exceliacost: 500, shown: false, purchased: false, desc:"Shoot a fireball at the start of every battle!"});
-upgrades.push({name: "Auto Crawl 1", id: "autocrawl1", exceliacost: 1000, shown: false, purchased: false, desc:"Rest whenever you're below 10% health. Start exploring again when completely healed."});
+upgrades.push({name: "Time Warp 2", id: "timewarp2", exceliacost: 100, shown: false, purchased: false, desc:"Change to the next gear! With this, everything is five times faster!"});
+upgrades.push({name: "Blessings", id: "blessings", exceliacost: 100, shown:false, purchased: false, desc:"Keep 10% of your excelia upon death."});
+upgrades.push({name: "Auto-Shooting", id: "autoshoot", exceliacost: 500, shown: false, purchased: false, desc:"Shoot a fireball at the start of every battle without losing a turn!"});
 upgrades.push({name: "Excelia x2", id: "doubleexcelia", exceliacost: 2000, shown: false, purchased: false, desc:"Double the amount of Excelia you gain per monster."});
 upgrades.push({name: "Adept Mage", id: "adeptmage", exceliacost: 5000, shown: false, purchased: false, desc:"Master spells twice as fast. Blow yourself up twice as much."});
 upgrades.push({name: "Battle Healing", id: "battlehealing", exceliacost: 5000, shown: false, purchased: false, desc:"Cast Cure whenever you get under 50% HP during battle."});
-upgrades.push({name: "Blessings", id: "blessings", exceliacost: 10000, shown:false, purchased: false, desc:"Keep 10% of your excelia upon death."});
 
 //Buffs
 var buffs = {
-	autoCrawlPercent: 0,
 	exceliaMultiplier: 1,
 	spellMasteryMultiplier: 1,
 	aegis: 0,
@@ -72,29 +72,25 @@ var buffs = {
 	exhaustedMind: 0
 };
 
+var hpCalc = function(number) {
+	return (Math.pow(number, 2)*4);
+};
+
 //Monster List:
-var monster = [];
-monster.push({name: "Rat", curhp:50, hp: 50, str: 5, dex: 5, con: 5, status: 0, killed: 0});
-monster.push({name: "Bat", curhp:40, hp: 40, str: 4, dex: 7, con: 4, status: 0, killed: 0});
-monster.push({name: "Slime", curhp: 65, hp: 65, str: 6, dex: 5, con: 7, status: 0, killed: 0});
-monster.push({name: "Kobold", curhp: 180, hp: 180, str: 12, dex: 8, con: 7, status: 0, killed: 0});
-monster.push({name: "Wolf", curhp: 320, hp: 320, str: 20, dex: 15, con: 12, status: 0, killed: 0});
-monster.push({name: "Lizard", curhp: 710, hp: 710, str: 28, dex: 20, con: 25, status: 0, killed: 0});
-monster.push({name: "Goblin", curhp: 1400, hp: 1400, str: 45, dex: 32, con: 40, status: 0, killed: 0});
-monster.push({name: "Bandit", curhp: 2850, hp: 2850, str: 48, dex: 72, con: 35, status: 0, killed: 0});
-monster.push({name: "Giant Wolf", curhp: 5000, hp: 5000, str: 104, dex: 78, con: 80, status: 0, killed: 0});
-monster.push({name: "Armored Slime", curhp: 12430, hp: 12430, str: 172, dex: 50, con: 340, status: 0, killed: 0});
-monster.push({name: "Kobold Leader", curhp: 22000, hp: 22000, str: 150, dex: 124, con: 165, status: 0, killed: 0});
-monster.push({name: "Weakened Minotaur", curhp: 47320, hp: 47320, str: 226, dex: 160, con: 189, status: 0, killed: 0});
-monster.push({name: "Dragon Cub", curhp: 101000, hp: 101000, str: 402, dex: 216, con: 287, status: 0, killed: 0});
-monster.push({name: "Giant Snake", curhp: 183200, hp: 183200, str: 521, dex: 674, con: 195, status: 0, killed: 0});
-monster.push({name: "Living Armor", curhp: 321950, hp: 321950, str: 832, dex: 420, con: 429, status: 0, killed: 0});
-monster.push({name: "Beholder", curhp: 623900, hp: 623900, str: 1047, dex: 500, con: 986, status: 0, killed: 0});
-monster.push({name: "Shadow Killer", curhp: 1178000, hp: 1178000, str: 1870, dex: 2500, con: 320, status: 0, killed: 0});
+var monsterList = [{name:"Rat", killed:0}, {name:"Bat", killed:0}, {name:"Slime", killed:0}, {name:"Kobold", killed:0}, {name:"Wolf", killed:0}, {name:"Lizard", killed:0}, {name:"Goblin", killed:0}, {name:"Bandit", killed:0}, {name:"Spider", killed:0}, {name:"Eagle", killed:0}];
+var monsterInstance = {
+	name: "",
+	curhp: 0,
+	hp: 0,
+	str: 0,
+	dex: 0,
+	con: 0,
+	status: 0
+};
 
 //Tower
 var tower = [];
-for (var i = 0; i <= monster.length; i++) { //It has as many floors as monsters
+for (i = 0; i <= monsterList.length; i++) { //It has as many floors as monsters
 	if (i === 0) {
 		tower.push({size:100, explored:100, advallowed:1, stairpos: 0, density: 0});
 	}
@@ -125,203 +121,294 @@ var saving = function() {
 		savedSpellbook: spellbook,
 		savedUpgrades: upgrades,
 		savedBuffs: buffs,
-		savedMonster: monster,
+		savedMonsterList: monsterList,
+		savedMonsterInstance: monsterInstance,
 		savedTower: tower
 	};
 	localStorage.setItem("saved",JSON.stringify(save));
+};
+
+var loadGame = function(savegame) {
+	if (savegame.savedGame.ticks !== undefined) {
+		if (savegame.savedGame.ticks > 30000000) {
+			game.ticks = 31536000 - savegame.savedGame.ticks;
+		}
+		else {
+			game.ticks = savegame.savedGame.ticks;
+		}
+	}
+	if (savegame.savedGame.gameSpeed !== undefined) {
+		game.gameSpeed = savegame.savedGame.gameSpeed;
+	}
+	if (savegame.savedGame.refreshSpeed !== undefined) {
+		game.refreshSpeed = savegame.savedGame.refreshSpeed;
+	}
+	if (savegame.savedGame.found !== undefined) {
+		game.found = savegame.savedGame.found;
+	}
+	if (savegame.savedGame.inbattle !== undefined) {
+		game.inbattle = savegame.savedGame.inbattle;
+	}
+};
+
+var loadPlayerHP = function(savegame) {
+	if (savegame.savedPlayer.hp.curval !== undefined) {
+		player.hp.curval = savegame.savedPlayer.hp.curval;
+	}
+	if (savegame.savedPlayer.hp.maxval !== undefined) {
+		player.hp.maxval = savegame.savedPlayer.hp.maxval;
+	}
+};
+
+var loadPlayerMP = function(savegame) {
+	if (savegame.savedPlayer.mp.curval !== undefined) {
+		player.mp.curval = savegame.savedPlayer.mp.curval;
+	}
+	if (savegame.savedPlayer.mp.maxval !== undefined) {
+		player.mp.maxval = savegame.savedPlayer.mp.maxval;
+	}
+};
+
+var loadPlayerSTR = function(savegame) {
+	if (savegame.savedPlayer.str.val !== undefined) {
+		player.str.val = savegame.savedPlayer.str.val;
+	}
+	if (savegame.savedPlayer.str.xp !== undefined) {
+		player.str.xp = savegame.savedPlayer.str.xp;
+	}
+	if (savegame.savedPlayer.str.next !== undefined) {
+		player.str.next = savegame.savedPlayer.str.next;
+	}
+};
+
+var loadPlayerDEX = function(savegame) {
+	if (savegame.savedPlayer.dex.val !== undefined) {
+		player.dex.val = savegame.savedPlayer.dex.val;
+	}
+	if (savegame.savedPlayer.dex.xp !== undefined) {
+		player.dex.xp = savegame.savedPlayer.dex.xp;
+	}
+	if (savegame.savedPlayer.dex.next !== undefined) {
+		player.dex.next = savegame.savedPlayer.dex.next;
+	}
+};
+
+var loadPlayerCON = function(savegame) {
+	if (savegame.savedPlayer.con.val !== undefined) {
+		player.con.val = savegame.savedPlayer.con.val;
+	}
+	if (savegame.savedPlayer.con.xp !== undefined) {
+		player.con.xp = savegame.savedPlayer.con.xp;
+	}
+	if (savegame.savedPlayer.con.next !== undefined) {
+		player.con.next = savegame.savedPlayer.con.next;
+	}
+};
+
+var loadPlayerSPD = function(savegame) {
+	if (savegame.savedPlayer.spd.val !== undefined) {
+		player.spd.val = savegame.savedPlayer.spd.val;
+	}
+	if (savegame.savedPlayer.spd.xp !== undefined) {
+		player.spd.xp = savegame.savedPlayer.spd.xp;
+	}
+	if (savegame.savedPlayer.spd.next !== undefined) {
+		player.spd.next = savegame.savedPlayer.spd.next;
+	}
+};
+
+var loadPlayerMGC = function (savegame) {
+	if (savegame.savedPlayer.mgc.val !== undefined) {
+		player.mgc.val = savegame.savedPlayer.mgc.val;
+	}
+	if (savegame.savedPlayer.mgc.xp !== undefined) {
+		player.mgc.xp = savegame.savedPlayer.mgc.xp;
+	}
+	if (savegame.savedPlayer.mgc.next !== undefined) {
+		player.mgc.next = savegame.savedPlayer.mgc.next;
+	}
+};
+
+var loadPlayer = function(savegame) {
+	if (savegame.savedPlayer.name !== undefined) {
+		player.name = savegame.savedPlayer.name;
+	}
+	if (savegame.savedPlayer.hp !== undefined) {
+		loadPlayerHP(savegame);
+	}
+	if (savegame.savedPlayer.mp !== undefined) {
+		loadPlayerMP(savegame);
+	}
+	if (savegame.savedPlayer.str !== undefined) {
+		loadPlayerSTR(savegame);
+	}
+	if (savegame.savedPlayer.dex !== undefined) {
+		loadPlayerDEX(savegame);
+	}
+	if (savegame.savedPlayer.con !== undefined) {
+		loadPlayerCON(savegame);
+	}
+	if (savegame.savedPlayer.spd !== undefined) {
+		loadPlayerSPD(savegame);
+	}
+	if (savegame.savedPlayer.mgc !== undefined) {
+		loadPlayerMGC(savegame);
+	}
+	if (savegame.savedPlayer.curfloor !== undefined) {
+		player.curfloor = savegame.savedPlayer.curfloor;
+	}
+};
+
+var loadResources = function(savegame) {
+	if (savegame.savedResources.excelia !== undefined) {
+		resources.excelia = savegame.savedResources.excelia;
+	}
+	if (savegame.savedResources.exceliaMultiplier !== undefined) {
+		resources.exceliaMultiplier = savegame.savedResources.exceliaMultiplier;
+	}
+};
+
+var loadSpells = function(savegame) {
+	for (i = 0; i < savegame.savedSpellbook.length; i++) {
+		if (i == spellbook.length) break;
+		if (savegame.savedSpellbook[i].learned !== undefined) {
+			spellbook[i].learned = savegame.savedSpellbook[i].learned;
+		}
+		if (savegame.savedSpellbook[i].xp !== undefined) {
+			spellbook[i].xp = savegame.savedSpellbook[i].xp;
+		}
+		if (savegame.savedSpellbook[i].next !== undefined) {
+			spellbook[i].next = savegame.savedSpellbook[i].next;
+		}
+		if (savegame.savedSpellbook[i].level !== undefined) {
+			spellbook[i].level = savegame.savedSpellbook[i].level;
+		}
+	}
+};
+
+var loadUpgrades = function(savegame) {
+	for (i = 0; i < savegame.savedUpgrades.length; i++) {
+		if (i == upgrades.length) break;
+		if (savegame.savedUpgrades[i].shown !== undefined) {
+			upgrades[i].shown = savegame.savedUpgrades[i].shown;
+		}
+		if (savegame.savedUpgrades[i].purchased !== undefined) {
+			upgrades[i].purchased = savegame.savedUpgrades[i].purchased;
+		}
+	}
+};
+
+var loadBuffs = function(savegame) {
+	if (savegame.savedBuffs.barrier !== undefined) {
+		buffs.barrier = savegame.savedBuffs.barrier;
+	}
+	if (savegame.savedBuffs.aegis !== undefined) {
+		buffs.aegis = savegame.savedBuffs.aegis;
+	}
+	if (savegame.savedBuffs.spellMasteryMultiplier !== undefined) {
+		buffs.spellMasteryMultiplier = savegame.savedBuffs.spellMasteryMultiplier;
+	}
+	if (savegame.savedBuffs.exceliaMultiplier !== undefined) {
+		buffs.exceliaMultiplier = savegame.savedBuffs.exceliaMultiplier;
+	}
+	if (savegame.savedBuffs.aethericLevel !== undefined) {
+		buffs.aethericLevel = savegame.savedBuffs.aethericLevel;
+	}
+	if (savegame.savedBuffs.battleHealing !== undefined) {
+		buffs.battleHealing = savegame.savedBuffs.battleHealing;
+	}
+	if (savegame.savedBuffs.exceliaBless !== undefined) {
+		buffs.exceliaBless = savegame.savedBuffs.exceliaBless;
+	}
+	if (savegame.savedBuffs.autoFireball !== undefined) {
+		buffs.autoFireball = savegame.savedBuffs.autoFireball;
+	}
+	if (savegame.savedBuffs.exhaustedMind !== undefined) {
+		buffs.exhaustedMind = savegame.savedBuffs.exhaustedMind;
+	}
+};
+
+var loadMonsterList = function(savegame) {
+	for (i = 0; i < savegame.savedMonsterList.length; i++) {
+		if (i == monsterList.length) break;
+		if (savegame.savedMonsterList[i].killed !== undefined) {
+			monsterList[i].killed = savegame.savedMonsterList[i].killed;
+		}
+	}
+};
+
+var loadMonsterInstance = function(savegame) {
+	if (savegame.savedMonsterInstance.name !== undefined) {
+		monsterInstance.name = savegame.savedMonsterInstance.name;
+	}
+	if (savegame.savedMonsterInstance.curhp !== undefined) {
+		monsterInstance.curhp = savegame.savedMonsterInstance.curhp;
+	}
+	if (savegame.savedMonsterInstance.hp !== undefined) {
+		monsterInstance.hp = savegame.savedMonsterInstance.hp;
+	}
+	if (savegame.savedMonsterInstance.str !== undefined) {
+		monsterInstance.str = savegame.savedMonsterInstance.str;
+	}
+	if (savegame.savedMonsterInstance.dex !== undefined) {
+		monsterInstance.dex = savegame.savedMonsterInstance.dex;
+	}
+	if (savegame.savedMonsterInstance.con !== undefined) {
+		monsterInstance.con = savegame.savedMonsterInstance.con;
+	}
+	if (savegame.savedMonsterInstance.status !== undefined) {
+		monsterInstance.status = savegame.savedMonsterInstance.status;
+	}
+};
+
+var loadTower = function(savegame) {
+	for (i = 0; i < savegame.savedTower.length; i++) {
+		if (i == tower.length) break;
+		if (savegame.savedTower[i].explored !== undefined) {
+			tower[i].explored = savegame.savedTower[i].explored;
+		}
+		if (savegame.savedTower[i].advallowed !== undefined) {
+			tower[i].advallowed = savegame.savedTower[i].advallowed;
+		}
+		if (savegame.savedTower[i].stairpos !== undefined) {
+			tower[i].stairpos = savegame.savedTower[i].stairpos;
+		}
+		if (savegame.savedTower[i].density !== undefined) {
+			tower[i].density = savegame.savedTower[i].density;
+		}
+	}
 };
 
 //Load the game! If all goes well, retro-compatibility is forever!
 var load = function() {
   var savegame = JSON.parse(localStorage.getItem("saved"));
 	if (savegame) {
-		if (savegame.savedGame != undefined) {
-			if (savegame.savedGame.ticks != undefined) {
-				if (savegame.savedGame.ticks > 30000000) {
-					game.ticks = 31536000 - savegame.savedGame.ticks;
-				}
-				else {
-					game.ticks = savegame.savedGame.ticks;
-				}
-			}
-			if (savegame.savedGame.gameSpeed != undefined) {
-				game.gameSpeed = savegame.savedGame.gameSpeed;
-			}
-			if (savegame.savedGame.refreshSpeed != undefined) {
-				game.refreshSpeed = savegame.savedGame.refreshSpeed;
-			}
+		if (savegame.savedGame !== undefined) {
+			loadGame(savegame);
 		}
-		if (savegame.savedPlayer != undefined) {
-			if (savegame.savedPlayer.name != undefined) {
-				player.name = savegame.savedPlayer.name;
-			}
-			if (savegame.savedPlayer.hp != undefined) {
-				if (savegame.savedPlayer.hp.curval != undefined) {
-					player.hp.curval = savegame.savedPlayer.hp.curval;
-				}
-				if (savegame.savedPlayer.hp.maxval != undefined) {
-					player.hp.maxval = savegame.savedPlayer.hp.maxval;
-				}
-			}
-			if (savegame.savedPlayer.mp != undefined) {
-				if (savegame.savedPlayer.mp.curval != undefined) {
-					player.mp.curval = savegame.savedPlayer.mp.curval;
-				}
-				if (savegame.savedPlayer.mp.maxval != undefined) {
-					player.mp.maxval = savegame.savedPlayer.mp.maxval;
-				}
-			}
-			if (savegame.savedPlayer.str != undefined) {
-				if (savegame.savedPlayer.str.val != undefined) {
-					player.str.val = savegame.savedPlayer.str.val;
-				}
-				if (savegame.savedPlayer.str.xp != undefined) {
-					player.str.xp = savegame.savedPlayer.str.xp;
-				}
-				if (savegame.savedPlayer.str.next != undefined) {
-					player.str.next = savegame.savedPlayer.str.next;
-				}
-			}
-			if (savegame.savedPlayer.dex != undefined) {
-				if (savegame.savedPlayer.dex.val != undefined) {
-					player.dex.val = savegame.savedPlayer.dex.val;
-				}
-				if (savegame.savedPlayer.dex.xp != undefined) {
-					player.dex.xp = savegame.savedPlayer.dex.xp;
-				}
-				if (savegame.savedPlayer.dex.next != undefined) {
-					player.dex.next = savegame.savedPlayer.dex.next;
-				}
-			}
-			if (savegame.savedPlayer.con != undefined) {
-				if (savegame.savedPlayer.con.val != undefined) {
-					player.con.val = savegame.savedPlayer.con.val;
-				}
-				if (savegame.savedPlayer.con.xp != undefined) {
-					player.con.xp = savegame.savedPlayer.con.xp;
-				}
-				if (savegame.savedPlayer.con.next != undefined) {
-					player.con.next = savegame.savedPlayer.con.next;
-				}
-			}
-			if (savegame.savedPlayer.spd != undefined) {
-				if (savegame.savedPlayer.spd.val != undefined) {
-					player.spd.val = savegame.savedPlayer.spd.val;
-				}
-				if (savegame.savedPlayer.spd.xp != undefined) {
-					player.spd.xp = savegame.savedPlayer.spd.xp;
-				}
-				if (savegame.savedPlayer.spd.next != undefined) {
-					player.spd.next = savegame.savedPlayer.spd.next;
-				}
-			}
-			if (savegame.savedPlayer.mgc != undefined) {
-				if (savegame.savedPlayer.mgc.val != undefined) {
-					player.mgc.val = savegame.savedPlayer.mgc.val;
-				}
-				if (savegame.savedPlayer.mgc.xp != undefined) {
-					player.mgc.xp = savegame.savedPlayer.mgc.xp;
-				}
-				if (savegame.savedPlayer.mgc.next != undefined) {
-					player.mgc.next = savegame.savedPlayer.mgc.next;
-				}
-			}
-			if (savegame.savedPlayer.curfloor != undefined) {
-				player.curfloor = savegame.savedPlayer.curfloor;
-			}
+		if (savegame.savedPlayer !== undefined) {
+			loadPlayer(savegame);
 		}
-		if (savegame.savedResources != undefined) {
-			if (savegame.savedResources.excelia != undefined) {
-				resources.excelia = savegame.savedResources.excelia;
-			}
-			if (savegame.savedResources.exceliaMultiplier != undefined) {
-				resources.exceliaMultiplier = savegame.savedResources.exceliaMultiplier;
-			}
+		if (savegame.savedResources !== undefined) {
+			loadResources(savegame);
 		}
-		if (savegame.savedSpellbook != undefined) {
-			for (i = 0; i < savegame.savedSpellbook.length; i++) {
-				if (i == spellbook.length) break;
-				if (savegame.savedSpellbook[i].learned != undefined) {
-					spellbook[i].learned = savegame.savedSpellbook[i].learned;
-				}
-				if (savegame.savedSpellbook[i].xp != undefined) {
-					spellbook[i].xp = savegame.savedSpellbook[i].xp;
-				}
-				if (savegame.savedSpellbook[i].next != undefined) {
-					spellbook[i].next = savegame.savedSpellbook[i].next;
-				}
-				if (savegame.savedSpellbook[i].level != undefined) {
-					spellbook[i].level = savegame.savedSpellbook[i].level;
-				}
-			}
+		if (savegame.savedSpellbook !== undefined) {
+			loadSpells(savegame);
 		}
-		if (savegame.savedUpgrades != undefined) {
-			for (i = 0; i < savegame.savedUpgrades.length; i++) {
-				if (i == upgrades.length) break;
-				if (savegame.savedUpgrades[i].shown != undefined) {
-					upgrades[i].shown = savegame.savedUpgrades[i].shown;
-				}
-				if (savegame.savedUpgrades[i].purchased != undefined) {
-					upgrades[i].purchased = savegame.savedUpgrades[i].purchased;
-				}
-			}
+		if (savegame.savedUpgrades !== undefined) {
+			loadUpgrades(savegame);
 		}
-		if (savegame.savedBuffs != undefined) {
-			if (savegame.savedBuffs.autoCrawlPercent != undefined) {
-				buffs.autoCrawlPercent = savegame.savedBuffs.autoCrawlPercent;
-			}
-			if (savegame.savedBuffs.barrier != undefined) {
-				buffs.barrier = savegame.savedBuffs.barrier;
-			}
-			if (savegame.savedBuffs.aegis != undefined) {
-				buffs.aegis = savegame.savedBuffs.aegis;
-			}
-			if (savegame.savedBuffs.spellMasteryMultiplier != undefined) {
-				buffs.spellMasteryMultiplier = savegame.savedBuffs.spellMasteryMultiplier;
-			}
-			if (savegame.savedBuffs.exceliaMultiplier != undefined) {
-				buffs.exceliaMultiplier = savegame.savedBuffs.exceliaMultiplier;
-			}
-			if (savegame.savedBuffs.aethericLevel != undefined) {
-				buffs.aethericLevel = savegame.savedBuffs.aethericLevel;
-			}
-			if (savegame.savedBuffs.battleHealing != undefined) {
-				buffs.battleHealing = savegame.savedBuffs.battleHealing;
-			}
-			if (savegame.savedBuffs.exceliaBless != undefined) {
-				buffs.exceliaBless = savegame.savedBuffs.exceliaBless;
-			}
-			if (savegame.savedBuffs.autoFireball != undefined) {
-				buffs.autoFireball = savegame.savedBuffs.autoFireball;
-			}
-			if (savegame.savedBuffs.exhaustedMind != undefined) {
-				buffs.exhaustedMind = savegame.savedBuffs.exhaustedMind;
-			}
+		if (savegame.savedBuffs !== undefined) {
+			loadBuffs(savegame);
 		}
-		if (savegame.savedMonster != undefined) {
-			for (i = 0; i < savegame.savedMonster.length; i++) {
-				if (i == monster.length) break;
-				if (savegame.savedMonster[i].killed != undefined) {
-					monster[i].killed = savegame.savedMonster[i].killed;
-				}
-			}
+		if (savegame.savedMonsterList !== undefined) {
+			loadMonsterList(savegame);
 		}
-		if (savegame.savedTower != undefined) {
-			for (i = 0; i < savegame.savedTower.length; i++) {
-				if (i == tower.length) break;
-				if (savegame.savedTower[i].explored != undefined) {
-					tower[i].explored = savegame.savedTower[i].explored;
-				}
-				if (savegame.savedTower[i].advallowed != undefined) {
-					tower[i].advallowed = savegame.savedTower[i].advallowed;
-				}
-				if (savegame.savedTower[i].stairpos != undefined) {
-					tower[i].stairpos = savegame.savedTower[i].stairpos;
-				}
-				if (savegame.savedTower[i].density != undefined) {
-					tower[i].density = savegame.savedTower[i].density;
-				}
-			}
+		if (savegame.savedMonsterInstance !== undefined) {
+			loadMonsterInstance(savegame);
+		}
+		if (savegame.savedTower !== undefined) {
+			loadTower(savegame);
 		}
 	}
 	else {
@@ -354,48 +441,97 @@ var updateTime = function(number) {
 
 //How fast can we go?
 var gameSpeed = function(number) {
-	game.refreshSpeed = number;
-	theGame = window.clearInterval(theGame);
-	runGame();
-	document.getElementById("speed").innerHTML = 1000/number;
+	if (game.idleMode) {
+		game.refreshSpeed = number;
+		theGame = window.clearInterval(theGame);
+		runGame();
+		document.getElementById("speed").innerHTML = 1000/number;
+	}
 };
 
 //I am the Alpha and the Omega
 var main = function() {
-	if (game.init === false) {
+	if (!game.init) {
 		startTheEngine();
 	}
 	game.ticks += 1;
-	if (game.inbattle === false) {
+	if (!game.inbattle) {
 		if (game.resting) {
 			updateCondition(player.hp, 1*player.con.val);
 			updateCondition(player.mp, 1*player.mgc.val);
-			if (game.queued && player.hp.curval == player.hp.maxval && player.mp.curval == player.mp.maxval) {
+			
+			if (fullyRested()) {
 				game.resting = false;
-				document.getElementById("restwalk").innerHTML = '<button class="btn btn-default btn-block" onClick="explore()">Rest</button>';
-				game.queued = false;
+				exploreRestButtonLoad();
 			}
 		}
-		else if (percentage(player.hp.curval, player.hp.maxval) <= buffs.autoCrawlPercent) {
-			explore();
-			explore();
-		}
-		else {
-			updateCondition(player.mp, buffs.aethericLevel);
+	}
+	
+	//Here's my bot!
+	if (player.curfloor === 0) {
+		toggleIdle();
+	}
+	
+	if (game.idleMode) {
+		if (!game.inbattle && fullyRested()) {
 			exploreFloor();
 		}
+		else if (!game.inbattle && !fullyRested()) {
+			startRest();
+		}
+		else {
+			attackMelee();
+		}
 	}
-	else {
-		battle(monster[game.found]);
-	}
+	
 	readTempBuffs(true);
 	updateTime(game.ticks);
 	saving();
 };
 
+var exploreRestButtonLoad = function() {
+	if ((game.inbattle || game.resting) && player.curfloor !== 0) {
+		if (tower[player.curfloor].size == tower[player.curfloor].explored) {
+			document.getElementById("exploreButton").innerHTML = '<button class="btn btn-danger btn-block" disabled="disabled">Find Monster</button>';
+		}
+		else {
+			document.getElementById("exploreButton").innerHTML = '<button class="btn btn-danger btn-block" disabled="disabled">Explore</button>';
+		}
+		document.getElementById("restButton").innerHTML = '<button class="btn btn-danger btn-block" disabled="disabled">Rest</button>';
+	}
+	else if (player.curfloor !== 0) {
+		if (tower[player.curfloor].size == tower[player.curfloor].explored) {
+			document.getElementById("exploreButton").innerHTML = '<button class="btn btn-default btn-block" onClick="exploreFloor()">Find Monster</button>';
+		}
+		else {
+			document.getElementById("exploreButton").innerHTML = '<button class="btn btn-default btn-block" onClick="exploreFloor()">Explore</button>';
+		}
+		document.getElementById("restButton").innerHTML = '<button class="btn btn-default btn-block" onClick="startRest()">Rest</button>';
+	}
+};
+
+var toggleIdle = function() {
+	if (player.curfloor === 0) {
+		return false;
+	}
+	
+	if (game.idleMode) {
+		game.idleMode = false;
+		document.getElementById("idleSwitch").innerHTML = '<button class="btn btn-danger" onClick="toggleIdle()">Idle OFF</button>';
+		gameSpeed(1000);
+	}
+	else {
+		game.idleMode = true;
+		document.getElementById("idleSwitch").innerHTML = '<button class="btn btn-success" onClick="toggleIdle()">Idle ON</button>';
+	}
+};
+
 //Loading everything
 var startTheEngine = function() {
+	//Load Saved Game
 	load();
+	
+	//Load Player Screen
 	document.getElementById("name").innerHTML = player.name;
 	updateStat(player.str, 0);
 	updateStat(player.dex, 0);
@@ -409,39 +545,52 @@ var startTheEngine = function() {
 	document.getElementById("floor").innerHTML = player.curfloor;
 	document.getElementById("explperc").innerHTML = Math.round(percentage(tower[player.curfloor].explored, tower[player.curfloor].size)*100)/100 + "%";
 	document.getElementById("floorbar").style.width = percentage(tower[player.curfloor].explored, tower[player.curfloor].size) + "%";
-	if (tower[player.curfloor].advallowed == 1) {
-		document.getElementById("advbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(1)">Proceed to Floor <span id="nextfloor">0</span></button>';
-		document.getElementById("nextfloor").innerHTML = player.curfloor + 1;
-	}
-	if (player.curfloor !== 0) {
-		document.getElementById("retbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(-1)">Back to Floor <span id="prevfloor">0</span></button>';
-		document.getElementById("prevfloor").innerHTML = player.curfloor - 1;
-	}
-	if (game.resting) {
-		if (tower[player.curfloor].size == tower[player.curfloor].explored && player.curfloor !== 0) {
-			document.getElementById("restwalk").innerHTML = '<button class="btn btn-default btn-block" onClick="explore()">Search for Monsters</button>';
-		}
-		else if (player.curfloor !== 0) {
-			document.getElementById("restwalk").innerHTML = '<button class="btn btn-default btn-block" onClick="explore()">Explore Floor</button>';
-		}
+	
+	//Load Idle Button
+	if (game.idleMode) {
+		document.getElementById("idleSwitch").innerHTML = '<button class="btn btn-success" onClick="toggleIdle()">Idle ON</button>';
 	}
 	else {
-		document.getElementById("restwalk").innerHTML = '<button class="btn btn-default btn-block" onClick="explore()">Rest</button>';
+		document.getElementById("idleSwitch").innerHTML = '<button class="btn btn-danger" onClick="toggleIdle()">Idle OFF</button>';
 	}
-	document.getElementById("excelia").innerHTML = Math.round(100*resources.excelia)/100;
+	
+	//Load The Tower
+	if (tower[player.curfloor].advallowed == 1) {
+		document.getElementById("advbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(1)">Next Floor</button>';
+	}
+	if (player.curfloor !== 0) {
+		document.getElementById("retbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(-1)">Previous Floor</button>';
+	}
+	exploreRestButtonLoad();
+	
+	//Load Spellbook
 	readSpells();
+	
+	//Load Upgrade Screen
+	document.getElementById("excelia").innerHTML = Math.round(100*resources.excelia)/100;
 	readUpgrades();
-	readPermBuffs();
-	readToggBuffs();
-	readTempBuffs(false);
+	
+	//Load any upgrade related button
 	for (i = 0; i < upgrades.length; i++) {
-		if (upgrades[i].id == "timewarp1" && upgrades[i].purchased == true) {
+		if (upgrades[i].id == "timewarp1" && upgrades[i].purchased === true) {
 			document.getElementById("speed2").innerHTML = '<button class="btn btn-primary" onClick="gameSpeed(500)">x2</button>';
 		}
-		else if (upgrades[i].id == "timewarp2" && upgrades[i].purchased == true) {
+		else if (upgrades[i].id == "timewarp2" && upgrades[i].purchased === true) {
 			document.getElementById("speed5").innerHTML = '<button class="btn btn-primary" onClick="gameSpeed(200)">x5</button>';
 		}
 	}
+	
+	//Load Buff Screen
+	readPermBuffs();
+	readToggBuffs();
+	readTempBuffs(false);
+	
+	//Load Battle Screen
+	if (game.inbattle) {
+		loadMonsterInfo(monsterInstance);
+	}
+	
+	//Engine has been started
 	game.refreshSpeed = 1000;
 	theGame = window.clearInterval(theGame);
 	runGame();
@@ -512,7 +661,7 @@ var readToggBuffs = function() {
 	
 	//Can I shoot?
 	var upStatus = findUpgrade("autoshoot");
-	if (buffs.autoFireball == true || upStatus.purchased == true) {
+	if (buffs.autoFireball === true || upStatus.purchased === true) {
 		if (buffs.autoFireball) {
 			togText = "ON";
 		}
@@ -524,8 +673,8 @@ var readToggBuffs = function() {
 	
 	//Can I healz?
 	var togText;
-	var upStatus = findUpgrade("battlehealing");
-	if (buffs.battleHealing == true || upStatus.purchased == true) {
+	upStatus = findUpgrade("battlehealing");
+	if (buffs.battleHealing === true || upStatus.purchased === true) {
 		if (buffs.battleHealing) {
 			togText = "ON";
 		}
@@ -534,7 +683,7 @@ var readToggBuffs = function() {
 		}
 		document.getElementById("toggleable").innerHTML += '<button type="button" class="list-group-item" onClick="switchToggBuff(\'battlehealing\')"><span class="badge">' + togText + '</span>Battle Healing</button>';
 	}
-}
+};
 
 //Let's get buffed!
 var readPermBuffs = function() {
@@ -542,9 +691,6 @@ var readPermBuffs = function() {
 	document.getElementById("permanent").innerHTML = '';
 	
 	//You don't even need to play anymore
-	if (buffs.autoCrawlPercent !== 0) {
-		document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">' + buffs.autoCrawlPercent + '%</span>Auto Crawl</li>';
-	}
 	if (buffs.exceliaMultiplier !== 1) {
 		document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">x' + buffs.exceliaMultiplier + '</span>Excelia Gain</li>';
 	}
@@ -590,7 +736,7 @@ var readTempBuffs = function(decrease) {
 		if (decrease) {
 			buffs.exhaustedMind--;
 		}
-		document.getElementById("temporary").innerHTML += '<li class="list-group-item list-group-item-danger"><span class="badge">' + Math.round(buffs.exhaustedMind) + '</span>Exhausted Mind</li>';
+		document.getElementById("temporary").innerHTML += '<li class="list-group-item list-group-item-danger"><span class="badge">' + Math.round(buffs.exhaustedMind) + '</span>exhausted Mind</li>';
 	}
 };
 
@@ -640,6 +786,14 @@ var damageFormula = function(str, dex, enemyCon, enemyHP) {
 //----------------------------------------------------------------//
 //----------------------- PLAYER FUNCTIONS -----------------------//
 //----------------------------------------------------------------//
+
+//Am I ready for punching?
+var fullyRested = function() {
+	if (player.hp.curval == player.hp.maxval && player.mp.curval == player.mp.maxval) {
+		return true;
+	}
+	return false;
+};
 
 //Update HP/MP values.
 //arg can be player.hp or player.mp
@@ -713,6 +867,50 @@ var updateStat = function(arg, number) {
 //----------------------- BATTLE FUNCTIONS -----------------------//
 //----------------------------------------------------------------//
 
+//Hit him in the head!
+var attackMelee = function() {
+	if (game.inbattle) {
+		battle(monsterInstance, false);
+	}
+};
+
+//Let's create a monster!
+var createMonster = function(number) {
+  var tempMonster = {name: "", curhp: 0, hp:0 , str: 0, dex: 0, con: 0, status: 0};
+	
+	tempMonster.name = monsterList[number].name;
+	var statPool = player.curfloor * 15;
+	tempMonster.str++;
+	tempMonster.dex++;
+	tempMonster.con++;
+	statPool -= 3;
+	
+	var statChoice;
+	while (statPool !== 0) {
+		statChoice = Math.floor(Math.random()*3);
+		while (statChoice == 3) {
+			statChoice = Math.floor(Math.random()*3);
+		}
+		
+		if (statChoice === 0) {
+			tempMonster.str++;
+		}
+		else if (statChoice == 1) {
+			tempMonster.dex++;
+		}
+		else if (statChoice == 2) {
+			tempMonster.con++;
+		}
+		statPool--;
+	}
+	
+	tempMonster.hp = hpCalc(tempMonster.con);
+	tempMonster.curhp = tempMonster.hp;
+	tempMonster.status = 0;
+	
+	return tempMonster;
+};
+
 //Are we going to fight a monster?
 var battleChance = function() {
 	//Roll the dice!
@@ -720,80 +918,115 @@ var battleChance = function() {
 	
 	//BATTLE MUSIC INTENSIFIES
 	if (check <= tower[player.curfloor].density) {
-		game.found = player.curfloor + (Math.floor(Math.random()*3))-1;
-		if (game.found < 0) {
-			game.found = 0;
+		game.found = Math.floor(Math.random()*11);
+		while (game.found == 11) {
+			game.found = Math.floor(Math.random()*11);
 		}
-		else if (game.found >= monster.length) {
-			game.found = monster.length-1;
-		}
-		battle(monster[game.found]);
+		monsterInstance = createMonster(game.found);
+		battle(monsterInstance, false);
+		exploreRestButtonLoad();
+		return true;
 	}
+	return false;
+};
+
+//It's my turn!
+var playerAttack = function(arg) {
+	var damage = damageFormula(player.str.val, player.dex.val, arg.con, arg.curhp);
+	if (buffs.rage !== 0) {
+		damage *= 5;
+	}
+	if (damage > arg.curhp) {
+		damage = arg.curhp;
+	}
+	document.getElementById("combatlog").innerHTML += "You dealt " + Math.round(damage) + " damage to the " + arg.name + ".<br>";
+	return monsterDamage(arg, damage);
+};
+
+//Brace yourselves, the enemy is coming.
+var monsterAttack = function(arg) {
+	var damage;
+	
+	//Is the enemy slowed?
+	if (arg.status == 1) {
+		damage = damageFormula(arg.str, arg.dex/2, player.con.val, player.hp.curhp);
+	}
+	else {
+		damage = damageFormula(arg.str, arg.dex, player.con.val, player.hp.curhp);
+	}
+
+	//Am I invulnerable?
+	if (buffs.aegis === 0) {
+		//Do I have a barrier up?
+		if (buffs.barrier > 0) {
+			
+			//Is my barrier enough?
+			if (buffs.barrier >= damage) { 
+				buffs.barrier -= damage;
+				document.getElementById("combatlog").innerHTML += "Your barrier absorbed " + Math.round(damage) + " damage from " + arg.name + "'s attack.<br>";
+				readTempBuffs(false);
+				return false;
+			}
+			else {
+				damage -= buffs.barrier;
+				buffs.barrier = 0;
+				document.getElementById("combatlog").innerHTML += "Your barrier absorbed " + Math.round(damage) + " damage from " + arg.name + "'s attack.<br>";
+				document.getElementById("combatlog").innerHTML += "Your barrier has shattered.<br>";
+				readTempBuffs(false);
+			}
+		}
+		
+		//Remove my HP
+		updateCondition(player.hp, -damage);
+		document.getElementById("combatlog").innerHTML += "You took " + Math.round(damage) + " damage from the " + arg.name + "'s attack.<br>";
+		
+		//Am I still alive?
+		if (player.hp.curval === 0) {
+			playerDeath(arg);
+			return true;
+		}
+	}
+	else {
+		document.getElementById("combatlog").innerHTML += "Aegis absorbed " + Math.round(damage) + " damage from " + arg.name + "'s attack.<br>";
+	}
+	return false;
 };
 
 //This is where the real fun is
-var battle = function(arg) {
+var battle = function(arg, spellCast) {
 	//What am I battling against?
 	if (game.inbattle === false) {
 		loadMonsterInfo(arg);
-		if (buffs.autoFireball == true) {
+		if (buffs.autoFireball === true) {
 			castSpell("fireball");
 		}
 	}
 	
 	//The intense battle continues
 	else {
-		//This is how much I hit
-		var playerAttackDamage = damageFormula(player.str.val, player.dex.val, arg.con, arg.curhp);
-		var monsterAttackDamage;
-		if (buffs.rage !== 0) {
-			playerAttackDamage *= 5;
-			monsterAttackDamage *= 2;
-			if (playerAttackDamage > arg.curhp) {
-				playerAttackDamage = arg.curhp;
-			}
-			if (monsterAttackDamage > player.hp.cur) {
-				monsterAttackDamage = player.hp.cur;
-			}
-		}
-		if (arg.status == 1) {
-			monsterAttackDamage = damageFormula(arg.str, arg.dex/2, player.con.val, player.hp.curhp);
-		}
-		else {
-			monsterAttackDamage = damageFormula(arg.str, arg.dex, player.con.val, player.hp.curhp);
-		}
-		
-		if (buffs.battleHealing && player.hp.curval <= player.hp.maxval/2 && buffs.rage === 0) {
-			castSpell("cure");
-		}
-		
-		//Damage makes me stronger
-		if (buffs.aegis === 0) {
-			if (buffs.barrier > 0) {
-				if (monsterAttackDamage > buffs.barrier) {
-					monsterAttackDamage -= buffs.barrier;
-					updateCondition(player.hp, -monsterAttackDamage);
-					buffs.barrier = 0;
+		var isDead = false;
+		if (!spellCast) {
+			document.getElementById("combatlog").innerHTML = '';
+			if (buffs.battleHealing && player.hp.curval <= player.hp.maxval/2) {
+				if(!castSpell("cure")) {
+					isDead = playerAttack(arg);
 				}
-				else {
-					buffs.barrier -= monsterAttackDamage;
-				}
-				readTempBuffs(false);
 			}
 			else {
-				updateCondition(player.hp, -monsterAttackDamage);
+				isDead = playerAttack(arg);
 			}
 		}
-		updateStat(player.str, (arg.str/player.str.val));
-		updateStat(player.con, (arg.con/player.con.val));
-		updateStat(player.dex, (arg.dex/player.dex.val));
 		
-		//Weak monster is dying
-		monsterDamage(arg, playerAttackDamage);
-		
-		//Am I still alive?
-		if (player.hp.curval <= 0) {
-			playerDeath(arg);
+		//If the enemy is not dead, it's their turn
+		if (!isDead) {
+			isDead = monsterAttack(arg);
+			
+			//If I'm not dead, I gain expz!!!
+			if (!isDead) {
+				updateStat(player.str, (arg.str/player.str.val));
+				updateStat(player.con, (arg.con/player.con.val));
+				updateStat(player.dex, (arg.dex/player.dex.val));
+			}
 		}
 	}
 };
@@ -805,49 +1038,56 @@ var monsterDamage = function(arg, damage) {
 	document.getElementById("monsterbar").style.width = percentage(arg.curhp, arg.hp) + "%";
 	if (arg.curhp <= 0) {
 		monsterDeath(arg);
+		return true;
 	}
+	return false;
 };
 
 //Cry me a river
 var monsterDeath = function(arg) {
 	game.inbattle = false;
-	document.getElementById("battlestatus").innerHTML = "You have defeated the " + arg.name + "!";
+	document.getElementById("combatlog").innerHTML += "You have defeated the " + arg.name + "!";
 	updateStat(player.str, arg.str);
 	updateStat(player.con, arg.con);
 	updateStat(player.dex, arg.dex);
-	arg.killed += 1;
+	monsterList[game.found].killed += 1;
 	gainExcelia(arg);
 	
 	//Restoring monster to default
 	arg.curhp = arg.hp;
 	arg.status = 0;
 	
-	if (game.resting) {
-		if (tower[player.curfloor].size == tower[player.curfloor].explored && player.curfloor !== 0) {
-			document.getElementById("restwalk").innerHTML = '<button class="btn btn-default btn-block" onClick="explore()">Search for Monsters</button>';
-		}
-		else if (player.curfloor !== 0) {
-			document.getElementById("restwalk").innerHTML = '<button class="btn btn-default btn-block" onClick="explore()">Explore Floor</button>';
-		}
-	}
+	exploreRestButtonLoad();
+	loadMonsterInfo();
 };
 
 //I'm working on it!
 var loadMonsterInfo = function(arg) {
-	document.getElementById("monstername").innerHTML = arg.name;
-	document.getElementById("monsterhp").innerHTML = arg.hp;
-	document.getElementById("monsterstr").innerHTML = arg.str;
-	document.getElementById("monsterdex").innerHTML = arg.dex;
-	document.getElementById("monstercon").innerHTML = arg.con;
-	document.getElementById("monsterbar").style.width = percentage(arg.curhp, arg.hp) + "%";
-	document.getElementById("battlestatus").innerHTML = "You are attacked by a " + arg.name + "!";
-	game.inbattle = true;
+	if (arg !== undefined) {
+		document.getElementById("monstername").innerHTML = arg.name;
+		document.getElementById("monsterhp").innerHTML = Math.round(arg.curhp);
+		document.getElementById("monsterstr").innerHTML = arg.str;
+		document.getElementById("monsterdex").innerHTML = arg.dex;
+		document.getElementById("monstercon").innerHTML = arg.con;
+		document.getElementById("monsterbar").style.width = percentage(arg.curhp, arg.hp) + "%";
+		document.getElementById("combatlog").innerHTML = "You are attacked by a " + arg.name + "!<br>";
+		game.inbattle = true;
+	}
+	else {
+		document.getElementById("monstername").innerHTML = "None";
+		document.getElementById("monsterhp").innerHTML = "0";
+		document.getElementById("monsterstr").innerHTML = "0";
+		document.getElementById("monsterdex").innerHTML = "0";
+		document.getElementById("monstercon").innerHTML = "0";
+		document.getElementById("monsterbar").style.width = "0%";
+	}
 };
 
 //RIP me
 var playerDeath = function(arg) {
 	game.inbattle = false;
-	document.getElementById("battlestatus").innerHTML = "You have been defeated by the " + arg.name + "!";
+	document.getElementById("combatlog").innerHTML += "You have been defeated by the " + arg.name + "!";
+	toggleIdle();
 	changeFloor(-player.curfloor);
 	updateExcelia(-((100-buffs.exceliaBless)*resources.excelia/100));
 	player.str.val -= Math.floor(player.str.val/10);
@@ -861,50 +1101,45 @@ var playerDeath = function(arg) {
 	updateStat(player.spd, -player.spd.xp);
 	updateStat(player.mgc, -player.mgc.xp);
 	arg.curhp = arg.hp;
+	loadMonsterInfo();
 	readSpells();
+};
+
+//Coward, lol
+var runAway = function() {
+	var runRoll = Math.random() * (monsterInstance.str + monsterInstance.dex + monsterInstance.con);
+	if (runRoll < player.spd.val*3) {
+		document.getElementById("combatlog").innerHTML = "";
+		document.getElementById("combatlog").innerHTML += "You escaped from the battle against " + monsterInstance.name + ".";
+		updateStat(player.spd, runRoll);
+		loadMonsterInfo();
+		game.inbattle = false;
+	}
+	else {
+		document.getElementById("combatlog").innerHTML = "";
+		document.getElementById("combatlog").innerHTML += "You failed to run away.<br>";
+		battle(monsterInstance, true);
+	}
+	exploreRestButtonLoad();
 };
 
 //----------------------------------------------------------------//
 //--------------------- EXPLORATION FUNCTIONS --------------------//
 //----------------------------------------------------------------//
 
-//Switch between rest/explore
-var explore = function() {
-	//I'm not fighting anything
-	if (game.inbattle === false) {
-		//I'm fully restored, let's go
-		if (game.resting && player.hp.curval == player.hp.maxval && player.mp.curval == player.mp.maxval) {
-			game.resting = false;
-			document.getElementById("restwalk").innerHTML = '<button class="btn btn-default btn-block" onClick="explore()">Rest</button>';
-		}
-		
-		//Wait, I'm almost done
-		else if (game.resting) {
-			game.queued = true;
-			document.getElementById("restwalk").innerHTML = '<button class="btn btn-success btn-block" onClick="explore()">Exploration Queued</button>';
-		}
-		
-		//Okay, time to rest
-		else {
-			game.resting = true;
-			if (tower[player.curfloor].size == tower[player.curfloor].explored && player.curfloor !== 0) {
-				document.getElementById("restwalk").innerHTML = '<button class="btn btn-default btn-block" onClick="explore()">Search for Monsters</button>';
-			}
-			else if (player.curfloor !== 0) {
-				document.getElementById("restwalk").innerHTML = '<button class="btn btn-default btn-block" onClick="explore()">Explore Floor</button>';
-			}
-		}
-	}
-	
-	//Down the rabbit hole we go
-	else {
+//A good night of sleep
+var startRest = function() {
+	if (player.hp.curval != player.hp.maxval || player.mp.curval != player.mp.maxval) {
 		game.resting = true;
-		document.getElementById("restwalk").innerHTML = '<button class="btn btn-success btn-block" onClick="explore()">Resting Queued</button>';
 	}
+	exploreRestButtonLoad();
 };
 
 //I'm walking down the street on the boulevard of broken dreams
 var exploreFloor = function() {
+	//Absorb the aether
+	updateCondition(player.mp, buffs.aethericLevel);
+	
 	//There is still more to see
 	if (tower[player.curfloor].explored < tower[player.curfloor].size) {
 		tower[player.curfloor].explored += player.spd.val/10;
@@ -913,65 +1148,60 @@ var exploreFloor = function() {
 		}
 		document.getElementById("floorbar").style.width = percentage(tower[player.curfloor].explored, tower[player.curfloor].size) + "%";
 		document.getElementById("explperc").innerHTML = Math.round(100 * percentage(tower[player.curfloor].explored, tower[player.curfloor].size))/100 + "%";
+		
+		//Are we there yet?
+		if (tower[player.curfloor].stairpos <= tower[player.curfloor].explored && tower[player.curfloor].advallowed === 0 && player.curfloor < monsterList.length) {
+			tower[player.curfloor].advallowed = 1;
+			document.getElementById("advbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(1)">Next Floor</button>';
+		}
+		
+		//My calfs are getting tougher
+		if (tower[player.curfloor].explored != tower[player.curfloor].size) {
+			updateStat(player.spd, player.spd.val/10);
+		}
+		battleChance();
 	}
-	
-	//Are we there yet?
-	if (tower[player.curfloor].stairpos <= tower[player.curfloor].explored && tower[player.curfloor].advallowed === 0 && player.curfloor < monster.length) {
-		tower[player.curfloor].advallowed = 1;
-		document.getElementById("advbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(1)">Proceed to Floor <span id="nextfloor">0</span></button>';
-		document.getElementById("nextfloor").innerHTML = player.curfloor + 1;
+	else {
+		while(!battleChance()) {
+			updateCondition(player.mp, buffs.aethericLevel);
+		}
 	}
-	
-	//My calfs are getting tougher
-	if (tower[player.curfloor].explored != tower[player.curfloor].size) {
-		updateStat(player.spd, player.spd.val/10);
-	}
-	battleChance();
 };
 
 //I hate stairs so much
 var changeFloor = function(number) {
-	//This many floors!
-	player.curfloor += number;
-	document.getElementById("floor").innerHTML = player.curfloor;
-	document.getElementById("floorbar").style.width = percentage(tower[player.curfloor].explored, tower[player.curfloor].size) + "%";
-	document.getElementById("explperc").innerHTML = Math.round(100 * percentage(tower[player.curfloor].explored, tower[player.curfloor].size))/100 + "%";
-	
-	//I can go to the next floor
-	if (tower[player.curfloor].advallowed == 1 && player.curfloor < monster.length) {
-		document.getElementById("advbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(1)">Proceed to Floor <span id="nextfloor">0</span></button>';
-		document.getElementById("nextfloor").innerHTML = player.curfloor + 1;
-	}
-	else {
-		document.getElementById("advbut").innerHTML = '';
-	}
-	
-	//If I'm not at the bottom, I can go down
-	if (player.curfloor !== 0) {
-		document.getElementById("retbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(-1)">Back to Floor <span id="prevfloor">0</span></button>';
-		document.getElementById("prevfloor").innerHTML = player.curfloor - 1;
-	}
-	else {
-		document.getElementById("retbut").innerHTML = '';
-	}
-	
-	//Have I reached the bottom?
-	if (player.curfloor === 0) {
-		game.resting = true;
-		document.getElementById("restwalk").innerHTML = '';
-	}
-	
-	//Am I resting?
-	if (game.resting) {
-		if (tower[player.curfloor].size == tower[player.curfloor].explored && player.curfloor !== 0) {
-			document.getElementById("restwalk").innerHTML = '<button class="btn btn-default btn-block" onClick="explore()">Search for Monsters</button>';
+	if (!game.inbattle) {
+		//This many floors!
+		player.curfloor += number;
+		document.getElementById("floor").innerHTML = player.curfloor;
+		document.getElementById("floorbar").style.width = percentage(tower[player.curfloor].explored, tower[player.curfloor].size) + "%";
+		document.getElementById("explperc").innerHTML = Math.round(100 * percentage(tower[player.curfloor].explored, tower[player.curfloor].size))/100 + "%";
+		
+		//I can go to the next floor
+		if (tower[player.curfloor].advallowed == 1 && player.curfloor < monsterList.length) {
+			document.getElementById("advbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(1)">Next Floor</button>';
 		}
-		else if (player.curfloor !== 0) {
-			document.getElementById("restwalk").innerHTML = '<button class="btn btn-default btn-block" onClick="explore()">Explore Floor</button>';
+		else {
+			document.getElementById("advbut").innerHTML = '';
 		}
-	}
-	else {
-		document.getElementById("restwalk").innerHTML = '<button class="btn btn-default btn-block" onClick="explore()">Rest</button>';
+		
+		//If I'm not at the bottom, I can go down
+		if (player.curfloor !== 0) {
+			document.getElementById("retbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(-1)">Previous Floor</button>';
+			game.resting = false;
+		}
+		else {
+			document.getElementById("retbut").innerHTML = '';
+		}
+		
+		//Have I reached the bottom?
+		if (player.curfloor === 0) {
+			game.resting = true;
+			document.getElementById("exploreButton").innerHTML = '';
+			document.getElementById("restButton").innerHTML = '';
+		}
+		
+		exploreRestButtonLoad();
 	}
 };
 
@@ -1002,7 +1232,7 @@ var findUpgrade = function(upgradeId) {
 		if (upgrades[i].id == upgradeId) break;
 	}
 	return upgrades[i];
-}
+};
 
 //Let's cheat our way up!
 var buyUpgrade = function(upgradeId) {
@@ -1019,10 +1249,7 @@ var buyUpgrade = function(upgradeId) {
 		
 		//Let's activate it!
 		//You don't even need any higher than that.
-		if (upgrades[i].id == "autocrawl1") {
-			setAutoCrawl(10);
-		}
-		else if (upgrades[i].id == "timewarp1") {
+		if (upgrades[i].id == "timewarp1") {
 			document.getElementById("speed2").innerHTML = '<button class="btn btn-primary" onClick="gameSpeed(500)">x2</button>';
 		}
 		else if (upgrades[i].id == "aetheric") {
@@ -1060,11 +1287,6 @@ var switchToggBuff = function(buffId) {
 		buffs.autoFireball = !buffs.autoFireball;
 	}
 	readToggBuffs();
-}
-
-//How far are you willing to go?
-var setAutoCrawl = function(number) {
-	buffs.autoCrawlPercent = number;
 };
 
 //----------------------------------------------------------------//
@@ -1090,10 +1312,10 @@ var addSpellDescriptions = function() {
 			spellbook[i].desc = "Halve an enemy's DEX.";
 		}
 		else if (spellbook[i].id == "rage") {
-			spellbook[i].desc = "Fill yourself with rage for " + ragePotency(spellbook[i]) + " seconds. You deal 5x damage, however, you take 2x damage and cannot cast other spells."
+			spellbook[i].desc = "Fill yourself with rage for " + ragePotency(spellbook[i]) + " seconds. You deal 5x damage, however, you take 2x damage and cannot cast other spells.";
 		}
 		else if (spellbook[i].id == "clairvoyance") {
-			spellbook[i].desc = "Project your mind further into the tower, trying to find the stairs. It's very exhausting, so you can only do it so often.";
+			spellbook[i].desc = "Project your mind further into the tower, trying to find the stairs. It's very exausting, so you can only do it so often.";
 		}
 	}
 };
@@ -1155,9 +1377,9 @@ var castSpell = function(spellId) {
 	
 	//Go away, Anna
 	var mpCost = spellCost(spellbook[i]);
-	if (player.mp.curval >= mpCost && buffs.rage === 0) {
+	if (player.mp.curval >= mpCost && buffs.rage === 0 && !game.resting) {
 		//Let it cast! Let it cast! Can't hold it back anymore!
-    var castSuccess;
+		var castSuccess;
 		if (spellbook[i].id == "cure") {
 			castSuccess = castCure(spellbook[i]);
 		}
@@ -1186,8 +1408,10 @@ var castSpell = function(spellId) {
 			spellLevel(spellbook[i], mpCost);
 			updateStat(player.mgc, buffs.spellMasteryMultiplier * (spellbook[i].level + 1 + mpCost/2));
 			updateCondition(player.mp, 0);
+			return true;
 		}
 	}
+	return false;
 };
 
 //Voodoo magic!
@@ -1204,6 +1428,11 @@ var castCure = function(arg) {
 			cureValue = player.hp.maxval - player.hp.curval;
 		}
 		updateCondition(player.hp, cureValue);
+		if (game.inbattle) {
+			document.getElementById("combatlog").innerHTML = '';
+			document.getElementById("combatlog").innerHTML += "You healed yourself for " + Math.round(cureValue) + " HP with Cure.<br>";
+			battle(monsterInstance, true);
+		}
 		return true;
 	}
 };
@@ -1223,10 +1452,14 @@ var castFireball = function(arg) {
 	//BURN IT!!!!
 	else {
 		var damageValue = fireballPotency(arg);
-		if (monster[game.found].curhp <= damageValue) {
-			damageValue = monster[game.found].curhp;
+		if (monsterInstance.curhp <= damageValue) {
+			damageValue = monsterInstance.curhp;
 		}
-		monsterDamage(monster[game.found], damageValue);
+		document.getElementById("combatlog").innerHTML = '';
+		document.getElementById("combatlog").innerHTML += "Your fireball hit the " + monsterInstance.name + " for " + Math.floor(damageValue) + " damage.<br>";
+		if (!monsterDamage(monsterInstance, damageValue)) {
+			battle(monsterInstance, true);
+		}
 		return true;
 	}
 };
@@ -1245,6 +1478,11 @@ var castBarrier = function(arg) {
 	else {
 		buffs.barrier = potency;
 		readTempBuffs(false);
+		if (game.inbattle) {
+			document.getElementById("combatlog").innerHTML = '';
+			document.getElementById("combatlog").innerHTML += "You created a magical barrier.<br>";
+			battle(monsterInstance, true);
+		}
 		return true;
 	}
 };
@@ -1262,6 +1500,11 @@ var castAegis = function(arg) {
 	else {
 		buffs.aegis = aegisPotency(arg);
 		readTempBuffs(false);
+		if (game.inbattle) {
+			document.getElementById("combatlog").innerHTML = '';
+			document.getElementById("combatlog").innerHTML += "You summon the heavenly shield, Aegis.<br>";
+			battle(monsterInstance, true);
+		}
 		return true;
 	}
 };
@@ -1273,12 +1516,15 @@ var aegisPotency = function(arg) {
 
 //The monsters are gonna get behind
 var castSlow = function(arg) {
-	if (game.inbattle === false || monster[game.found].status !== 0) {
+	if (game.inbattle === false || monsterInstance.status !== 0) {
 		return false;
 	}
 	else {
-		monster[game.found].status = 1;
-		document.getElementById("monsterdex").innerHTML = monster[game.found].dex/2;
+		monsterInstance.status = 1;
+		document.getElementById("monsterdex").innerHTML = monsterInstance.dex/2;
+		document.getElementById("combatlog").innerHTML = '';
+		document.getElementById("combatlog").innerHTML += "You have cast slow on the " + monsterInstance.name + ". Its DEX has been halved.<br>";
+		battle(monsterInstance, true);
 		return true;
 	}
 };
@@ -1291,9 +1537,12 @@ var castRage = function(arg) {
 	else {
 		buffs.rage = ragePotency(arg);
 		readTempBuffs(false);
+		document.getElementById("combatlog").innerHTML = '';
+		document.getElementById("combatlog").innerHTML += "You have entered a state of frenzy!<br>";
+		battle(monsterInstance, true);
 		return true;
 	}
-}
+};
 
 //Count to 10
 var ragePotency = function(arg) {
@@ -1302,21 +1551,21 @@ var ragePotency = function(arg) {
 
 //Look deep into the dungeon
 var castClairvoyance = function(arg) {
-	if (tower[player.curfloor].advallowed == 1 || player.curfloor >= monster.length || buffs.exhaustedMind !== 0) {
+	if (tower[player.curfloor].advallowed == 1 || player.curfloor >= monsterList.length || buffs.exhaustedMind !== 0 || game.inbattle === true) {
 		return false;
 	}
 	else {
 		tower[player.curfloor].stairpos = Math.floor(Math.random() * Math.floor(tower[player.curfloor].size));
 		if (tower[player.curfloor].explored >= tower[player.curfloor].stairpos) {
 			tower[player.curfloor].advallowed = 1;
-			document.getElementById("advbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(1)">Proceed to Floor <span id="nextfloor">0</span></button>';
+			document.getElementById("advbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(1)">Next Floor</button>';
 			document.getElementById("nextfloor").innerHTML = player.curfloor + 1;
 		}
 		buffs.exhaustedMind = 600 + 600*arg.level;
 		readTempBuffs(false);
 		return true;
 	}
-}
+};
 
 //Now all that is left...
 runGame();
