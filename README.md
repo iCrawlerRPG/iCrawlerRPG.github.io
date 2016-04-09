@@ -5,7 +5,6 @@ This was an idea that was on my head for a few days now. I've finally had the pa
 It is currently in a very early stage, but it's playable enough for me to be satisfied with posting it here.
 Link: http://shiroge.github.io/
 
-It has come a long way since I posted it, but please, keep giving your feedbacks. If you love it/hate it/has any suggestions, please leave a comment. :)
 
 I'm currently looking for ideas for spells and upgrades. You can comment them here or send them to my inbox, please. If possible, tell me how far you have progressed into the tower.
 
