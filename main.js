@@ -77,7 +77,10 @@ var hpCalc = function(number) {
 };
 
 //Monster List:
-var monsterList = [{name:"Rat", killed:0}, {name:"Bat", killed:0}, {name:"Slime", killed:0}, {name:"Kobold", killed:0}, {name:"Wolf", killed:0}, {name:"Lizard", killed:0}, {name:"Goblin", killed:0}, {name:"Bandit", killed:0}, {name:"Spider", killed:0}, {name:"Eagle", killed:0}];
+var monsterList = [
+	{name:"Rat", killed:0}, {name:"Bat", killed:0}, {name:"Slime", killed:0}, {name:"Kobold", killed:0}, {name:"Wolf", killed:0}, {name:"Lizard", killed:0}, {name:"Goblin", killed:0}, {name:"Bandit", killed:0}, {name:"Spider", killed:0}, {name:"Eagle", killed:0},
+	{name:"Bear", killed:0}, {name:"Snake", killed:0}, {name:"Troll", killed:0}, {name:"Kobold Warrior", killed:0}, {name:"Giant Wolf", killed:0}, {name:"Ghoul", killed:0}, {name:"Alligator", killed:0}, {name:"Giant Lizard", killed:0}, {name:"Giant Rat", killed: 0}, {name:"Orc Child", killed:0}
+];
 var monsterInstance = {
 	name: "",
 	curhp: 0,
@@ -605,7 +608,7 @@ var startTheEngine = function() {
 var readSpells = function() {
 	//First we must clear our mind...
 	document.getElementById("spellbook").innerHTML = '';
-	for (i = 0; i <= 2; i++) {
+	for (i = 0; i <= 3; i++) {
 		document.getElementById("spellbook" + i).innerHTML = '';
 	}
 	
@@ -736,7 +739,7 @@ var readTempBuffs = function(decrease) {
 		if (decrease) {
 			buffs.exhaustedMind--;
 		}
-		document.getElementById("temporary").innerHTML += '<li class="list-group-item list-group-item-danger"><span class="badge">' + Math.round(buffs.exhaustedMind) + '</span>exhausted Mind</li>';
+		document.getElementById("temporary").innerHTML += '<li class="list-group-item list-group-item-danger"><span class="badge">' + Math.round(buffs.exhaustedMind) + '</span>Exhausted Mind</li>';
 	}
 };
 
@@ -922,7 +925,12 @@ var battleChance = function() {
 		while (game.found == 11) {
 			game.found = Math.floor(Math.random()*11);
 		}
-		monsterInstance = createMonster(game.found);
+		var tier;
+		for (i = player.curfloor-1; i < 10; i-10) {
+			tier++;
+		}
+		Math.floor(player.curfloor-1/10);
+		monsterInstance = createMonster((tier*10)+game.found);
 		battle(monsterInstance, false);
 		exploreRestButtonLoad();
 		return true;
@@ -1406,7 +1414,7 @@ var castSpell = function(spellId) {
 		if (castSuccess === true) {
 			updateCondition(player.mp, -mpCost);
 			spellLevel(spellbook[i], mpCost);
-			updateStat(player.mgc, buffs.spellMasteryMultiplier * (spellbook[i].level + 1 + mpCost/2));
+			updateStat(player.mgc, buffs.spellMasteryMultiplier * (spellbook[i].level + 1 + mpCost/10));
 			updateCondition(player.mp, 0);
 			return true;
 		}
