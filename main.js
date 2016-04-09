@@ -1116,20 +1116,22 @@ var playerDeath = function(arg) {
 
 //Coward, lol
 var runAway = function() {
-	var runRoll = Math.random() * (monsterInstance.str + monsterInstance.dex + monsterInstance.con);
-	if (runRoll < player.spd.val*3) {
-		document.getElementById("combatlog").innerHTML = "";
-		document.getElementById("combatlog").innerHTML += "You escaped from the battle against " + monsterInstance.name + ".";
-		updateStat(player.spd, runRoll);
-		loadMonsterInfo();
-		game.inbattle = false;
+	if (game.inbattle) {
+		var runRoll = Math.random() * (monsterInstance.str + monsterInstance.dex + monsterInstance.con);
+		if (runRoll < player.spd.val) {
+			document.getElementById("combatlog").innerHTML = "";
+			document.getElementById("combatlog").innerHTML += "You escaped from the battle against " + monsterInstance.name + ".";
+			updateStat(player.spd, runRoll);
+			loadMonsterInfo();
+			game.inbattle = false;
+		}
+		else {
+			document.getElementById("combatlog").innerHTML = "";
+			document.getElementById("combatlog").innerHTML += "You failed to run away.<br>";
+			battle(monsterInstance, true);
+		}
+		exploreRestButtonLoad();
 	}
-	else {
-		document.getElementById("combatlog").innerHTML = "";
-		document.getElementById("combatlog").innerHTML += "You failed to run away.<br>";
-		battle(monsterInstance, true);
-	}
-	exploreRestButtonLoad();
 };
 
 //----------------------------------------------------------------//
