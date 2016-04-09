@@ -47,15 +47,15 @@ spellbook.push({name: "Aegis", id: "aegis", type: 0, requiredmgc: 50, learned: f
 
 //Excelia Upgrades:
 var upgrades = [];
-//upgrades.push({name: "Time Warp 1", id: "timewarp1", exceliacost: 10, shown: false, purchased: false, desc:"Progress too slow? Make everything go at twice the speed!"});
+upgrades.push({name: "Time Warp 1", id: "timewarp1", exceliacost: 10, shown: false, purchased: false, desc:"Progress too slow? Make everything go at twice the speed!"});
 upgrades.push({name: "Aetheric Attunement", id: "aetheric", exceliacost: 100, shown: false, purchased: false, desc:"Tap into the mana around you. Recover +1 MP per second while exploring."});
-//upgrades.push({name: "Time Warp 2", id: "timewarp2", exceliacost: 100, shown: false, purchased: false, desc:"Change to the next gear! With this, everything is five times faster!"});
+upgrades.push({name: "Time Warp 2", id: "timewarp2", exceliacost: 100, shown: false, purchased: false, desc:"Change to the next gear! With this, everything is five times faster!"});
+upgrades.push({name: "Blessings", id: "blessings", exceliacost: 100, shown:false, purchased: false, desc:"Keep 10% of your excelia upon death."});
 upgrades.push({name: "Auto-Shooting", id: "autoshoot", exceliacost: 500, shown: false, purchased: false, desc:"Shoot a fireball at the start of every battle!"});
 upgrades.push({name: "Auto Crawl 1", id: "autocrawl1", exceliacost: 1000, shown: false, purchased: false, desc:"Rest whenever you're below 10% health. Start exploring again when completely healed."});
 upgrades.push({name: "Excelia x2", id: "doubleexcelia", exceliacost: 2000, shown: false, purchased: false, desc:"Double the amount of Excelia you gain per monster."});
 upgrades.push({name: "Adept Mage", id: "adeptmage", exceliacost: 5000, shown: false, purchased: false, desc:"Master spells twice as fast. Blow yourself up twice as much."});
 upgrades.push({name: "Battle Healing", id: "battlehealing", exceliacost: 5000, shown: false, purchased: false, desc:"Cast Cure whenever you get under 50% HP during battle."});
-upgrades.push({name: "Blessings", id: "blessings", exceliacost: 10000, shown:false, purchased: false, desc:"Keep 10% of your excelia upon death."});
 
 //Buffs
 var buffs = {
@@ -72,14 +72,18 @@ var buffs = {
 	exaustedMind: 0
 };
 
+var hpCalc = function(number) {
+	return (Math.pow(number, 2)*4);
+}
+
 //Monster List:
 var monster = [];
-monster.push({name: "Rat", curhp:50, hp: 50, str: 5, dex: 5, con: 5, status: 0, killed: 0});
-monster.push({name: "Bat", curhp:40, hp: 40, str: 4, dex: 7, con: 4, status: 0, killed: 0});
-monster.push({name: "Slime", curhp: 65, hp: 65, str: 6, dex: 5, con: 7, status: 0, killed: 0});
-monster.push({name: "Kobold", curhp: 180, hp: 180, str: 12, dex: 8, con: 7, status: 0, killed: 0});
-monster.push({name: "Wolf", curhp: 320, hp: 320, str: 20, dex: 15, con: 12, status: 0, killed: 0});
-monster.push({name: "Lizard", curhp: 710, hp: 710, str: 28, dex: 20, con: 25, status: 0, killed: 0});
+monster.push({name: "Rat", curhp: hpCalc(5), hp: hpCalc(5), str: 5, dex: 5, con: 5, status: 0, killed: 0});	//15 stat points
+monster.push({name: "Bat", curhp: hpCalc(4), hp: hpCalc(4), str: 4, dex: 7, con: 4, status: 0, killed: 0}); //15 stat points
+monster.push({name: "Slime", curhp: hpCalc(7), hp: hpCalc(7), str: 6, dex: 2, con: 7, status: 0, killed: 0}); //15 stat points
+monster.push({name: "Kobold", curhp: hpCalc(9), hp: hpCalc(9), str: 12, dex: 9, con: 9, status: 0, killed: 0}); //30 stat points
+monster.push({name: "Wolf", curhp: hpCalc(15), hp: hpCalc(15), str: 15, dex: 30, con: 15, status: 0, killed: 0}); //60 stat points
+monster.push({name: "Lizard", curhp: 710, hp: 710, str: 28, dex: 20, con: 25, status: 0, killed: 0}); //120 stat points
 monster.push({name: "Goblin", curhp: 1400, hp: 1400, str: 45, dex: 32, con: 40, status: 0, killed: 0});
 monster.push({name: "Bandit", curhp: 2850, hp: 2850, str: 48, dex: 72, con: 35, status: 0, killed: 0});
 monster.push({name: "Giant Wolf", curhp: 5000, hp: 5000, str: 104, dex: 78, con: 80, status: 0, killed: 0});
@@ -88,13 +92,16 @@ monster.push({name: "Kobold Leader", curhp: 22000, hp: 22000, str: 150, dex: 124
 monster.push({name: "Weakened Minotaur", curhp: 47320, hp: 47320, str: 226, dex: 160, con: 189, status: 0, killed: 0});
 monster.push({name: "Dragon Cub", curhp: 101000, hp: 101000, str: 402, dex: 216, con: 287, status: 0, killed: 0});
 monster.push({name: "Giant Snake", curhp: 183200, hp: 183200, str: 521, dex: 674, con: 195, status: 0, killed: 0});
-monster.push({name: "Living Armor", curhp: 321950, hp: 321950, str: 832, dex: 420, con: 429, status: 0, killed: 0});
+monster.push({name: "Living Armor", curhp: 321950, hp: 321950, str: 832, dex: 420, con: 1229, status: 0, killed: 0});
 monster.push({name: "Beholder", curhp: 623900, hp: 623900, str: 1047, dex: 500, con: 986, status: 0, killed: 0});
 monster.push({name: "Shadow Killer", curhp: 1178000, hp: 1178000, str: 1870, dex: 2500, con: 320, status: 0, killed: 0});
+monster.push({name: "Giant Lizard", curhp: 2542900, hp: 2542900, str: 3150, dex: 3100, con: 3200, status: 0, killed: 0});
+monster.push({name: "Elder Kobold", curhp: 5140000, hp: 5140000, str: 5200, dex: 4600, con: 5000, status: 0, killed: 0});
+monster.push({name: "Orc", curhp: 24234900, hp: 24234900, str: 13250, dex: 9810, con: 11200, status: 0, killed: 0});
 
 //Tower
 var tower = [];
-for (var i = 0; i <= monster.length; i++) { //It has as many floors as monsters
+for (i = 0; i <= monster.length; i++) { //It has as many floors as monsters
 	if (i === 0) {
 		tower.push({size:100, explored:100, advallowed:1, stairpos: 0, density: 0});
 	}
