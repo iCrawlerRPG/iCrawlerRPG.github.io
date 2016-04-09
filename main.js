@@ -154,6 +154,12 @@ var loadGame = function(savegame) {
 	if (savegame.savedGame.refreshSpeed !== undefined) {
 		game.refreshSpeed = savegame.savedGame.refreshSpeed;
 	}
+	if (savegame.savedGame.found !== undefined) {
+		game.found = savegame.savedGame.found;
+	}
+	if (savegame.savedGame.inbattle !== undefined) {
+		game.inbattle = savegame.savedGame.inbattle;
+	}
 };
 
 var loadPlayerHP = function(savegame) {
@@ -340,6 +346,7 @@ var loadMonsters = function(savegame) {
 	for (i = 0; i < savegame.savedMonster.length; i++) {
 		if (i == monster.length) break;
 		if (savegame.savedMonster[i].killed !== undefined) {
+			monster[i].curhp = savegame.savedMonster[i].curhp;
 			monster[i].killed = savegame.savedMonster[i].killed;
 		}
 	}
@@ -506,6 +513,9 @@ var startTheEngine = function() {
 		else if (upgrades[i].id == "timewarp2" && upgrades[i].purchased === true) {
 			document.getElementById("speed5").innerHTML = '<button class="btn btn-primary" onClick="gameSpeed(200)">x5</button>';
 		}
+	}
+	if (game.inbattle) {
+		loadMonsterInfo(monster[game.found]);
 	}
 	game.refreshSpeed = 1000;
 	theGame = window.clearInterval(theGame);
@@ -937,18 +947,30 @@ var monsterDeath = function(arg) {
 			document.getElementById("restwalk").innerHTML = '<button class="btn btn-default btn-block" onClick="explore()">Explore Floor</button>';
 		}
 	}
+	
+	loadMonsterInfo();
 };
 
 //I'm working on it!
 var loadMonsterInfo = function(arg) {
-	document.getElementById("monstername").innerHTML = arg.name;
-	document.getElementById("monsterhp").innerHTML = arg.hp;
-	document.getElementById("monsterstr").innerHTML = arg.str;
-	document.getElementById("monsterdex").innerHTML = arg.dex;
-	document.getElementById("monstercon").innerHTML = arg.con;
-	document.getElementById("monsterbar").style.width = percentage(arg.curhp, arg.hp) + "%";
-	document.getElementById("combatlog").innerHTML = "You are attacked by a " + arg.name + "!<br>";
-	game.inbattle = true;
+	if (arg != undefined) {
+		document.getElementById("monstername").innerHTML = arg.name;
+		document.getElementById("monsterhp").innerHTML = Math.round(arg.curhp);
+		document.getElementById("monsterstr").innerHTML = arg.str;
+		document.getElementById("monsterdex").innerHTML = arg.dex;
+		document.getElementById("monstercon").innerHTML = arg.con;
+		document.getElementById("monsterbar").style.width = percentage(arg.curhp, arg.hp) + "%";
+		document.getElementById("combatlog").innerHTML = "You are attacked by a " + arg.name + "!<br>";
+		game.inbattle = true;
+	}
+	else {
+		document.getElementById("monstername").innerHTML = "None";
+		document.getElementById("monsterhp").innerHTML = "0";
+		document.getElementById("monsterstr").innerHTML = "0";
+		document.getElementById("monsterdex").innerHTML = "0";
+		document.getElementById("monstercon").innerHTML = "0";
+		document.getElementById("monsterbar").style.width = "0%";
+	}
 };
 
 //RIP me
@@ -968,11 +990,26 @@ var playerDeath = function(arg) {
 	updateStat(player.spd, -player.spd.xp);
 	updateStat(player.mgc, -player.mgc.xp);
 	arg.curhp = arg.hp;
+	loadMonsterInfo();
 	readSpells();
 };
 
 //Coward, lol
 var runAway = function() {
+	var runRoll = Math.random() * (monster[game.found].str + monster[game.found].dex + monster[game.found].con);
+	if (runRoll < player.spd.val*3) {
+		document.getElementById("combatlog").innerHTML = "";
+		document.getElementById("combatlog").innerHTML += "You escaped from the battle against " + monster[game.found].name + ".";
+		monster[game.found].curhp = monster[game.found].hp;
+		updateStat(player.spd, runRoll);
+		loadMonsterInfo();
+		game.inbattle = false;
+	}
+	else {
+		document.getElementById("combatlog").innerHTML = "";
+		document.getElementById("combatlog").innerHTML += "You failed to run away.<br>";
+		battle(monster[game.found], true);
+	}
 }
 
 //----------------------------------------------------------------//
