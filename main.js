@@ -69,7 +69,7 @@ var buffs = {
 	exceliaBless: 0,
 	rage: 0,
 	autoFireball: false,
-	exaustedMind: 0
+	exhaustedMind: 0
 };
 
 //Monster List:
@@ -294,8 +294,8 @@ var load = function() {
 			if (savegame.savedBuffs.autoFireball != undefined) {
 				buffs.autoFireball = savegame.savedBuffs.autoFireball;
 			}
-			if (savegame.savedBuffs.exaustedMind != undefined) {
-				buffs.exaustedMind = savegame.savedBuffs.exaustedMind;
+			if (savegame.savedBuffs.exhaustedMind != undefined) {
+				buffs.exhaustedMind = savegame.savedBuffs.exhaustedMind;
 			}
 		}
 		if (savegame.savedMonster != undefined) {
@@ -586,11 +586,11 @@ var readTempBuffs = function(decrease) {
 	}
 	
 	//Those debuffs are the shit
-	if (buffs.exaustedMind !== 0) {
+	if (buffs.exhaustedMind !== 0) {
 		if (decrease) {
-			buffs.exaustedMind--;
+			buffs.exhaustedMind--;
 		}
-		document.getElementById("temporary").innerHTML += '<li class="list-group-item list-group-item-danger"><span class="badge">' + Math.round(buffs.exaustedMind) + '</span>Exausted Mind</li>';
+		document.getElementById("temporary").innerHTML += '<li class="list-group-item list-group-item-danger"><span class="badge">' + Math.round(buffs.exhaustedMind) + '</span>Exhausted Mind</li>';
 	}
 };
 
@@ -1093,7 +1093,7 @@ var addSpellDescriptions = function() {
 			spellbook[i].desc = "Fill yourself with rage for " + ragePotency(spellbook[i]) + " seconds. You deal 5x damage, however, you take 2x damage and cannot cast other spells."
 		}
 		else if (spellbook[i].id == "clairvoyance") {
-			spellbook[i].desc = "Project your mind further into the tower, trying to find the stairs. It's very exausting, so you can only do it so often.";
+			spellbook[i].desc = "Project your mind further into the tower, trying to find the stairs. It's very exhausting, so you can only do it so often.";
 		}
 	}
 };
@@ -1302,7 +1302,7 @@ var ragePotency = function(arg) {
 
 //Look deep into the dungeon
 var castClairvoyance = function(arg) {
-	if (tower[player.curfloor].advallowed == 1 || player.curfloor >= monster.length || buffs.exaustedMind !== 0) {
+	if (tower[player.curfloor].advallowed == 1 || player.curfloor >= monster.length || buffs.exhaustedMind !== 0) {
 		return false;
 	}
 	else {
@@ -1312,7 +1312,7 @@ var castClairvoyance = function(arg) {
 			document.getElementById("advbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(1)">Proceed to Floor <span id="nextfloor">0</span></button>';
 			document.getElementById("nextfloor").innerHTML = player.curfloor + 1;
 		}
-		buffs.exaustedMind = 600 + 600*arg.level;
+		buffs.exhaustedMind = 600 + 600*arg.level;
 		readTempBuffs(false);
 		return true;
 	}
