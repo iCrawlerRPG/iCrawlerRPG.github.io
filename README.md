@@ -18,7 +18,7 @@ I'm currently looking for ideas for spells and upgrades. You can open an issue f
 - Adjust the slider to choose at which HP percentage you want to auto-rest while Idle is ON.
 - Minimum is 10%, all the way up to 100%.
 
-*Prettier UI!*
+*Prettier UI! (thanks to peterbrinck!)*
 - Who doesn't love pretty things?
 
 **Changes in alpha v0.8:**
