@@ -520,9 +520,9 @@ var toggleIdle = function() {
 	}
 	
 	if (game.idleMode) {
+		gameSpeed(1000);
 		game.idleMode = false;
 		document.getElementById("idleSwitch").innerHTML = '<button class="btn btn-danger" onClick="toggleIdle()">Idle OFF</button>';
-		gameSpeed(1000);
 	}
 	else {
 		game.idleMode = true;
