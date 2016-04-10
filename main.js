@@ -477,7 +477,7 @@ var main = function() {
 	}
 	
 	if (game.idleMode) {
-		if (!game.inbattle && percentage(player.hp.curval, player.hp.maxval) > idleRestSlider.getValue()) {
+		if (!game.inbattle && percentage(player.hp.curval, player.hp.maxval) > idleRestSlider.getValue() && !game.resting) {
 			exploreFloor();
 		}
 		else if (!game.inbattle && percentage(player.hp.curval, player.hp.maxval) <= idleRestSlider.getValue()) {
