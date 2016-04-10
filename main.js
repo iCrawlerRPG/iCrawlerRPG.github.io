@@ -16,7 +16,8 @@ var game = {
 	queued: false,
 	init: false,
 	found: 0,
-	idleMode: false
+	idleMode: false,
+	idleRestSlider: undefined
 };
 
 //Player Object:
@@ -479,7 +480,7 @@ var main = function() {
 		if (!game.inbattle && fullyRested()) {
 			exploreFloor();
 		}
-		else if (!game.inbattle && !fullyRested()) {
+		else if (!game.inbattle && percentage(player.hp.curval, player.hp.maxval) <= idleRestSlider.getValue()) {
 			startRest();
 		}
 		else {
@@ -556,6 +557,13 @@ var startTheEngine = function() {
 	else {
 		document.getElementById("idleSwitch").innerHTML = '<button class="btn btn-danger" onClick="toggleIdle()">Idle OFF</button>';
 	}
+
+	//Load Idle Options
+	idleRestSlider = new Slider("#idleRest", {
+		ticks: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+		ticks_snap_bounds: 10,
+		value: 100
+	});
 	
 	//Load The Tower
 	if (tower[player.curfloor].advallowed == 1) {
@@ -925,11 +933,10 @@ var battleChance = function() {
 		while (game.found == 11) {
 			game.found = Math.floor(Math.random()*11);
 		}
-		var tier;
-		for (i = player.curfloor-1; i < 10; i-10) {
+		var tier = 0;
+		for (i = player.curfloor; i > 10; i -= 10) {
 			tier++;
 		}
-		Math.floor(player.curfloor-1/10);
 		monsterInstance = createMonster((tier*10)+game.found);
 		battle(monsterInstance, false);
 		exploreRestButtonLoad();
@@ -1095,7 +1102,9 @@ var loadMonsterInfo = function(arg) {
 var playerDeath = function(arg) {
 	game.inbattle = false;
 	document.getElementById("combatlog").innerHTML += "You have been defeated by the " + arg.name + "!";
-	toggleIdle();
+	if (game.idleMode) {
+		toggleIdle();
+	}
 	changeFloor(-player.curfloor);
 	updateExcelia(-((100-buffs.exceliaBless)*resources.excelia/100));
 	player.str.val -= Math.floor(player.str.val/10);
@@ -1115,20 +1124,22 @@ var playerDeath = function(arg) {
 
 //Coward, lol
 var runAway = function() {
-	var runRoll = Math.random() * (monsterInstance.str + monsterInstance.dex + monsterInstance.con);
-	if (runRoll < player.spd.val*3) {
-		document.getElementById("combatlog").innerHTML = "";
-		document.getElementById("combatlog").innerHTML += "You escaped from the battle against " + monsterInstance.name + ".";
-		updateStat(player.spd, runRoll);
-		loadMonsterInfo();
-		game.inbattle = false;
+	if (game.inbattle) {
+		var runRoll = Math.random() * (monsterInstance.str + monsterInstance.dex + monsterInstance.con);
+		if (runRoll < player.spd.val) {
+			document.getElementById("combatlog").innerHTML = "";
+			document.getElementById("combatlog").innerHTML += "You escaped from the battle against " + monsterInstance.name + ".";
+			updateStat(player.spd, runRoll);
+			loadMonsterInfo();
+			game.inbattle = false;
+		}
+		else {
+			document.getElementById("combatlog").innerHTML = "";
+			document.getElementById("combatlog").innerHTML += "You failed to run away.<br>";
+			battle(monsterInstance, true);
+		}
+		exploreRestButtonLoad();
 	}
-	else {
-		document.getElementById("combatlog").innerHTML = "";
-		document.getElementById("combatlog").innerHTML += "You failed to run away.<br>";
-		battle(monsterInstance, true);
-	}
-	exploreRestButtonLoad();
 };
 
 //----------------------------------------------------------------//
@@ -1413,8 +1424,8 @@ var castSpell = function(spellId) {
 		//These spells never bothered me anyway.
 		if (castSuccess === true) {
 			updateCondition(player.mp, -mpCost);
-			spellLevel(spellbook[i], mpCost);
-			updateStat(player.mgc, buffs.spellMasteryMultiplier * (spellbook[i].level + 1 + mpCost/10));
+			spellLevel(spellbook[i], (buffs.spellMasteryMultiplier * mpCost));
+			updateStat(player.mgc, (spellbook[i].level + 1 + mpCost/10));
 			updateCondition(player.mp, 0);
 			return true;
 		}
