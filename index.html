@@ -5,6 +5,7 @@
 
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 		<link href="https://fonts.googleapis.com/css?family=Germania+One" rel="stylesheet">
+		<link rel="stylesheet" href="assets/main.css">
 		<title>ICrawler · v0.8</title>
 	</head>
 	<body>
@@ -38,93 +39,93 @@
 				<div class="col-xs-3">
 					<div class="row">
 						<div class="col-xs-12">
-							<div class="well well-sm">
-								<div class="row">
-									<div class="col-xs-12">
-										<p class="text-danger" style="font-family: 'Germania One', cursive;">Status Screen</p>
-										<p>Name: <span id="name">Crawler</span></p>
-									</div>
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<h3 class="panel-title" style="font-family: 'Germania One', cursive;">Status Screen</h3>
+									<p>Name: <span id="name">Crawler</span></p>
 								</div>
-								<div class="row">
-									<div class="col-xs-1">
-										<p>HP:</p>
-									</div>
-									<div class="col-xs-10">
-										<div class="progress">
-											<div id="hpbar" class="progress-bar progress-bar-danger" role="progressbar" style="width: 0%;">
-												<span id="hp">0</span>/<span id="hpmax">0</span>
+								<div class="panel-body">
+									<div class="row">
+										<div class="col-xs-1">
+											<p>HP:</p>
+										</div>
+										<div class="col-xs-10">
+											<div class="progress">
+												<div id="hpbar" class="progress-bar progress-bar-danger" role="progressbar" style="width: 0%;">
+													<span id="hp">0</span>/<span id="hpmax">0</span>
+												</div>
 											</div>
 										</div>
 									</div>
-								</div>
-								<div class="row">
-									<div class="col-xs-1">
-										<p>MP:</p>
-									</div>
-									<div class="col-xs-10">
-										<div class="progress">
-											<div id="mpbar" class="progress-bar progress-bar-info" role="progressbar" style="width: 0%;">
-												<span id="mp">0</span>/<span id="mpmax">0</span>
+									<div class="row">
+										<div class="col-xs-1">
+											<p>MP:</p>
+										</div>
+										<div class="col-xs-10">
+											<div class="progress">
+												<div id="mpbar" class="progress-bar progress-bar-info" role="progressbar" style="width: 0%;">
+													<span id="mp">0</span>/<span id="mpmax">0</span>
+												</div>
 											</div>
 										</div>
 									</div>
-								</div>
-								<div class="row">
-									<div class="col-xs-4">
-										<p>STR: <span id="str">0</span></p>
-									</div>
-									<div class="col-xs-7">
-										<div class="progress">
-											<div id="strprog" class="progress-bar" role="progressbar" style="width: 0%;">
-												<span id="strper">0%</span>
+									<div class="row">
+										<div class="col-xs-4">
+											<p>STR: <span id="str">0</span></p>
+										</div>
+										<div class="col-xs-7">
+											<div class="progress">
+												<div id="strprog" class="progress-bar" role="progressbar" style="width: 0%;">
+													<span id="strper">0%</span>
+												</div>
 											</div>
 										</div>
 									</div>
-								</div>
-								<div class="row">
-									<div class="col-xs-4">
-										<p>DEX: <span id="dex">0</span></p>
-									</div>
-									<div class="col-xs-7">
-										<div class="progress">
-											<div id="dexprog" class="progress-bar" role="progressbar" style="width: 0%;">
-												<span id="dexper">0%</span>
+									<div class="row">
+										<div class="col-xs-4">
+											<p>DEX: <span id="dex">0</span></p>
+										</div>
+										<div class="col-xs-7">
+											<div class="progress">
+												<div id="dexprog" class="progress-bar" role="progressbar" style="width: 0%;">
+													<span id="dexper">0%</span>
+												</div>
 											</div>
 										</div>
 									</div>
-								</div>
-								<div class="row">
-									<div class="col-xs-4">
-										<p>CON: <span id="con">0</span></p>
-									</div>
-									<div class="col-xs-7">
-										<div class="progress">
-											<div id="conprog" class="progress-bar" role="progressbar" style="width: 0%;">
-												<span id="conper">0%</span>
+									<div class="row">
+										<div class="col-xs-4">
+											<p>CON: <span id="con">0</span></p>
+										</div>
+										<div class="col-xs-7">
+											<div class="progress">
+												<div id="conprog" class="progress-bar" role="progressbar" style="width: 0%;">
+													<span id="conper">0%</span>
+												</div>
 											</div>
 										</div>
 									</div>
-								</div>
-								<div class="row">
-									<div class="col-xs-4">
-										<p>SPD: <span id="spd">0</span></p>
-									</div>
-									<div class="col-xs-7">
-										<div class="progress">
-											<div id="spdprog" class="progress-bar" role="progressbar" style="width: 0%;">
-												<span id="spdper">0%</span>
+									<div class="row">
+										<div class="col-xs-4">
+											<p>SPD: <span id="spd">0</span></p>
+										</div>
+										<div class="col-xs-7">
+											<div class="progress">
+												<div id="spdprog" class="progress-bar" role="progressbar" style="width: 0%;">
+													<span id="spdper">0%</span>
+												</div>
 											</div>
 										</div>
 									</div>
-								</div>
-								<div class="row">
-									<div class="col-xs-4">
-										<p>MGC: <span id="mgc">0</span></p>
-									</div>
-									<div class="col-xs-7">
-										<div class="progress">
-											<div id="mgcprog" class="progress-bar" role="progressbar" style="width: 0%;">
-												<span id="mgcper">0%</span>
+									<div class="row">
+										<div class="col-xs-4">
+											<p>MGC: <span id="mgc">0</span></p>
+										</div>
+										<div class="col-xs-7">
+											<div class="progress">
+												<div id="mgcprog" class="progress-bar" role="progressbar" style="width: 0%;">
+													<span id="mgcper">0%</span>
+												</div>
 											</div>
 										</div>
 									</div>
@@ -134,37 +135,37 @@
 					</div>
 					<div class="row">
 						<div class="col-xs-12">
-							<div class="well well-sm">
-								<div class="row">
-									<div class="col-xs-12">
-										<p class="text-danger" style="font-family: 'Germania One', cursive;">Buffs</p>
-									</div>
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<h3 class="panel-title text-danger" style="font-family: 'Germania One', cursive;">Buffs</h3>
 								</div>
-								<div class="row">
-									<div class="col-xs-12">
-										<p class="text-success">Temporary Buffs:</p>
-										<ul class="list-group">
-											<span id="temporary">
-											</span>
-										</ul>
-									</div>
-								</div>
-								<div class="row">
-									<div class="col-xs-12">
-										<p class="text-success">Toggleable Buffs:</p>
-										<div class="list-group">
-											<span id="toggleable">
-											</span>
+								<div class="panel-body">
+									<div class="row">
+										<div class="col-xs-12">
+											<p class="text-success">Temporary Buffs:</p>
+											<ul class="list-group">
+												<span id="temporary">
+												</span>
+											</ul>
 										</div>
 									</div>
-								</div>
-								<div class="row">
-									<div class="col-xs-12">
-										<p class="text-success">Permanent Buffs:</p>
-										<ul class="list-group">
-											<span id="permanent">
-											</span>
-										<ul>
+									<div class="row">
+										<div class="col-xs-12">
+											<p class="text-success">Toggleable Buffs:</p>
+											<div class="list-group">
+												<span id="toggleable">
+												</span>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-xs-12">
+											<p class="text-success">Permanent Buffs:</p>
+											<ul class="list-group">
+												<span id="permanent">
+												</span>
+											<ul>
+										</div>
 									</div>
 								</div>
 							</div>
@@ -173,167 +174,171 @@
 				</div>
 				<div class="col-xs-6">
 					<div class="row">
-						<div class="well well-sm">
-							<div class="row">
-								<div class="col-xs-3">
-									<p class="text-danger" style="font-family: 'Germania One', cursive;">Time Controls</p>
-								</div>
-								<div class="col-xs-9">
-									<p class="text-right">Current Run: <span id="days">0</span> days, <span id="hours">0</span> hours, <span id="minutes">0</span> minutes, <span id="seconds">0</span> seconds</p>
-								</div>
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h3 class="panel-title" style="font-family: 'Germania One', cursive;">Time Controls</h3>
+								<p>Current Run: <span id="days">0</span> days, <span id="hours">0</span> hours, <span id="minutes">0</span> minutes, <span id="seconds">0</span> seconds</p>
 							</div>
-							<div class="row">
-								<div class="col-xs-2">
-									Time speed: x<span id="speed">1</span>
-								</div>
-								<div class="col-xs-10">
-									<div class="row">
-										<div class="col-xs-12">
-											<span id="idleSwitch"></span>
-											<button class="btn btn-primary" onClick="gameSpeed(1000)">x1</button>
-											<span id="speed2"></span>
-											<span id="speed5"></span>
-										</div>
+							<div class="panel-body">
+								<div class="row">
+									<div class="col-xs-2">
+										Time speed: x<span id="speed">1</span>
 									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="row">
-						<div class="well well-sm">
-							<p class="text-danger" style="font-family: 'Germania One', cursive;">The Tower</p>
-							<p>You are currently at Floor <span id="floor">0</span>.</p>
-							<div class="row" style="height: 10px;"></div>
-							<div class="row">
-								<div class="col-xs-12">
-									Floor explored:
-								</div>
-							</div>
-							<div class="row">
-								<div class="col-xs-12">
-									<div class="progress">
-										<div id="floorbar" class="progress-bar" role="progressbar" style="width: 0%;">
-											<span id="explperc">0</span>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="row">
-								<div class="col-xs-3">
-									<span id="retbut"></span>
-								</div>
-								<div class="col-xs-3">
-									<span id="exploreButton"></span>
-								</div>
-								<div class="col-xs-3">
-									<span id="restButton"></span>
-								</div>
-								<div class="col-xs-3">
-									<span id="advbut"></span>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="row">
-						<div class="well well-sm">
-							<div class="row">
-								<div class="col-xs-12">
-									<p class="text-danger" style="font-family: 'Germania One', cursive;">Battle Screen</p>
-								</div>
-							</div>
-							<div class="row">
-								<div class="col-xs-3">
-									<div class="row">
-										<div class="col-xs-12">
-											Monster: <span id="monstername">None</span><br>
-										</div>
-										<div class="col-xs-12">
-											STR: <span id="monsterstr">0</span><br>
-										</div>
-										<div class="col-xs-12">
-											DEX: <span id="monsterdex">0</span><br>
-										</div>
-										<div class="col-xs-12">
-											CON: <span id="monstercon">0</span>
-										</div>
-									</div>
-								</div>
-								<div class="col-xs-9">
-									<div class="row">
-										<div class="col-xs-12">
-											<div class="progress">
-												<div id="monsterbar" class="progress-bar progress-bar-danger" role="progressbar" style="width: 0%;">
-													<span id="monsterhp">0</span>
-												</div>
+									<div class="col-xs-10">
+										<div class="row">
+											<div class="col-xs-12">
+												<span id="idleSwitch"></span>
+												<button class="btn btn-primary" onClick="gameSpeed(1000)">x1</button>
+												<span id="speed2"></span>
+												<span id="speed5"></span>
 											</div>
 										</div>
 									</div>
-									<div class="row">
-										<div class="col-xs-6">
-											<button class="btn btn-block btn-danger" onClick="attackMelee()">Fight</button>
-										</div>
-										<div class="col-xs-6">
-											<button class="btn btn-block btn-warning" onClick="runAway()">Run</button>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="row" style="height: 10px;"></div>
-							<div class="row">
-								<div class="col-xs-12">
-									<span class="text-success">Combat Log:</span>
-								</div>
-							</div>
-							<div class="row">
-								<div class="col-xs-12">
-									<span id="combatlog"></span>
 								</div>
 							</div>
 						</div>
 					</div>
 					<div class="row">
-						<div class="well well-sm">
-							<div class="row">
-								<div class="col-xs-12">
-									<p class="text-danger" style="font-family: 'Germania One', cursive;">Last changes:</p>
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h3 class="panel-title" style="font-family: 'Germania One', cursive;">The Tower <i class="glyphicon glyphicon-tower"></i></h3>
+								<p>You are currently at Floor <span id="floor">0</span>.</p>
+							</div>
+							<div class="panel-body">
+								<div class="row">
+									<div class="col-xs-12">
+										Floor explored:
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-xs-12">
+										<div class="progress">
+											<div id="floorbar" class="progress-bar" role="progressbar" style="width: 0%;">
+												<span id="explperc">0</span>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-xs-3">
+										<span id="retbut"></span>
+									</div>
+									<div class="col-xs-3">
+										<span id="exploreButton"></span>
+									</div>
+									<div class="col-xs-3">
+										<span id="restButton"></span>
+									</div>
+									<div class="col-xs-3">
+										<span id="advbut"></span>
+									</div>
 								</div>
 							</div>
-							<div class="row">
-								<div class="col-xs-9">
-									v0.8:<br>
-									<ul>
-										<li>New active turn-combat system!</li>
-										<ul>
-											<li>Attack by clicking the "Fight" button.</li>
-											<li>Or you can cast a spell from your spellbook.</li>
-											<li>If things get too rough, there's no shame in running away with the "Run" button!</li>
-										</ul>
-										<li>New active exploration system</li>
-										<ul>
-											<li>Click the "Explore" button to explore some of the floor.</li>
-											<li>If a battle start, you cannot neither explore nor rest until it ends.</li>
-											<li>You can't cast spells when resting anymore, either.</li>
-										</ul>
-										<li>Idle Mode!</li>
-										<ul>
-											<li>For those who are not fans of clicking, Idle Mode makes the game work just as before!</li>
-											<li>Whenever you're not in battle, floor will be explored automatically.</li>
-											<li>In battle, melee attacks only will be used (unless upgraded)!</li>
-											<li>You can still manually cast spells, or melee/run during battle.</li>
-											<li>When the battle ends, auto rest kicks in, so you don't even need to worry about dying!</li>
-											<li>Time speed may only be changed with Idle Mode ON</li>
-										</ul>
-										<li>Dynamic Monsters!</li>
-										<ul>
-											<li>Monsters are now generated dynamically, with various stat distributions.</li>
-											<li>That make every monster encounter different, even if they're the same type!</li>
-											<li>At each floor, monsters get stronger.</li>
-											<li>Don't think you'll beat a floor 5 Rat easily just because you beat a floor 1 one.</li>
-										</ul>
-									</ul>
+						</div>
+					</div>
+					<div class="row">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h3 class="panel-title" style="font-family: 'Germania One', cursive;">Battle Screen</h3>
+							</div>
+							<div class="panel-body">
+								<div class="row">
+									<div class="col-xs-3">
+										<div class="row">
+											<div class="col-xs-12">
+												Monster: <span id="monstername">None</span><br>
+											</div>
+											<div class="col-xs-12">
+												STR: <span id="monsterstr">0</span><br>
+											</div>
+											<div class="col-xs-12">
+												DEX: <span id="monsterdex">0</span><br>
+											</div>
+											<div class="col-xs-12">
+												CON: <span id="monstercon">0</span>
+											</div>
+										</div>
+									</div>
+									<div class="col-xs-9">
+										<div class="row">
+											<div class="col-xs-12">
+												<div class="progress">
+													<div id="monsterbar" class="progress-bar progress-bar-danger" role="progressbar" style="width: 0%;">
+														<span id="monsterhp">0</span>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="row">
+											<div class="col-xs-6">
+												<button class="btn btn-block btn-danger" onClick="attackMelee()"><img width="10%" class="img-responsive" src="assets/sword.svg" alt="">Fight</button>
+											</div>
+											<div class="col-xs-6">
+												<button class="btn btn-block btn-warning" onClick="runAway()">Run</button>
+											</div>
+										</div>
+									</div>
 								</div>
-								<div class="col-xs-3">
-									<button class="btn btn-danger btn-block" onClick="hardReset()">Hard Reset!</button>
+							</div>
+							<div class="panel-footer">
+								<div class="row">
+									<div class="col-xs-12">
+										<span class="text-success">Combat Log:</span>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-xs-12">
+										<span id="combatlog"></span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="panel panel-default">
+							<div class="panel-heading" data-toggle="collapse" data-target="#collapseChangelog">
+								<h3 class="panel-title" style="font-family: 'Germania One', cursive;"><a style="cursor:pointer;" class="accordion-toggle">Latest Changes</a></h3>
+							</div>
+							<div id="collapseChangelog" class="panel-collapse collapse">
+								<div class="panel-body">
+									<div class="row">
+										<div class="col-xs-9">
+											v0.8:<br>
+											<ul>
+												<li>New active turn-combat system!</li>
+												<ul>
+													<li>Attack by clicking the "Fight" button.</li>
+													<li>Or you can cast a spell from your spellbook.</li>
+													<li>If things get too rough, there's no shame in running away with the "Run" button!</li>
+												</ul>
+												<li>New active exploration system</li>
+												<ul>
+													<li>Click the "Explore" button to explore some of the floor.</li>
+													<li>If a battle start, you cannot neither explore nor rest until it ends.</li>
+													<li>You can't cast spells when resting anymore, either.</li>
+												</ul>
+												<li>Idle Mode!</li>
+												<ul>
+													<li>For those who are not fans of clicking, Idle Mode makes the game work just as before!</li>
+													<li>Whenever you're not in battle, floor will be explored automatically.</li>
+													<li>In battle, melee attacks only will be used (unless upgraded)!</li>
+													<li>You can still manually cast spells, or melee/run during battle.</li>
+													<li>When the battle ends, auto rest kicks in, so you don't even need to worry about dying!</li>
+													<li>Time speed may only be changed with Idle Mode ON</li>
+												</ul>
+												<li>Dynamic Monsters!</li>
+												<ul>
+													<li>Monsters are now generated dynamically, with various stat distributions.</li>
+													<li>That make every monster encounter different, even if they're the same type!</li>
+													<li>At each floor, monsters get stronger.</li>
+													<li>Don't think you'll beat a floor 5 Rat easily just because you beat a floor 1 one.</li>
+												</ul>
+											</ul>
+										</div>
+										<div class="col-xs-3">
+											<button class="btn btn-danger btn-block" onClick="hardReset()">Hard Reset!</button>
+										</div>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -342,51 +347,51 @@
 				<div class="col-xs-3">
 					<div class="row">
 						<div class="col-xs-12">
-							<div class="well well-sm">
-								<div class="row">
-									<div class="col-xs-12">
-										<p class="text-danger" style="font-family: 'Germania One', cursive;">Spellbook</p>
-									</div>
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<h3 class="panel-title" style="font-family: 'Germania One', cursive;">Spellbook</h3>
 								</div>
-								<div class="row">
-									<div class="col-xs-12">
-										<ul class="nav nav-pills" role="tablist">
-											<li role="presentation" class="active">
-												<a href="#all" aria-controls="healing" role="tab" data-toggle="tab">All</a>
-											</li>
-											<li role="presentation">
-												<a href="#healing" aria-controls="healing" role="tab" data-toggle="tab">Healing</a>
-											</li>
-											<li role="presentation">
-												<a href="#damage" aria-controls="damage" role="tab" data-toggle="tab">Damage</a>
-											</li>
-											<li role="presentation">
-												<a href="#debuff" aria-controls="debuff" role="tab" data-toggle="tab">Debuff</a>
-											</li>
-											<li role="presentation">
-												<a href="#utility" aria-controls="utility" role="tab" data-toggle="tab">Utility</a>
-											</li>
-										</ul>
+								<div class="panel-body">
+									<div class="row">
+										<div class="col-xs-12">
+											<ul class="nav nav-pills" role="tablist">
+												<li role="presentation" class="active">
+													<a href="#all" aria-controls="healing" role="tab" data-toggle="tab">All</a>
+												</li>
+												<li role="presentation">
+													<a href="#healing" aria-controls="healing" role="tab" data-toggle="tab">Healing</a>
+												</li>
+												<li role="presentation">
+													<a href="#damage" aria-controls="damage" role="tab" data-toggle="tab">Damage</a>
+												</li>
+												<li role="presentation">
+													<a href="#debuff" aria-controls="debuff" role="tab" data-toggle="tab">Debuff</a>
+												</li>
+												<li role="presentation">
+													<a href="#utility" aria-controls="utility" role="tab" data-toggle="tab">Utility</a>
+												</li>
+											</ul>
+										</div>
 									</div>
-								</div>
-								<div class="row" style="height: 10px;"></div>
-								<div class="row">
-									<div class="col-xs-12">
-										<div class="tab-content">
-											<div role="tabpanel" class="tab-pane active" id="all">
-												<span id="spellbook"></span>
-											</div>
-											<div role="tabpanel" class="tab-pane" id="healing">
-												<span id="spellbook0"></span>
-											</div>
-											<div role="tabpanel" class="tab-pane" id="damage">
-												<span id="spellbook1"></span>
-											</div>
-											<div role="tabpanel" class="tab-pane" id="debuff">
-												<span id="spellbook2"></span>
-											</div>
-											<div role="tabpanel" class="tab-pane" id="utility">
-												<span id="spellbook3"></span>
+									<div class="row" style="height: 10px;"></div>
+									<div class="row">
+										<div class="col-xs-12">
+											<div class="tab-content">
+												<div role="tabpanel" class="tab-pane active" id="all">
+													<span id="spellbook"></span>
+												</div>
+												<div role="tabpanel" class="tab-pane" id="healing">
+													<span id="spellbook0"></span>
+												</div>
+												<div role="tabpanel" class="tab-pane" id="damage">
+													<span id="spellbook1"></span>
+												</div>
+												<div role="tabpanel" class="tab-pane" id="debuff">
+													<span id="spellbook2"></span>
+												</div>
+												<div role="tabpanel" class="tab-pane" id="utility">
+													<span id="spellbook3"></span>
+												</div>
 											</div>
 										</div>
 									</div>
@@ -396,18 +401,16 @@
 					</div>
 					<div class="row">
 						<div class="col-xs-12">
-							<div class="well well-sm">
-								<div class="row">
-									<div class="col-xs-3">
-										<p class="text-danger" style="font-family: 'Germania One', cursive;">Upgrades</p>
-									</div>
-									<div class="col-xs-9">
-										<p class="text-right">Excelia: <span id="excelia">0</span></p>
-									</div>
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<h3 class="panel-title" style="font-family: 'Germania One', cursive;">Upgrades</h3>
+									<p>Excelia: <span id="excelia">0</span></p>
 								</div>
-								<div class="row">
-									<div class="col-xs-12">
-										<span id="upgrades"></span>
+								<div class="panel-body">
+									<div class="row">
+										<div class="col-xs-12">
+											<span id="upgrades"></span>
+										</div>
 									</div>
 								</div>
 							</div>
