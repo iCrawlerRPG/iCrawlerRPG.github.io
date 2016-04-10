@@ -16,7 +16,8 @@ var game = {
 	queued: false,
 	init: false,
 	found: 0,
-	idleMode: false
+	idleMode: false,
+	idleRestSlider: undefined
 };
 
 //Player Object:
@@ -479,7 +480,7 @@ var main = function() {
 		if (!game.inbattle && fullyRested()) {
 			exploreFloor();
 		}
-		else if (!game.inbattle && !fullyRested()) {
+		else if (!game.inbattle && percentage(player.hp.curval, player.hp.maxval) <= idleRestSlider.getValue()) {
 			startRest();
 		}
 		else {
@@ -556,6 +557,13 @@ var startTheEngine = function() {
 	else {
 		document.getElementById("idleSwitch").innerHTML = '<button class="btn btn-danger" onClick="toggleIdle()">Idle OFF</button>';
 	}
+
+	//Load Idle Options
+	idleRestSlider = new Slider("#idleRest", {
+		ticks: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+		ticks_snap_bounds: 10,
+		value: 100
+	});
 	
 	//Load The Tower
 	if (tower[player.curfloor].advallowed == 1) {
@@ -1416,8 +1424,8 @@ var castSpell = function(spellId) {
 		//These spells never bothered me anyway.
 		if (castSuccess === true) {
 			updateCondition(player.mp, -mpCost);
-			spellLevel(spellbook[i], mpCost);
-			updateStat(player.mgc, buffs.spellMasteryMultiplier * (spellbook[i].level + 1 + mpCost/10));
+			spellLevel(spellbook[i], (buffs.spellMasteryMultiplier * mpCost));
+			updateStat(player.mgc, (spellbook[i].level + 1 + mpCost/10));
 			updateCondition(player.mp, 0);
 			return true;
 		}
