@@ -9,10 +9,21 @@ Link: http://shiroge.github.io/
 I'm currently looking for ideas for spells and upgrades. You can open an issue for that. If possible, tell me how far you have progressed into the tower.
 
 ## Changelog
+**Changes in alpha v0.8.1:**
+
+*New Floors!*
+- You can now go up to Floor 20!
+
+*New Idle settings!*
+- Adjust the slider to choose at which HP percentage you want to auto-rest while Idle is ON.
+- Minimum is 10%, all the way up to 100%.
+
+*Prettier UI! (thanks to peterbrinck!)*
+- Who doesn't love pretty things?
+
 **Changes in alpha v0.8:**
 
 *New active turn-combat system!*
-
 - Attack by clicking the "Fight" button.
 - Or you can cast a spell from your spellbook.
 - If things get too rough, there's no shame in running away with the "Run" button!
