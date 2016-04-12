@@ -1,4 +1,17 @@
 # Changelog
+**(In-development now) Changes coming in alpha v0.9:**
+*Spell Changes!*
+- Clairvoyance has been removed.
+- (Still in-dev) You have to buy new spells instead of getting them automatically.
+- (Still in-dev) A new resource will be used for that. You'll get this resource by casting spells.
+
+*Upgrades Changes!*
+- Upgrades now have requirements. For example: You can only get Time Warp (x5) after Time Warp (x2).
+- (Still in-dev) New upgrades.
+
+*More Floors!*
+- (Still in-dev) You can now go up to floor 50!
+
 **Changes in alpha v0.8.1:**
 
 *New Floors!*
