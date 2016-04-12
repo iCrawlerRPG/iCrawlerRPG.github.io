@@ -1988,4 +1988,14 @@ var upgrades = new Upgrades();
 var spells = new Spells();
 var player = new Player();
 var system = new System();
+
+$.get( "https://raw.githubusercontent.com/shiroge/shiroge.github.io/master/CHANGELOG.md", function( data ) {
+
+	var converter       = new showdown.Converter(),
+		md_content        = data,
+		md_to_html      = converter.makeHtml( md_content );
+	$("#changelog").html( md_to_html );
+
+});
+
 system.runGame();
