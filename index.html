@@ -10,7 +10,13 @@
 		<title>ICrawler · v0.8</title>
 	</head>
 	<body>
-		<script type="text/javascript" src="main.js"></script>
+		<script type="text/javascript" src="system.js"></script>
+		<script type="text/javascript" src="player.js"></script>
+		<script type="text/javascript" src="spells.js"></script>
+		<script type="text/javascript" src="upgrades.js"></script>
+		<script type="text/javascript" src="buffs.js"></script>
+		<script type="text/javascript" src="monsters.js"></script>
+		<script type="text/javascript" src="tower.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/7.0.0/bootstrap-slider.min.js"></script>
@@ -195,7 +201,7 @@
 										<div class="row">
 											<div class="col-xs-12">
 												<span id="idleSwitch"></span>
-												<button class="btn btn-primary" onClick="gameSpeed(1000)">x1</button>
+												<button class="btn btn-primary" onClick="system.gameSpeed(1000)">x1</button>
 												<span id="speed2"></span>
 												<span id="speed5"></span>
 												<span id="speed10"></span>
@@ -298,10 +304,10 @@
 										</div>
 										<div class="row">
 											<div class="col-xs-6">
-												<button class="btn btn-block btn-danger" onClick="attackMelee()"><!--<img width="10%" class="img-responsive" src="assets/sword.svg" alt="">-->Fight</button>
+												<button class="btn btn-block btn-danger" onClick="monsters.attackMelee()"><!--<img width="10%" class="img-responsive" src="assets/sword.svg" alt="">-->Fight</button>
 											</div>
 											<div class="col-xs-6">
-												<button class="btn btn-block btn-warning" onClick="runAway()">Run</button>
+												<button class="btn btn-block btn-warning" onClick="monsters.runAway()">Run</button>
 											</div>
 										</div>
 									</div>
@@ -379,7 +385,7 @@
 											</ul>
 										</div>
 										<div class="col-xs-3">
-											<button class="btn btn-danger btn-block" onClick="hardReset()">Hard Reset!</button>
+											<button class="btn btn-danger btn-block" onClick="system.hardReset()">Hard Reset!</button>
 										</div>
 									</div>
 								</div>

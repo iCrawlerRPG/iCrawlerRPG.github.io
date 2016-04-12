@@ -1,1590 +1,1991 @@
-//----------------------------------------------------------------//
-//---------------------------- OBJECTS ---------------------------//
-//----------------------------------------------------------------//
+var System = function() {
+	var ticks = 0;
+	var refreshSpeed = 1000;
 
-//The most important ones.
-var i;
-var theGame;
+	var init = false;
+	var idleMode = false;
 
-//Game controllers:
-var game = {
-	ticks: 0,
-	gameSpeed: 1,
-	refreshSpeed: 1000,
-	inbattle: false,
-	resting: false,
-	queued: false,
-	init: false,
-	found: 0,
-	idleMode: false,
-	idleRestSlider: undefined
-};
+	var theGame;
+	var idleHealthSlider;
 
-//Player Object:
-var player = {
-	name:"placeholder",
-	hp: {id: "hp", curval: 100, maxval: 100},
-	mp: {id: "mp", curval: 50, maxval: 50},
-	str: {id: "str", val: 5, xp: 0, next: 90},
-	dex: {id: "dex", val: 5, xp: 0, next: 90},
-	con: {id: "con", val: 5, xp: 0, next: 90},
-	spd: {id: "spd", val: 5, xp: 0, next: 90},
-	mgc: {id: "mgc", val: 5, xp: 0, next: 90},
-	curfloor: 0,
-};
-
-//Resources:
-var resources = {
-	excelia: 0
-};
-
-//Spellbook:
-var spellbook = [];
-spellbook.push({name: "Cure", id: "cure", type: 0, requiredmgc: 5, learned: false, baseMP: 15, xp: 0, next: 150, baseNext: 150, level: 0, desc:""});
-spellbook.push({name: "Fireball", id: "fireball", type: 1, requiredmgc: 5, learned: false, baseMP: 10, xp: 0, next: 100, baseNext: 100, level: 0, desc:""});
-spellbook.push({name: "Barrier", id: "barrier", type: 0, requiredmgc: 10, learned: false, baseMP: 100, xp: 0, next: 1000, baseNext: 1000, level: 0, desc: ""});
-spellbook.push({name: "Clairvoyance", id:"clairvoyance", type: 3, requiredmgc: 10, learned: false, baseMP: 100, xp: 0, next: 1000, baseNext: 1000, level: 0, desc: ""});
-spellbook.push({name: "Slow", id: "slow", type: 2, requiredmgc: 20, learned: false, baseMP: 400, xp: 0, next: 4000, baseNext: 4000, level: 0, desc: ""});
-spellbook.push({name: "Rage", id: "rage", type: 1, requiredmgc: 25, learned: false, baseMP: 1250, xp: 0, next: 12500, baseNext: 12500, level: 0, desc: ""});
-spellbook.push({name: "Aegis", id: "aegis", type: 0, requiredmgc: 50, learned: false, baseMP: 5000, xp: 0, next: 50000, baseNext: 50000, level: 0, desc: ""});
-
-//Excelia Upgrades:
-var upgrades = [];
-upgrades.push({name: "Time Warp 1", id: "timewarp1", exceliacost: 10, shown: false, purchased: false, desc:"Progress too slow? Make everything go at twice the speed!"});
-upgrades.push({name: "Aetheric Attunement", id: "aetheric", exceliacost: 100, shown: false, purchased: false, desc:"Tap into the mana around you. Recover +1 MP per second while exploring."});
-upgrades.push({name: "Time Warp 2", id: "timewarp2", exceliacost: 100, shown: false, purchased: false, desc:"Change to the next gear! With this, everything is five times faster!"});
-upgrades.push({name: "Blessings", id: "blessings", exceliacost: 100, shown:false, purchased: false, desc:"Keep 10% of your excelia upon death."});
-upgrades.push({name: "Auto-Shooting", id: "autoshoot", exceliacost: 500, shown: false, purchased: false, desc:"Shoot a fireball at the start of every battle without losing a turn!"});
-upgrades.push({name: "Excelia x2", id: "doubleexcelia", exceliacost: 2000, shown: false, purchased: false, desc:"Double the amount of Excelia you gain per monster."});
-upgrades.push({name: "Adept Mage", id: "adeptmage", exceliacost: 5000, shown: false, purchased: false, desc:"Master spells twice as fast. Blow yourself up twice as much."});
-upgrades.push({name: "Battle Healing", id: "battlehealing", exceliacost: 5000, shown: false, purchased: false, desc:"Cast Cure whenever you get under 50% HP during battle."});
-
-//Buffs
-var buffs = {
-	exceliaMultiplier: 1,
-	spellMasteryMultiplier: 1,
-	aegis: 0,
-	barrier: 0,
-	aethericLevel: 0,
-	battleHealing: false,
-	exceliaBless: 0,
-	rage: 0,
-	autoFireball: false,
-	exhaustedMind: 0
-};
-
-var hpCalc = function(number) {
-	return (Math.pow(number, 2)*4);
-};
-
-//Monster List:
-var monsterList = [
-	{name:"Rat", killed:0}, {name:"Bat", killed:0}, {name:"Slime", killed:0}, {name:"Kobold", killed:0}, {name:"Wolf", killed:0}, {name:"Lizard", killed:0}, {name:"Goblin", killed:0}, {name:"Bandit", killed:0}, {name:"Spider", killed:0}, {name:"Eagle", killed:0},
-	{name:"Bear", killed:0}, {name:"Snake", killed:0}, {name:"Troll", killed:0}, {name:"Kobold Warrior", killed:0}, {name:"Giant Wolf", killed:0}, {name:"Ghoul", killed:0}, {name:"Alligator", killed:0}, {name:"Giant Lizard", killed:0}, {name:"Giant Rat", killed: 0}, {name:"Orc Child", killed:0}
-];
-var monsterInstance = {
-	name: "",
-	curhp: 0,
-	hp: 0,
-	str: 0,
-	dex: 0,
-	con: 0,
-	status: 0
-};
-
-//Tower
-var tower = [];
-for (i = 0; i <= monsterList.length; i++) { //It has as many floors as monsters
-	if (i === 0) {
-		tower.push({size:100, explored:100, advallowed:1, stairpos: 0, density: 0});
-	}
-	else {
-		tower.push({size: Math.floor(2*tower[i-1].size),
-					explored: 0,
-					advallowed: 0,
-					stairpos: Math.floor(Math.random() * Math.floor(2*tower[i-1].size)),
-					density: 10 + Math.random()*40});
-	}
-}
-
-//----------------------------------------------------------------//
-//----------------------- SYSTEM FUNCTIONS -----------------------//
-//----------------------------------------------------------------//
-
-//Run the game!
-var runGame = function() {
-	theGame = window.setInterval(function() {main();}, game.refreshSpeed);
-};
-
-//Save the game!
-var saving = function() {
-	var save = {
-		savedGame: game,
-		savedPlayer: player,
-		savedResources: resources,
-		savedSpellbook: spellbook,
-		savedUpgrades: upgrades,
-		savedBuffs: buffs,
-		savedMonsterList: monsterList,
-		savedMonsterInstance: monsterInstance,
-		savedTower: tower
+	var self = this;
+	//Save Method
+	var save = function() {
+		var systemSave = {
+			savedTicks: ticks
+		};
+		localStorage.setItem("systemSave",JSON.stringify(systemSave));
 	};
-	localStorage.setItem("saved",JSON.stringify(save));
-};
 
-var loadGame = function(savegame) {
-	if (savegame.savedGame.ticks !== undefined) {
-		if (savegame.savedGame.ticks > 30000000) {
-			game.ticks = 31536000 - savegame.savedGame.ticks;
-		}
-		else {
-			game.ticks = savegame.savedGame.ticks;
-		}
-	}
-	if (savegame.savedGame.gameSpeed !== undefined) {
-		game.gameSpeed = savegame.savedGame.gameSpeed;
-	}
-	if (savegame.savedGame.refreshSpeed !== undefined) {
-		game.refreshSpeed = savegame.savedGame.refreshSpeed;
-	}
-	if (savegame.savedGame.found !== undefined) {
-		game.found = savegame.savedGame.found;
-	}
-	if (savegame.savedGame.inbattle !== undefined) {
-		game.inbattle = savegame.savedGame.inbattle;
-	}
-};
+	var saveAll = function() {
+		save();
+		player.save();
+		spells.save();
+		upgrades.save();
+		buffs.save();
+		monsters.save();
+		tower.save();
+	};
 
-var loadPlayerHP = function(savegame) {
-	if (savegame.savedPlayer.hp.curval !== undefined) {
-		player.hp.curval = savegame.savedPlayer.hp.curval;
-	}
-	if (savegame.savedPlayer.hp.maxval !== undefined) {
-		player.hp.maxval = savegame.savedPlayer.hp.maxval;
-	}
-};
+	//Load Method
+	var load = function() {
+		var systemSave = JSON.parse(localStorage.getItem("systemSave"));
+		if (systemSave) {
+			if (systemSave.savedTicks !== undefined) {
+				ticks = systemSave.savedTicks;
+			}
+		}
+	};
 
-var loadPlayerMP = function(savegame) {
-	if (savegame.savedPlayer.mp.curval !== undefined) {
-		player.mp.curval = savegame.savedPlayer.mp.curval;
-	}
-	if (savegame.savedPlayer.mp.maxval !== undefined) {
-		player.mp.maxval = savegame.savedPlayer.mp.maxval;
-	}
-};
+	var loadAll = function() {
+		load();
+		player.load();
+		spells.load();
+		upgrades.load();
+		buffs.load();
+		monsters.load();
+		tower.load();
+	};
 
-var loadPlayerSTR = function(savegame) {
-	if (savegame.savedPlayer.str.val !== undefined) {
-		player.str.val = savegame.savedPlayer.str.val;
-	}
-	if (savegame.savedPlayer.str.xp !== undefined) {
-		player.str.xp = savegame.savedPlayer.str.xp;
-	}
-	if (savegame.savedPlayer.str.next !== undefined) {
-		player.str.next = savegame.savedPlayer.str.next;
-	}
-};
+	//Getters
+	self.getIdleMode = function() {
+		return idleMode;
+	};
 
-var loadPlayerDEX = function(savegame) {
-	if (savegame.savedPlayer.dex.val !== undefined) {
-		player.dex.val = savegame.savedPlayer.dex.val;
-	}
-	if (savegame.savedPlayer.dex.xp !== undefined) {
-		player.dex.xp = savegame.savedPlayer.dex.xp;
-	}
-	if (savegame.savedPlayer.dex.next !== undefined) {
-		player.dex.next = savegame.savedPlayer.dex.next;
-	}
-};
+	//Setters
 
-var loadPlayerCON = function(savegame) {
-	if (savegame.savedPlayer.con.val !== undefined) {
-		player.con.val = savegame.savedPlayer.con.val;
-	}
-	if (savegame.savedPlayer.con.xp !== undefined) {
-		player.con.xp = savegame.savedPlayer.con.xp;
-	}
-	if (savegame.savedPlayer.con.next !== undefined) {
-		player.con.next = savegame.savedPlayer.con.next;
-	}
-};
+	//Other Methods
+	var loadIdleHealthSlider = function() {
+		idleHealthSlider = new Slider("#idleRest", {
+			ticks: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+			ticks_snap_bounds: 10,
+			value: 100
+		});
+	};
 
-var loadPlayerSPD = function(savegame) {
-	if (savegame.savedPlayer.spd.val !== undefined) {
-		player.spd.val = savegame.savedPlayer.spd.val;
-	}
-	if (savegame.savedPlayer.spd.xp !== undefined) {
-		player.spd.xp = savegame.savedPlayer.spd.xp;
-	}
-	if (savegame.savedPlayer.spd.next !== undefined) {
-		player.spd.next = savegame.savedPlayer.spd.next;
-	}
-};
+	self.runGame = function() {
+		theGame = window.setInterval(main, refreshSpeed);
+	};
 
-var loadPlayerMGC = function (savegame) {
-	if (savegame.savedPlayer.mgc.val !== undefined) {
-		player.mgc.val = savegame.savedPlayer.mgc.val;
-	}
-	if (savegame.savedPlayer.mgc.xp !== undefined) {
-		player.mgc.xp = savegame.savedPlayer.mgc.xp;
-	}
-	if (savegame.savedPlayer.mgc.next !== undefined) {
-		player.mgc.next = savegame.savedPlayer.mgc.next;
-	}
-};
+	self.gameSpeed = function(number) {
+		if (idleMode) {
+			refreshSpeed = number;
+			theGame = window.clearInterval(theGame);
+			self.runGame();
+			document.getElementById("speed").innerHTML = 1000/number;
+		}
+	};
 
-var loadPlayer = function(savegame) {
-	if (savegame.savedPlayer.name !== undefined) {
-		player.name = savegame.savedPlayer.name;
-	}
-	if (savegame.savedPlayer.hp !== undefined) {
-		loadPlayerHP(savegame);
-	}
-	if (savegame.savedPlayer.mp !== undefined) {
-		loadPlayerMP(savegame);
-	}
-	if (savegame.savedPlayer.str !== undefined) {
-		loadPlayerSTR(savegame);
-	}
-	if (savegame.savedPlayer.dex !== undefined) {
-		loadPlayerDEX(savegame);
-	}
-	if (savegame.savedPlayer.con !== undefined) {
-		loadPlayerCON(savegame);
-	}
-	if (savegame.savedPlayer.spd !== undefined) {
-		loadPlayerSPD(savegame);
-	}
-	if (savegame.savedPlayer.mgc !== undefined) {
-		loadPlayerMGC(savegame);
-	}
-	if (savegame.savedPlayer.curfloor !== undefined) {
-		player.curfloor = savegame.savedPlayer.curfloor;
-	}
-};
-
-var loadResources = function(savegame) {
-	if (savegame.savedResources.excelia !== undefined) {
-		resources.excelia = savegame.savedResources.excelia;
-	}
-	if (savegame.savedResources.exceliaMultiplier !== undefined) {
-		resources.exceliaMultiplier = savegame.savedResources.exceliaMultiplier;
-	}
-};
-
-var loadSpells = function(savegame) {
-	for (i = 0; i < savegame.savedSpellbook.length; i++) {
-		if (i == spellbook.length) break;
-		if (savegame.savedSpellbook[i].learned !== undefined) {
-			spellbook[i].learned = savegame.savedSpellbook[i].learned;
-		}
-		if (savegame.savedSpellbook[i].xp !== undefined) {
-			spellbook[i].xp = savegame.savedSpellbook[i].xp;
-		}
-		if (savegame.savedSpellbook[i].next !== undefined) {
-			spellbook[i].next = savegame.savedSpellbook[i].next;
-		}
-		if (savegame.savedSpellbook[i].level !== undefined) {
-			spellbook[i].level = savegame.savedSpellbook[i].level;
-		}
-	}
-};
-
-var loadUpgrades = function(savegame) {
-	for (i = 0; i < savegame.savedUpgrades.length; i++) {
-		if (i == upgrades.length) break;
-		if (savegame.savedUpgrades[i].shown !== undefined) {
-			upgrades[i].shown = savegame.savedUpgrades[i].shown;
-		}
-		if (savegame.savedUpgrades[i].purchased !== undefined) {
-			upgrades[i].purchased = savegame.savedUpgrades[i].purchased;
-		}
-	}
-};
-
-var loadBuffs = function(savegame) {
-	if (savegame.savedBuffs.barrier !== undefined) {
-		buffs.barrier = savegame.savedBuffs.barrier;
-	}
-	if (savegame.savedBuffs.aegis !== undefined) {
-		buffs.aegis = savegame.savedBuffs.aegis;
-	}
-	if (savegame.savedBuffs.spellMasteryMultiplier !== undefined) {
-		buffs.spellMasteryMultiplier = savegame.savedBuffs.spellMasteryMultiplier;
-	}
-	if (savegame.savedBuffs.exceliaMultiplier !== undefined) {
-		buffs.exceliaMultiplier = savegame.savedBuffs.exceliaMultiplier;
-	}
-	if (savegame.savedBuffs.aethericLevel !== undefined) {
-		buffs.aethericLevel = savegame.savedBuffs.aethericLevel;
-	}
-	if (savegame.savedBuffs.battleHealing !== undefined) {
-		buffs.battleHealing = savegame.savedBuffs.battleHealing;
-	}
-	if (savegame.savedBuffs.exceliaBless !== undefined) {
-		buffs.exceliaBless = savegame.savedBuffs.exceliaBless;
-	}
-	if (savegame.savedBuffs.autoFireball !== undefined) {
-		buffs.autoFireball = savegame.savedBuffs.autoFireball;
-	}
-	if (savegame.savedBuffs.exhaustedMind !== undefined) {
-		buffs.exhaustedMind = savegame.savedBuffs.exhaustedMind;
-	}
-};
-
-var loadMonsterList = function(savegame) {
-	for (i = 0; i < savegame.savedMonsterList.length; i++) {
-		if (i == monsterList.length) break;
-		if (savegame.savedMonsterList[i].killed !== undefined) {
-			monsterList[i].killed = savegame.savedMonsterList[i].killed;
-		}
-	}
-};
-
-var loadMonsterInstance = function(savegame) {
-	if (savegame.savedMonsterInstance.name !== undefined) {
-		monsterInstance.name = savegame.savedMonsterInstance.name;
-	}
-	if (savegame.savedMonsterInstance.curhp !== undefined) {
-		monsterInstance.curhp = savegame.savedMonsterInstance.curhp;
-	}
-	if (savegame.savedMonsterInstance.hp !== undefined) {
-		monsterInstance.hp = savegame.savedMonsterInstance.hp;
-	}
-	if (savegame.savedMonsterInstance.str !== undefined) {
-		monsterInstance.str = savegame.savedMonsterInstance.str;
-	}
-	if (savegame.savedMonsterInstance.dex !== undefined) {
-		monsterInstance.dex = savegame.savedMonsterInstance.dex;
-	}
-	if (savegame.savedMonsterInstance.con !== undefined) {
-		monsterInstance.con = savegame.savedMonsterInstance.con;
-	}
-	if (savegame.savedMonsterInstance.status !== undefined) {
-		monsterInstance.status = savegame.savedMonsterInstance.status;
-	}
-};
-
-var loadTower = function(savegame) {
-	for (i = 0; i < savegame.savedTower.length; i++) {
-		if (i == tower.length) break;
-		if (savegame.savedTower[i].explored !== undefined) {
-			tower[i].explored = savegame.savedTower[i].explored;
-		}
-		if (savegame.savedTower[i].advallowed !== undefined) {
-			tower[i].advallowed = savegame.savedTower[i].advallowed;
-		}
-		if (savegame.savedTower[i].stairpos !== undefined) {
-			tower[i].stairpos = savegame.savedTower[i].stairpos;
-		}
-		if (savegame.savedTower[i].density !== undefined) {
-			tower[i].density = savegame.savedTower[i].density;
-		}
-	}
-};
-
-//Load the game! If all goes well, retro-compatibility is forever!
-var load = function() {
-  var savegame = JSON.parse(localStorage.getItem("saved"));
-	if (savegame) {
-		if (savegame.savedGame !== undefined) {
-			loadGame(savegame);
-		}
-		if (savegame.savedPlayer !== undefined) {
-			loadPlayer(savegame);
-		}
-		if (savegame.savedResources !== undefined) {
-			loadResources(savegame);
-		}
-		if (savegame.savedSpellbook !== undefined) {
-			loadSpells(savegame);
-		}
-		if (savegame.savedUpgrades !== undefined) {
-			loadUpgrades(savegame);
-		}
-		if (savegame.savedBuffs !== undefined) {
-			loadBuffs(savegame);
-		}
-		if (savegame.savedMonsterList !== undefined) {
-			loadMonsterList(savegame);
-		}
-		if (savegame.savedMonsterInstance !== undefined) {
-			loadMonsterInstance(savegame);
-		}
-		if (savegame.savedTower !== undefined) {
-			loadTower(savegame);
-		}
-	}
-	else {
-		player.name = prompt("Please, enter your name:", "Crawler");
-	}
-};
-
-//Hard resetting is hard!
-var hardReset = function() {
-	theGame = window.clearInterval(theGame);
-	if (confirm("Are you sure? You will lose ALL your progress!")) {
-		localStorage.clear();
-		location.reload();
-	}
-	else {
-		runGame();
-	}
-};
-
-//Dawn of the First Day
-var updateTime = function(number) {
-	document.getElementById("seconds").innerHTML = number % 60;
-	number = Math.floor(number / 60);
-	document.getElementById("minutes").innerHTML = number % 60;
-	number = Math.floor(number / 60);
-	document.getElementById("hours").innerHTML = number % 24;
-	number = Math.floor(number / 24);
-	document.getElementById("days").innerHTML = number;
-};
-
-//How fast can we go?
-var gameSpeed = function(number) {
-	if (game.idleMode) {
-		game.refreshSpeed = number;
+	self.hardReset = function() {
 		theGame = window.clearInterval(theGame);
-		runGame();
-		document.getElementById("speed").innerHTML = 1000/number;
-	}
-};
-
-//I am the Alpha and the Omega
-var main = function() {
-	if (!game.init) {
-		startTheEngine();
-	}
-	game.ticks += 1;
-	if (!game.inbattle) {
-		if (game.resting) {
-			updateCondition(player.hp, 1*player.con.val);
-			updateCondition(player.mp, 1*player.mgc.val);
-			
-			if (fullyRested()) {
-				game.resting = false;
-				exploreRestButtonLoad();
-			}
-		}
-	}
-	
-	//Here's my bot!
-	if (player.curfloor === 0) {
-		toggleIdle();
-	}
-	
-	if (game.idleMode) {
-		if (!game.inbattle && percentage(player.hp.curval, player.hp.maxval) >= idleRestSlider.getValue() && !game.resting) {
-			exploreFloor();
-		}
-		else if (!game.inbattle && percentage(player.hp.curval, player.hp.maxval) <= idleRestSlider.getValue()) {
-			startRest();
+		if (confirm("Are you sure you want to wipe all your progress?")) {
+			localStorage.clear();
+			location.reload();
 		}
 		else {
-			attackMelee();
+			runGame();
 		}
-	}
-	
-	readTempBuffs(true);
-	updateTime(game.ticks);
-	saving();
-};
+	};
 
-var exploreRestButtonLoad = function() {
-	if ((game.inbattle || game.resting) && player.curfloor !== 0) {
-		if (tower[player.curfloor].size == tower[player.curfloor].explored) {
-			document.getElementById("exploreButton").innerHTML = '<button class="btn btn-danger btn-block" disabled="disabled">Find Monster</button>';
-		}
-		else {
-			document.getElementById("exploreButton").innerHTML = '<button class="btn btn-danger btn-block" disabled="disabled">Explore</button>';
-		}
-		document.getElementById("restButton").innerHTML = '<button class="btn btn-danger btn-block" disabled="disabled">Rest</button>';
-	}
-	else if (player.curfloor !== 0) {
-		if (tower[player.curfloor].size == tower[player.curfloor].explored) {
-			document.getElementById("exploreButton").innerHTML = '<button class="btn btn-default btn-block" onClick="exploreFloor()">Find Monster</button>';
-		}
-		else {
-			document.getElementById("exploreButton").innerHTML = '<button class="btn btn-default btn-block" onClick="exploreFloor()">Explore</button>';
-		}
-		document.getElementById("restButton").innerHTML = '<button class="btn btn-default btn-block" onClick="startRest()">Rest</button>';
-	}
-};
+	var updateTime = function(number) {
+		document.getElementById("seconds").innerHTML = number % 60;
+		number = Math.floor(number / 60);
+		document.getElementById("minutes").innerHTML = number % 60;
+		number = Math.floor(number / 60);
+		document.getElementById("hours").innerHTML = number % 24;
+		number = Math.floor(number / 24);
+		document.getElementById("days").innerHTML = number;
+	};
 
-var toggleIdle = function() {
-	if (player.curfloor === 0) {
-		return false;
-	}
-	
-	if (game.idleMode) {
-		gameSpeed(1000);
-		game.idleMode = false;
-		document.getElementById("idleSwitch").innerHTML = '<button class="btn btn-danger" onClick="toggleIdle()">Idle OFF</button>';
-	}
-	else {
-		game.idleMode = true;
-		document.getElementById("idleSwitch").innerHTML = '<button class="btn btn-success" onClick="toggleIdle()">Idle ON</button>';
-	}
-};
-
-//Loading everything
-var startTheEngine = function() {
-	//Load Saved Game
-	load();
-	
-	//Load Player Screen
-	document.getElementById("name").innerHTML = player.name;
-	updateStat(player.str, 0);
-	updateStat(player.dex, 0);
-	updateStat(player.con, 0);
-	updateStat(player.spd, 0);
-	updateStat(player.mgc, 0);
-	updateCondition(player.hp, 0);
-	updateCondition(player.mp, 0);
-	updateMaxCondition(player.hp);
-	updateMaxCondition(player.mp);
-	document.getElementById("floor").innerHTML = player.curfloor;
-	document.getElementById("explperc").innerHTML = Math.round(percentage(tower[player.curfloor].explored, tower[player.curfloor].size)*100)/100 + "%";
-	document.getElementById("floorbar").style.width = percentage(tower[player.curfloor].explored, tower[player.curfloor].size) + "%";
-	
-	//Load Idle Button
-	if (game.idleMode) {
-		document.getElementById("idleSwitch").innerHTML = '<button class="btn btn-success" onClick="toggleIdle()">Idle ON</button>';
-	}
-	else {
-		document.getElementById("idleSwitch").innerHTML = '<button class="btn btn-danger" onClick="toggleIdle()">Idle OFF</button>';
-	}
-
-	//Load Idle Options
-	idleRestSlider = new Slider("#idleRest", {
-		ticks: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-		ticks_snap_bounds: 10,
-		value: 100
-	});
-	
-	//Load The Tower
-	if (tower[player.curfloor].advallowed == 1) {
-		document.getElementById("advbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(1)">Next Floor</button>';
-	}
-	if (player.curfloor !== 0) {
-		document.getElementById("retbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(-1)">Previous Floor</button>';
-	}
-	exploreRestButtonLoad();
-	
-	//Load Spellbook
-	readSpells();
-	
-	//Load Upgrade Screen
-	document.getElementById("excelia").innerHTML = Math.round(100*resources.excelia)/100;
-	readUpgrades();
-	
-	//Load any upgrade related button
-	for (i = 0; i < upgrades.length; i++) {
-		if (upgrades[i].id == "timewarp1" && upgrades[i].purchased === true) {
-			document.getElementById("speed2").innerHTML = '<button class="btn btn-primary" onClick="gameSpeed(500)">x2</button>';
+	var main = function() {
+		if (!init) {
+			startTheEngine();
 		}
-		else if (upgrades[i].id == "timewarp2" && upgrades[i].purchased === true) {
-			document.getElementById("speed5").innerHTML = '<button class="btn btn-primary" onClick="gameSpeed(200)">x5</button>';
+		ticks++;
+		if (player.getResting()) {
+			player.rest();
 		}
-	}
-	
-	//Load Buff Screen
-	readPermBuffs();
-	readToggBuffs();
-	readTempBuffs(false);
-	
-	//Load Battle Screen
-	if (game.inbattle) {
-		loadMonsterInfo(monsterInstance);
-	}
-	
-	//Engine has been started
-	game.refreshSpeed = 1000;
-	theGame = window.clearInterval(theGame);
-	runGame();
-	game.init = true;
-};
-
-//----------------------------------------------------------------//
-//------------------------ DYNAMIC HTML --------------------------//
-//----------------------------------------------------------------//
-
-//Let's read our spellbook!
-var readSpells = function() {
-	//First we must clear our mind...
-	document.getElementById("spellbook").innerHTML = '';
-	for (i = 0; i <= 3; i++) {
-		document.getElementById("spellbook" + i).innerHTML = '';
-	}
-	
-	//Now CHECK ALL THE SPELLS o/
-	addSpellDescriptions();
-	for (var i = 0; i < spellbook.length; i++) {
-		if (player.mgc.val >= spellbook[i].requiredmgc) {
-			//Are you a goody-shiny or a baddy-hurty spell?
-			var btncolor = spellType(spellbook[i].type);
-			
-			//Let's write down what we learned:
-			document.getElementById("spellbook").innerHTML += '<div class="row"><div class="col-xs-5"><button class="btn ' + btncolor + ' btn-block" data-toggle="tooltip" data-placement="top" title="' + spellbook[i].desc + '" onClick="castSpell(\'' + spellbook[i].id + '\')">' + spellbook[i].name + '</button></div><div class="col-xs-7"><div class="progress"><div id="' + spellbook[i].id + 'xpall" class="progress-bar" role="progressbar" style="width: ' + 100*spellbook[i].xp/spellbook[i].next + '%;"><span id="' + spellbook[i].id + 'progall">' + 100*spellbook[i].xp/spellbook[i].next + '%</span></div></div></div></div><div class="row"><div class="col-xs-5">Level: <span id="' + spellbook[i].id + 'levelall">0</span></div><div class="col-xs-6"><p class="text-right">Mana Cost: <span id="' + spellbook[i].id + 'costall">0</span></p></div></div>';
-			document.getElementById("spellbook" + spellbook[i].type).innerHTML += '<div class="row"><div class="col-xs-5"><button class="btn ' + btncolor + ' btn-block" data-toggle="tooltip" data-placement="top" title="' + spellbook[i].desc + '" onClick="castSpell(\'' + spellbook[i].id + '\')">' + spellbook[i].name + '</button></div><div class="col-xs-7"><div class="progress"><div id="' + spellbook[i].id + 'xp" class="progress-bar" role="progressbar" style="width: ' + 100*spellbook[i].xp/spellbook[i].next + '%;"><span id="' + spellbook[i].id + 'prog">' + 100*spellbook[i].xp/spellbook[i].next + '%</span></div></div></div></div><div class="row"><div class="col-xs-5">Level: <span id="' + spellbook[i].id + 'level">0</span></div><div class="col-xs-6"><p class="text-right">Mana Cost: <span id="' + spellbook[i].id + 'cost">0</span></p></div></div>';
-			spellbook[i].learned = true;
-			
-			//Now we update our HTML:
-			document.getElementById(spellbook[i].id + "progall").innerHTML = Math.round(100 * percentage(spellbook[i].xp, spellbook[i].next))/100 + "%";
-			document.getElementById(spellbook[i].id + "costall").innerHTML = spellCost(spellbook[i]);
-			document.getElementById(spellbook[i].id + "levelall").innerHTML = spellbook[i].level;
-			document.getElementById(spellbook[i].id + "prog").innerHTML = Math.round(100 * percentage(spellbook[i].xp, spellbook[i].next))/100 + "%";
-			document.getElementById(spellbook[i].id + "cost").innerHTML = spellCost(spellbook[i]);
-			document.getElementById(spellbook[i].id + "level").innerHTML = spellbook[i].level;
-		}
-	}
-
-	$(document).ready(function(){
-		$('[data-toggle="tooltip"]').tooltip(); 
-	});
-};
-
-//Take a look at our shopping list!
-var readUpgrades = function() {
-	//Scratch all this, let's go from the beginning:
-	document.getElementById("upgrades").innerHTML = '';
-	
-	//Look at all these nice upgrades!
-	for (var i = 0; i < upgrades.length; i++) {
-		if ((resources.excelia >= upgrades[i].exceliacost || upgrades[i].shown === true) && upgrades[i].purchased === false) {
-			upgrades[i].shown = true;
-			document.getElementById("upgrades").innerHTML += '<div class="row"><div class="col-xs-7"><button class="btn btn-primary btn-block" data-toggle="tooltip" data-placement="top" title="' + upgrades[i].desc + '" onClick="buyUpgrade(\'' + upgrades[i].id + '\')">' + upgrades[i].name + '</button></div><div class="col-xs-5"><p>(Cost: ' + upgrades[i].exceliacost + ')</p></div></div><div class="row" style="height: 5px;"></div>';
-		}
-	}
-	
-	$(document).ready(function(){
-		$('[data-toggle="tooltip"]').tooltip(); 
-	});
-};
-
-//Are we buffed or not?
-var readToggBuffs = function() {
-	//Clean whatever is there
-	document.getElementById("toggleable").innerHTML = '';
-	
-	//Can I shoot?
-	var upStatus = findUpgrade("autoshoot");
-	if (buffs.autoFireball === true || upStatus.purchased === true) {
-		if (buffs.autoFireball) {
-			togText = "ON";
-		}
-		else {
-			togText = "OFF";
-		}
-		document.getElementById("toggleable").innerHTML += '<button type="button" class="list-group-item" onClick="switchToggBuff(\'autoshoot\')"><span class="badge">' + togText + '</span>Auto-Shooting</button>';
-	}
-	
-	//Can I healz?
-	var togText;
-	upStatus = findUpgrade("battlehealing");
-	if (buffs.battleHealing === true || upStatus.purchased === true) {
-		if (buffs.battleHealing) {
-			togText = "ON";
-		}
-		else {
-			togText = "OFF";
-		}
-		document.getElementById("toggleable").innerHTML += '<button type="button" class="list-group-item" onClick="switchToggBuff(\'battlehealing\')"><span class="badge">' + togText + '</span>Battle Healing</button>';
-	}
-};
-
-//Let's get buffed!
-var readPermBuffs = function() {
-	//Our body is a clean slate
-	document.getElementById("permanent").innerHTML = '';
-	
-	//You don't even need to play anymore
-	if (buffs.exceliaMultiplier !== 1) {
-		document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">x' + buffs.exceliaMultiplier + '</span>Excelia Gain</li>';
-	}
-	if (buffs.exceliaBless !== 0) {
-		document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">' + buffs.exceliaBless + '%</span>Excelia Saved Upon Death</li>';
-	}
-	if (buffs.aethericLevel !== 0) {
-		document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">+' + buffs.aethericLevel + '</span>Exploration Mana per Second</li>';
-	}
-	if (buffs.spellMasteryMultiplier !== 1) {
-		document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">x' + buffs.spellMasteryMultiplier + '</span>Spell Level Gain</li>';
-	}
-};
-
-//Steroids aren't forever!
-var readTempBuffs = function(decrease) {
-	//I'm so tired of all this
-	document.getElementById("temporary").innerHTML = '';
-	
-	//You're so durable!
-	if (buffs.aegis !== 0) {
-		if (decrease) {
-			buffs.aegis--;
-		}
-		document.getElementById("temporary").innerHTML += '<li class="list-group-item list-group-item-info"><span class="badge">' + Math.round(buffs.aegis) + '</span>Aegis</li>';
-	}
-	
-	//Puny shield
-	if (buffs.barrier !== 0) {
-		document.getElementById("temporary").innerHTML += '<li class="list-group-item list-group-item-info"><span class="badge">' + Math.round(buffs.barrier) + '</span>Barrier</li>';
-	}
-	
-	//HULK SMASH
-	if (buffs.rage !== 0) {
-		if (decrease) {
-			buffs.rage--;
-		}
-		document.getElementById("temporary").innerHTML += '<li class="list-group-item list-group-item-info"><span class="badge">' + Math.round(buffs.rage) + '</span>Rage</li>';
-	}
-	
-	//Those debuffs are the shit
-	if (buffs.exhaustedMind !== 0) {
-		if (decrease) {
-			buffs.exhaustedMind--;
-		}
-		document.getElementById("temporary").innerHTML += '<li class="list-group-item list-group-item-danger"><span class="badge">' + Math.round(buffs.exhaustedMind) + '</span>Exhausted Mind</li>';
-	}
-};
-
-//----------------------------------------------------------------//
-//--------------------- AUXILIARY FUNCTIONS ----------------------//
-//----------------------------------------------------------------//
-
-//It's easy to calculate percentages!
-var percentage = function(val, maxval) {
-	return (100*(val/maxval));
-};
-
-//How much does a spellcast cost?
-var spellCost = function(arg) {
-	var castMP;
-	if (arg.type == 2 || arg.type == 3) {
-		castMP = arg.baseMP;
-		for (i = 1; i <= arg.level; i++) {
-			castMP -= 0.1*castMP;
-		}
-		if (castMP <= 10) {
-			castMP = 10;
-		}
-		return Math.round(castMP);
-	}
-	else {
-		castMP = arg.baseMP;
-		for (i = 1; i <= arg.level; i++) {
-			castMP += 0.1*castMP;
-		}
-		return Math.round(castMP);
-	}
-};
-
-//This is how much we hit
-var damageFormula = function(str, dex, enemyCon, enemyHP) {
-	var damage = ((2*str - enemyCon/2) * dex/10);
-	if (damage < 0) {
-		damage = 0;
-	}
-	else if (damage > enemyHP) {
-		damage = enemyHP;
-	}
-	return damage;
-};
-
-//----------------------------------------------------------------//
-//----------------------- PLAYER FUNCTIONS -----------------------//
-//----------------------------------------------------------------//
-
-//Am I ready for punching?
-var fullyRested = function() {
-	if (player.hp.curval == player.hp.maxval && player.mp.curval == player.mp.maxval) {
-		return true;
-	}
-	return false;
-};
-
-//Update HP/MP values.
-//arg can be player.hp or player.mp
-//Number is always an integer
-var updateCondition = function(arg, number) {
-	//Change the number!
-	arg.curval += number;
-	
-	//Don't go below 0 HP!
-	if (arg.curval < 0) {
-		arg.curval = 0;
-	}
-	
-	//Don't go over max HP!
-	else if (arg.curval > arg.maxval) {
-		arg.curval = arg.maxval;
-	}
-	
-	//Update all the related HTML!
-	document.getElementById(arg.id).innerHTML = Math.floor(arg.curval);
-	document.getElementById(arg.id + "max").innerHTML = arg.maxval;
-	document.getElementById(arg.id + "bar").style.width = percentage(arg.curval, arg.maxval) + "%";
-};
-
-//Update max HP/MP values.
-//arg can be player.hp or player.mp
-var updateMaxCondition = function(arg) {
-	//Max HP is 4*(CON^2)
-	if (arg.id == "hp") {
-		arg.maxval = Math.pow(player.con.val, 2) * 4;
-	}
-	
-	//Max MP is 2*(MGC^2)
-	else if (arg.id == "mp") {
-		arg.maxval = Math.pow(player.mgc.val, 2) * 2;
-	}
-};
-
-//Update the stats.
-//arg can be player.(any stat)
-//Number doesn't need to be integer
-var updateStat = function(arg, number) {
-	//Increase the XP!
-	arg.xp += number;
-	
-	//Did we level up?
-	//Exp for next level is 3*(PREV^2 + PREV)
-	while (arg.xp >= arg.next) {
-		arg.val++;
-		arg.xp -= arg.next;
-		arg.next = (Math.pow(arg.val, 2) + arg.val) * 3;
-		
-		//If it was CON, we need to update MAX HP!
-		//If it was MGC, we need to update MAX MP!
-		if (arg.id == "con") {
-			updateMaxCondition(player.hp);
-		}
-		else if (arg.id == "mgc") {
-			updateMaxCondition(player.mp);
-			readSpells();
-		}
-	}
-	
-	//Let's update the HTMLs!
-	document.getElementById(arg.id).innerHTML = arg.val;
-	document.getElementById(arg.id + "prog").style.width = percentage(arg.xp, arg.next) + "%";
-	document.getElementById(arg.id + "per").innerHTML = Math.round(100 * percentage(arg.xp, arg.next))/100 + "%";
-};
-
-//----------------------------------------------------------------//
-//----------------------- BATTLE FUNCTIONS -----------------------//
-//----------------------------------------------------------------//
-
-//Hit him in the head!
-var attackMelee = function() {
-	if (game.inbattle) {
-		battle(monsterInstance, false);
-	}
-};
-
-//Let's create a monster!
-var createMonster = function(number) {
-  var tempMonster = {name: "", curhp: 0, hp:0 , str: 0, dex: 0, con: 0, status: 0};
-	
-	tempMonster.name = monsterList[number].name;
-	var statPool = player.curfloor * 15;
-	tempMonster.str++;
-	tempMonster.dex++;
-	tempMonster.con++;
-	statPool -= 3;
-	
-	var statChoice;
-	while (statPool !== 0) {
-		statChoice = Math.floor(Math.random()*3);
-		while (statChoice == 3) {
-			statChoice = Math.floor(Math.random()*3);
-		}
-		
-		if (statChoice === 0) {
-			tempMonster.str++;
-		}
-		else if (statChoice == 1) {
-			tempMonster.dex++;
-		}
-		else if (statChoice == 2) {
-			tempMonster.con++;
-		}
-		statPool--;
-	}
-	
-	tempMonster.hp = hpCalc(tempMonster.con);
-	tempMonster.curhp = tempMonster.hp;
-	tempMonster.status = 0;
-	
-	return tempMonster;
-};
-
-//Are we going to fight a monster?
-var battleChance = function() {
-	//Roll the dice!
-	var check = Math.random()*100;
-	
-	//BATTLE MUSIC INTENSIFIES
-	if (check <= tower[player.curfloor].density) {
-		game.found = Math.floor(Math.random()*11);
-		while (game.found == 11) {
-			game.found = Math.floor(Math.random()*11);
-		}
-		var tier = 0;
-		for (i = player.curfloor; i > 10; i -= 10) {
-			tier++;
-		}
-		monsterInstance = createMonster((tier*10)+game.found);
-		battle(monsterInstance, false);
-		exploreRestButtonLoad();
-		return true;
-	}
-	return false;
-};
-
-//It's my turn!
-var playerAttack = function(arg) {
-	var damage = damageFormula(player.str.val, player.dex.val, arg.con, arg.curhp);
-	if (buffs.rage !== 0) {
-		damage *= 5;
-	}
-	if (damage > arg.curhp) {
-		damage = arg.curhp;
-	}
-	document.getElementById("combatlog").innerHTML += "You dealt " + Math.round(damage) + " damage to the " + arg.name + ".<br>";
-	return monsterDamage(arg, damage);
-};
-
-//Brace yourselves, the enemy is coming.
-var monsterAttack = function(arg) {
-	var damage;
-	
-	//Is the enemy slowed?
-	if (arg.status == 1) {
-		damage = damageFormula(arg.str, arg.dex/2, player.con.val, player.hp.curhp);
-	}
-	else {
-		damage = damageFormula(arg.str, arg.dex, player.con.val, player.hp.curhp);
-	}
-
-	//Am I invulnerable?
-	if (buffs.aegis === 0) {
-		//Do I have a barrier up?
-		if (buffs.barrier > 0) {
-			
-			//Is my barrier enough?
-			if (buffs.barrier >= damage) { 
-				buffs.barrier -= damage;
-				document.getElementById("combatlog").innerHTML += "Your barrier absorbed " + Math.round(damage) + " damage from " + arg.name + "'s attack.<br>";
-				readTempBuffs(false);
-				return false;
-			}
-			else {
-				damage -= buffs.barrier;
-				buffs.barrier = 0;
-				document.getElementById("combatlog").innerHTML += "Your barrier absorbed " + Math.round(damage) + " damage from " + arg.name + "'s attack.<br>";
-				document.getElementById("combatlog").innerHTML += "Your barrier has shattered.<br>";
-				readTempBuffs(false);
-			}
-		}
-		
-		//Remove my HP
-		updateCondition(player.hp, -damage);
-		document.getElementById("combatlog").innerHTML += "You took " + Math.round(damage) + " damage from the " + arg.name + "'s attack.<br>";
-		
-		//Am I still alive?
-		if (player.hp.curval === 0) {
-			playerDeath(arg);
-			return true;
-		}
-	}
-	else {
-		document.getElementById("combatlog").innerHTML += "Aegis absorbed " + Math.round(damage) + " damage from " + arg.name + "'s attack.<br>";
-	}
-	return false;
-};
-
-//This is where the real fun is
-var battle = function(arg, spellCast) {
-	//What am I battling against?
-	if (game.inbattle === false) {
-		loadMonsterInfo(arg);
-		if (buffs.autoFireball === true) {
-			castSpell("fireball");
-		}
-	}
-	
-	//The intense battle continues
-	else {
-		var isDead = false;
-		if (!spellCast) {
-			document.getElementById("combatlog").innerHTML = '';
-			if (buffs.battleHealing && player.hp.curval <= player.hp.maxval/2) {
-				if(!castSpell("cure")) {
-					isDead = playerAttack(arg);
+		if (idleMode) {
+			if (!player.getInBattle()) {
+				if ((100*(player.getHealthCurrentValue()/player.getHealthMaximumValue()) >= idleHealthSlider.getValue()) && !player.getResting()) {
+					tower.exploreFloor();
+				}
+				else if (!player.getResting() || player.isFullyRested()) {
+					player.toggleRest();
 				}
 			}
 			else {
-				isDead = playerAttack(arg);
+				monsters.attackMelee();
 			}
 		}
-		
-		//If the enemy is not dead, it's their turn
-		if (!isDead) {
-			isDead = monsterAttack(arg);
-			
-			//If I'm not dead, I gain expz!!!
-			if (!isDead) {
-				updateStat(player.str, (arg.str/player.str.val));
-				updateStat(player.con, (arg.con/player.con.val));
-				updateStat(player.dex, (arg.dex/player.dex.val));
-			}
+		buffs.updateTemporaryBuffs(true);
+		updateTime(ticks);
+		saveAll();
+	};
+
+	self.toggleIdle = function() {
+		if (player.getCurrentFloor() === 0) {
+			return false;
 		}
-	}
-};
-
-//This is how much they suffer
-var monsterDamage = function(arg, damage) {
-	arg.curhp -= damage;
-	document.getElementById("monsterhp").innerHTML = Math.floor(arg.curhp);
-	document.getElementById("monsterbar").style.width = percentage(arg.curhp, arg.hp) + "%";
-	if (arg.curhp <= 0) {
-		monsterDeath(arg);
-		return true;
-	}
-	return false;
-};
-
-//Cry me a river
-var monsterDeath = function(arg) {
-	game.inbattle = false;
-	document.getElementById("combatlog").innerHTML += "You have defeated the " + arg.name + "!";
-	updateStat(player.str, arg.str);
-	updateStat(player.con, arg.con);
-	updateStat(player.dex, arg.dex);
-	monsterList[game.found].killed += 1;
-	gainExcelia(arg);
-	
-	//Restoring monster to default
-	arg.curhp = arg.hp;
-	arg.status = 0;
-	
-	exploreRestButtonLoad();
-	loadMonsterInfo();
-};
-
-//I'm working on it!
-var loadMonsterInfo = function(arg) {
-	if (arg !== undefined) {
-		document.getElementById("monstername").innerHTML = arg.name;
-		document.getElementById("monsterhp").innerHTML = Math.round(arg.curhp);
-		document.getElementById("monsterstr").innerHTML = arg.str;
-		document.getElementById("monsterdex").innerHTML = arg.dex;
-		document.getElementById("monstercon").innerHTML = arg.con;
-		document.getElementById("monsterbar").style.width = percentage(arg.curhp, arg.hp) + "%";
-		document.getElementById("combatlog").innerHTML = "You are attacked by a " + arg.name + "!<br>";
-		game.inbattle = true;
-	}
-	else {
-		document.getElementById("monstername").innerHTML = "None";
-		document.getElementById("monsterhp").innerHTML = "0";
-		document.getElementById("monsterstr").innerHTML = "0";
-		document.getElementById("monsterdex").innerHTML = "0";
-		document.getElementById("monstercon").innerHTML = "0";
-		document.getElementById("monsterbar").style.width = "0%";
-	}
-};
-
-//RIP me
-var playerDeath = function(arg) {
-	game.inbattle = false;
-	document.getElementById("combatlog").innerHTML += "You have been defeated by the " + arg.name + "!";
-	if (game.idleMode) {
-		toggleIdle();
-	}
-	changeFloor(-player.curfloor);
-	updateExcelia(-((100-buffs.exceliaBless)*resources.excelia/100));
-	player.str.val -= Math.floor(player.str.val/10);
-	player.dex.val -= Math.floor(player.dex.val/10);
-	player.con.val -= Math.floor(player.con.val/10);
-	player.spd.val -= Math.floor(player.spd.val/10);
-	player.mgc.val -= Math.floor(player.mgc.val/10);
-	updateStat(player.str, -player.str.xp);
-	updateStat(player.dex, -player.dex.xp);
-	updateStat(player.con, -player.con.xp);
-	updateStat(player.spd, -player.spd.xp);
-	updateStat(player.mgc, -player.mgc.xp);
-	arg.curhp = arg.hp;
-	loadMonsterInfo();
-	readSpells();
-};
-
-//Coward, lol
-var runAway = function() {
-	if (game.inbattle) {
-		var runRoll = Math.random() * (monsterInstance.str + monsterInstance.dex + monsterInstance.con);
-		if (runRoll < player.spd.val) {
-			document.getElementById("combatlog").innerHTML = "";
-			document.getElementById("combatlog").innerHTML += "You escaped from the battle against " + monsterInstance.name + ".";
-			updateStat(player.spd, runRoll);
-			loadMonsterInfo();
-			game.inbattle = false;
+		if (idleMode) {
+			self.gameSpeed(1000);
+			idleMode = false;
+			loadIdleButton();
 		}
 		else {
+			idleMode = true;
+			loadIdleButton();
+		}
+	};
+
+	var startTheEngine = function() {
+		loadAll();
+		loadIdleHealthSlider();
+		loadIdleButton();
+		player.loadPlayerScreen();
+		player.loadExploreButton();
+		player.loadRestButton();
+		spells.updateSpellbook();
+		upgrades.loadExcelia();
+		upgrades.updateUpgrades();
+		upgrades.loadTimeUpgrades();
+		buffs.updateTemporaryBuffs(false);
+		buffs.updateToggleableBuffs();
+		buffs.updatePermanentBuffs();
+		if (player.getInBattle()) {
+			monsters.loadMonsterInfo(monsters.getInstancedMonster());
+		}
+		tower.loadTowerScreen();
+		self.gameSpeed(1000);
+		init = true;
+	};
+
+	var loadIdleButton = function() {
+		if (idleMode) {
+			document.getElementById("idleSwitch").innerHTML = '<button class="btn btn-success" onClick="system.toggleIdle()">Idle ON</button>';
+		}
+		else {
+			document.getElementById("idleSwitch").innerHTML = '<button class="btn btn-danger" onClick="system.toggleIdle()">Idle OFF</button>';
+		}
+	};
+};
+
+var Player = function() {
+	var name = "Crawler";
+
+	var health = {currentValue: 100, maximumValue: 100};
+	var mana = {currentValue: 50, maximumValue: 50};
+	var strength = {level: 5, experience: 0, nextLevel: 100};
+	var dexterity = {level: 5, experience: 0, nextLevel: 100};
+	var constitution = {level: 5, experience: 0, nextLevel: 100};
+	var speed = {level: 5, experience: 0, nextLevel: 100};
+	var magic = {level: 5, experience: 0, nextLevel: 100};
+
+	var currentFloor = 0;
+
+	var inBattle = false;
+	var resting = false;
+
+	var self = this;
+	//Save Method
+	self.save = function() {
+		var playerSave = {
+			savedName: name,
+			savedHealth: health,
+			savedMana: mana,
+			savedStrength: strength,
+			savedDexterity: dexterity,
+			savedConstitution: constitution,
+			savedSpeed: speed,
+			savedMagic: magic,
+			savedCurrentFloor: currentFloor,
+			savedInBattle: inBattle
+		};
+		localStorage.setItem("playerSave",JSON.stringify(playerSave));
+	};
+
+	//Load Method
+	self.load = function() {
+		var playerSave = JSON.parse(localStorage.getItem("playerSave"));
+		if (playerSave) {
+			if (playerSave.savedName !== undefined) {
+				name = playerSave.savedName;
+			}
+			else {
+				name = prompt("Please, enter your name:", "Crawler");
+			}
+			if (playerSave.savedHealth !== undefined) {
+				loadHealth(playerSave.savedHealth);
+			}
+			if (playerSave.savedMana !== undefined) {
+				loadMana(playerSave.savedMana);
+			}
+			if (playerSave.savedStrength !== undefined) {
+				loadStrength(playerSave.savedStrength);
+			}
+			if (playerSave.savedDexterity !== undefined) {
+				loadDexterity(playerSave.savedDexterity);
+			}
+			if (playerSave.savedConstitution !== undefined) {
+				loadConstitution(playerSave.savedConstitution);
+			}
+			if (playerSave.savedSpeed !== undefined) {
+				loadSpeed(playerSave.savedSpeed);
+			}
+			if (playerSave.savedMagic !== undefined) {
+				loadMagic(playerSave.savedMagic);
+			}
+			if (playerSave.savedCurrentFloor !== undefined) {
+				currentFloor = playerSave.savedCurrentFloor;
+			}
+			if (playerSave.savedInBattle !== undefined) {
+				inBattle = playerSave.savedInBattle;
+			}
+		}
+		else {
+			name = prompt("Please, enter your name:", "Crawler");
+		}
+	};
+
+	var loadHealth = function(savedHealth) {
+		if (savedHealth.currentValue !== undefined) {
+			health.currentValue = savedHealth.currentValue;
+		}
+		if (savedHealth.maximumValue !== undefined) {
+			health.maximumValue = savedHealth.maximumValue;
+		}
+	};
+
+	var loadMana = function(savedMana) {
+		if (savedMana.currentValue !== undefined) {
+			mana.currentValue = savedMana.currentValue;
+		}
+		if (savedMana.maximumValue !== undefined) {
+			mana.maximumValue = savedMana.maximumValue;
+		}
+	};
+
+	var loadStrength = function(savedStrength) {
+		if (savedStrength.level !== undefined) {
+			strength.level = savedStrength.level;
+		}
+		if (savedStrength.experience !== undefined) {
+			strength.experience = savedStrength.experience;
+		}
+		if (savedStrength.nextLevel !== undefined) {
+			strength.nextLevel = savedStrength.nextLevel;
+		}
+	};
+
+	var loadDexterity = function(savedDexterity) {
+		if (savedDexterity.level !== undefined) {
+			dexterity.level = savedDexterity.level;
+		}
+		if (savedDexterity.experience !== undefined) {
+			dexterity.experience = savedDexterity.experience;
+		}
+		if (savedDexterity.nextLevel !== undefined) {
+			dexterity.nextLevel = savedDexterity.nextLevel;
+		}
+	};
+
+	var loadConstitution = function(savedConstitution) {
+		if (savedConstitution.level !== undefined) {
+			constitution.level = savedConstitution.level;
+		}
+		if (savedConstitution.experience !== undefined) {
+			constitution.experience = savedConstitution.experience;
+		}
+		if (savedConstitution.nextLevel !== undefined) {
+			constitution.nextLevel = savedConstitution.nextLevel;
+		}
+	};
+
+	var loadSpeed = function(savedSpeed) {
+		if (savedSpeed.level !== undefined) {
+			speed.level = savedSpeed.level;
+		}
+		if (savedSpeed.experience !== undefined) {
+			speed.experience = savedSpeed.experience;
+		}
+		if (savedSpeed.nextLevel !== undefined) {
+			speed.nextLevel = savedSpeed.nextLevel;
+		}
+	};
+
+	var loadMagic = function(savedMagic) {
+		if (savedMagic.level !== undefined) {
+			magic.level = savedMagic.level;
+		}
+		if (savedMagic.experience !== undefined) {
+			magic.experience = savedMagic.experience;
+		}
+		if (savedMagic.nextLevel !== undefined) {
+			magic.nextLevel = savedMagic.nextLevel;
+		}
+	};
+
+	//Getters
+	self.getName = function() {
+		return name;
+	};
+
+	self.getInBattle = function() {
+		return inBattle;
+	};
+
+	self.getResting = function() {
+		return resting;
+	};
+
+	self.getCurrentFloor = function() {
+		return currentFloor;
+	};
+
+	self.getHealthCurrentValue = function() {
+		return health.currentValue;
+	};
+
+	self.getHealthMaximumValue = function() {
+		return health.maximumValue;
+	};
+
+	self.getManaCurrentValue = function() {
+		return mana.currentValue;
+	};
+
+	self.getManaMaximumValue = function() {
+		return mana.maximumValue;
+	};
+
+	self.getStrengthLevel = function() {
+		return strength.level;
+	};
+
+	self.getDexterityLevel = function() {
+		return dexterity.level;
+	};
+
+	self.getConstitutionLevel = function() {
+		return constitution.level;
+	};
+
+	self.getSpeedLevel = function() {
+		return speed.level;
+	};
+
+	self.getMagicLevel = function() {
+		return magic.level;
+	};
+
+	self.getStrenthExperience = function() {
+		return strength.experience;
+	};
+
+	self.getDexterityExperience = function() {
+		return dexterity.experience;
+	};
+
+	self.getConstitutionExperience = function() {
+		return constitution.experience;
+	};
+
+	self.getSpeedExperience = function() {
+		return speed.experience;
+	};
+
+	self.getMagicExperience = function() {
+		return magic.experience;
+	};
+
+	//Setters
+	self.setInBattle = function(boolean) {
+		inBattle = boolean;
+	};
+
+	self.setCurrentFloor = function(newFloor) {
+		currentFloor = newFloor;
+	};
+
+	self.setHealthCurrentValue = function(newHealth) {
+		if (newHealth > health.maximumValue) {
+			newHealth = health.maximumValue;
+		}
+		health.currentValue = newHealth;
+		loadConditionScreen("hp", health);
+	};
+
+	self.setHealthMaximumValue = function(newHealth) {
+		health.maximumValue = newHealth;
+		loadConditionScreen("hp", health);
+	};
+
+	self.setManaCurrentValue = function(newMana) {
+		if (newMana > mana.maximumValue) {
+			newMana = mana.maximumValue;
+		}
+		mana.currentValue = newMana;
+		loadConditionScreen("mp", mana);
+	};
+
+	self.setManaMaximumValue = function(newMana) {
+		mana.maximumValue = newMana;
+		loadConditionScreen("mp", mana);
+	};
+
+	self.setStrengthExperience = function(experience) {
+		strength.experience = experience;
+		while (strength.experience >= strength.nextLevel) {
+			strength.experience -= strength.nextLevel;
+			setStrengthLevel(strength.level+1);
+		}
+		loadStatScreen("str", strength);
+	};
+
+	self.setDexterityExperience = function(experience) {
+		dexterity.experience = experience;
+		while (dexterity.experience >= dexterity.nextLevel) {
+			dexterity.experience -= dexterity.nextLevel;
+			setDexterityLevel(dexterity.level+1);
+		}
+		loadStatScreen("dex", dexterity);
+	};
+
+	self.setConstitutionExperience = function(experience) {
+		constitution.experience = experience;
+		while (constitution.experience >= constitution.nextLevel) {
+			constitution.experience -= constitution.nextLevel;
+			setConstitutionLevel(constitution.level+1);
+		}
+		loadStatScreen("con", constitution);
+	};
+
+	self.setSpeedExperience = function(experience) {
+		speed.experience = experience;
+		while (speed.experience >= speed.nextLevel) {
+			speed.experience -= speed.nextLevel;
+			setSpeedLevel(speed.level+1);
+		}
+		loadStatScreen("spd", speed);
+	};
+
+	self.setMagicExperience = function(experience) {
+		magic.experience = experience;
+		while (magic.experience >= magic.nextLevel) {
+			magic.experience -= magic.nextLevel;
+			setMagicLevel(magic.level+1);
+		}
+		loadStatScreen("mgc", magic);
+	};
+
+	var setStrengthLevel = function(newLevel) {
+		strength.level = newLevel;
+		strength.nextLevel = neededExperience(strength.level + 1);
+		loadStatScreen("str", strength);
+	};
+
+	var setDexterityLevel = function(newLevel) {
+		dexterity.level = newLevel;
+		dexterity.nextLevel = neededExperience(dexterity.level + 1);
+		loadStatScreen("dex", dexterity);
+	};
+
+	var setConstitutionLevel = function(newLevel) {
+		constitution.level = newLevel;
+		constitution.nextLevel = neededExperience(constitution.level + 1);
+		self.setHealthMaximumValue(Math.pow(constitution.level,2) * 4);
+		loadStatScreen("con", constitution);
+	};
+
+	var setSpeedLevel = function(newLevel) {
+		speed.level = newLevel;
+		speed.nextLevel = neededExperience(speed.level + 1);
+		loadStatScreen("spd", speed);
+	};
+
+	var setMagicLevel = function(newLevel) {
+		magic.level = newLevel;
+		magic.nextLevel = neededExperience(magic.level + 1);
+		spells.updateSpellbook();
+		self.setManaMaximumValue(Math.pow(magic.level,2) * 2);
+		loadStatScreen("mgc", magic);
+	};
+
+	//Other Methods
+	self.loadPlayerScreen = function() {
+		document.getElementById("name").innerHTML = name;
+		loadStatScreen("str", strength);
+		loadStatScreen("dex", dexterity);
+		loadStatScreen("con", constitution);
+		loadStatScreen("spd", speed);
+		loadStatScreen("mgc", magic);
+		loadConditionScreen("hp", health);
+		loadConditionScreen("mp", mana);
+	};
+
+	var loadStatScreen = function(statId, statName) {
+		document.getElementById(statId).innerHTML = statName.level;
+		document.getElementById(statId + "per").innerHTML = Math.round(100*(100*(statName.experience/statName.nextLevel)))/100 + "%";
+		document.getElementById(statId + "prog").style.width = 100*(statName.experience/statName.nextLevel) + "%";
+	};
+
+	var loadConditionScreen = function(conditionId, conditionName) {
+		document.getElementById(conditionId).innerHTML = Math.round(conditionName.currentValue);
+		document.getElementById(conditionId + "max").innerHTML = Math.round(conditionName.maximumValue);
+		document.getElementById(conditionId + "bar").style.width = 100*(conditionName.currentValue/conditionName.maximumValue) + "%";
+	};
+
+	var neededExperience = function(level) {
+		return ((Math.pow(level, 2) + level) * 3);
+	};
+
+	self.rest = function() {
+		if (resting) {
+			self.setHealthCurrentValue(health.currentValue + constitution.level);
+			self.setManaCurrentValue(mana.currentValue + magic.level);
+			if (self.isFullyRested()) {
+				self.toggleRest();
+			}
+		}
+	};
+
+	self.isFullyRested = function() {
+		if (health.currentValue == health.maximumValue && mana.currentValue == mana.maximumValue) {
+			return true;
+		}
+		return false;
+	};
+
+	self.loadExploreButton = function() {
+		if (currentFloor !== 0) {
+			if (inBattle || resting) {
+				if (tower.floorExplorationComplete(currentFloor)) {
+					document.getElementById("exploreButton").innerHTML = '<button class="btn btn-danger btn-block" disabled="disabled">Find Monster</button>';
+				}
+				else {
+					document.getElementById("exploreButton").innerHTML = '<button class="btn btn-danger btn-block" disabled="disabled">Explore</button>';
+				}
+			}
+			else {
+				if (tower.floorExplorationComplete(currentFloor)) {
+					document.getElementById("exploreButton").innerHTML = '<button class="btn btn-default btn-block" onClick="tower.exploreFloor()">Find Monster</button>';
+				}
+				else {
+					document.getElementById("exploreButton").innerHTML = '<button class="btn btn-default btn-block" onClick="tower.exploreFloor()">Explore</button>';
+				}
+			}
+		}
+		else {
+			document.getElementById("exploreButton").innerHTML = '';
+		}
+	};
+
+	self.loadRestButton = function() {
+		if (currentFloor !== 0) {
+			if (inBattle) {
+				document.getElementById("restButton").innerHTML = '<button class="btn btn-danger btn-block" disabled="disabled">Rest</button>';
+			}
+			else if (resting) {
+				document.getElementById("restButton").innerHTML = '<button class="btn btn-success btn-block" onClick="player.toggleRest()">Stop Resting</button>';
+			}
+			else {
+				document.getElementById("restButton").innerHTML = '<button class="btn btn-default btn-block" onClick="player.toggleRest()">Rest</button>';
+			}
+		}
+		else {
+			document.getElementById("restButton").innerHTML = '';
+		}
+	};
+
+	self.gainExperience = function(monster) {
+		self.setStrengthExperience(strength.experience + (monster.strength/strength.level));
+		self.setDexterityExperience(dexterity.experience + (monster.dexterity/dexterity.level));
+		self.setConstitutionExperience(constitution.experience + (monster.constitution/constitution.level));
+	};
+
+	self.death = function(monster) {
+		inBattle = false;
+		document.getElementById("combatlog").innerHTML += "You have been defeated by the " + monster.name + "!";
+		if (system.getIdleMode()) {
+			system.toggleIdle();
+		}
+		tower.changeFloor(-currentFloor);
+		upgrades.updateExcelia(-((100 - buffs.getExceliaSavedOnDeath()) * upgrades.getExcelia())/100);
+		loseStats(10);
+		loseAllExperience();
+		monsters.loadMonsterInfo();
+		spells.updateSpellbook();
+		player.toggleRest();
+	};
+
+	var loseStats = function(percentage) {
+		setStrengthLevel(strength.level - Math.floor(strength.level/percentage));
+		setDexterityLevel(dexterity.level - Math.floor(dexterity.level/percentage));
+		setConstitutionLevel(constitution.level - Math.floor(constitution.level/percentage));
+		setSpeedLevel(speed.level - Math.floor(speed.level/percentage));
+		setMagicLevel(magic.level - Math.floor(magic.level/percentage));
+	};
+
+	var loseAllExperience = function() {
+		self.setStrengthExperience(0);
+		self.setDexterityExperience(0);
+		self.setConstitutionExperience(0);
+		self.setSpeedExperience(0);
+		self.setMagicExperience(0);
+	};
+
+	self.toggleRest = function() {
+		resting = !resting;
+		self.loadRestButton();
+		self.loadExploreButton();
+	};
+};
+
+var Spells = function() {
+	var arcania = 0;
+
+	var spellbook = [];
+	spellbook.push({name: "Cure",
+		id: "cure",
+		type: 0,
+		requiredMagic: 5,
+		learned: true,
+		baseMana: 15,
+		experience: 0,
+		nextLevel: 150,
+		baseNextLevel: 150,
+		level: 0,
+		description:""});
+
+	spellbook.push({name: "Fireball",
+		id: "fireball",
+		type: 1,
+		requiredMagic: 5,
+		learned: true,
+		baseMana: 10,
+		experience: 0,
+		nextLevel: 100,
+		baseNextLevel: 100,
+		level: 0,
+		description:""});
+
+	spellbook.push({name: "Barrier",
+		id: "barrier",
+		type: 0,
+		requiredMagic: 10,
+		learned: false,
+		baseMana: 100,
+		experience: 0,
+		nextLevel: 1000,
+		baseNextLevel: 1000,
+		level: 0,
+		description: ""});
+
+	spellbook.push({name: "Slow",
+		id: "slow",
+		type: 2,
+		requiredMagic: 20,
+		learned: false,
+		baseMana: 400,
+		experience: 0,
+		next: 4000,
+		baseNextLevel: 4000,
+		level: 0,
+		description: ""});
+
+	spellbook.push({name: "Rage",
+		id: "rage",
+		type: 1,
+		requiredMagic: 25,
+		learned: false,
+		baseMana: 1250,
+		experience: 0,
+		next: 12500,
+		baseNextLevel: 12500,
+		level: 0,
+		description: ""});
+
+	spellbook.push({name: "Aegis",
+		id: "aegis",
+		type: 0,
+		requiredMagic: 50,
+		learned: false,
+		baseMana: 5000,
+		experience: 0,
+		next: 50000,
+		baseNextLevel: 50000,
+		level: 0,
+		description: ""});
+
+	var self = this;
+  	//Save Method
+	self.save = function() {
+		var spellsSave = {
+			savedArcania: arcania,
+			savedSpellbook: spellbook
+		};
+		localStorage.setItem("spellsSave",JSON.stringify(spellsSave));
+	};
+
+	//Load Method
+	self.load = function() {
+		var spellsSave = JSON.parse(localStorage.getItem("spellsSave"));
+		if (spellsSave) {
+			if (spellsSave.savedArcania !== undefined) {
+				arcania = spellsSave.savedArcania;
+			}
+			if (spellsSave.savedSpellbook !== undefined) {
+				loadSpellbook(spellsSave.savedSpellbook);
+			}
+		}
+	};
+
+	var loadSpellbook = function(savedSpellbook) {
+		for(var i = 0; i < savedSpellbook.length; i++) {
+			if (i == spellbook.length) {
+				break;
+			}
+			if (savedSpellbook[i].learned !== undefined) {
+				spellbook[i].learned = savedSpellbook[i].learned;
+			}
+			if (savedSpellbook[i].experience !== undefined) {
+				spellbook[i].experience = savedSpellbook[i].experience;
+			}
+			if (savedSpellbook[i].nextLevel !== undefined) {
+				spellbook[i].nextLevel = savedSpellbook[i].nextLevel;
+			}
+			if (savedSpellbook[i].level !== undefined) {
+				spellbook[i].level = savedSpellbook[i].level;
+			}
+		}
+	};
+
+	//Getters
+
+	//Setters
+
+	//Other Methods
+	var updateSpellDescriptions = function() {
+		for (var i = 0; i < spellbook.length; i++) {
+			if (spellbook[i].id == "cure") {
+			spellbook[i].description = "Heal " + curePotency(spellbook[i]) + " HP";
+			}
+			else if (spellbook[i].id == "fireball") {
+				spellbook[i].description = "Deal " + fireballPotency(spellbook[i]) + " fire damage.";
+			}
+			else if (spellbook[i].id == "barrier") {
+				spellbook[i].description = "Put up a barrier that will protect you from " + barrierPotency(spellbook[i]) + " damage.";
+			}
+			else if (spellbook[i].id == "aegis") {
+				spellbook[i].description = "Take no damage for " + aegisPotency(spellbook[i]) + " seconds.";
+			}
+			else if (spellbook[i].id == "slow") {
+				spellbook[i].description = "Halve an enemy's DEX.";
+			}
+			else if (spellbook[i].id == "rage") {
+				spellbook[i].description = "Fill yourself with rage for " + ragePotency(spellbook[i]) + " seconds. You deal 5x damage, however, you take 2x damage and cannot cast other spells.";
+			}
+		}
+	};
+
+	var spellType = function(type) {
+		if (type === 0) {
+			return "btn-info";
+		}
+		else if (type == 1) {
+			return "btn-danger";
+		}
+		else if (type == 2) {
+			return "btn-warning";
+		}
+		else if (type == 3) {
+			return "btn-success";
+		}
+	};
+
+	var findSpell = function(spellId) {
+		for (var i = 0; i < spellbook.length; i++) {
+			if (spellbook[i].id == spellId) {
+				return i;
+			}
+		}
+	};
+
+	var spellCost = function(spell) {
+    var i;
+		var cost = spell.baseMana;
+		if (spell.type == 2) {
+			for (i = 0; i < spell.level; i++) {
+				cost -= 0.1 * cost;
+			}
+			if (cost <= 10) {
+				cost = 10;
+			}
+		}
+		else {
+			for (i = 0; i < spell.level; i++) {
+				cost += 0.1 * cost;
+			}
+		}
+		return Math.round(cost);
+	};
+
+	var levelSpell = function(spell, experience) {
+		spell.experience += experience;
+		while (spell.experience >= spell.nextLevel) {
+			spell.level++;
+			spell.experience -= spell.nextLevel;
+			spell.nextLevel = Math.pow(2, spell.level) * spell.baseNextLevel;
+			self.updateSpellbook();
+		}
+		updateSpellHtml(spell);
+	};
+
+	self.updateSpellbook = function() {
+		document.getElementById("spellbook").innerHTML = '';
+		for (var i = 0; i <= 3; i++) {
+			document.getElementById("spellbook" + i).innerHTML = '';
+		}
+		updateSpellDescriptions();
+		for (i = 0; i < spellbook.length; i++) {
+			if (player.getMagicLevel() >= spellbook[i].requiredMagic) {
+				var spellColor = spellType(spellbook[i].type);
+
+				document.getElementById("spellbook").innerHTML += '<div class="row"><div class="col-xs-5"><button class="btn ' + spellColor + ' btn-block" data-toggle="tooltip" data-placement="top" title="' + spellbook[i].description + '" onClick="spells.castSpell(\'' + spellbook[i].id + '\')">' + spellbook[i].name + '</button></div><div class="col-xs-7"><div class="progress"><div id="' + spellbook[i].id + 'xpall" class="progress-bar" role="progressbar" style="width: ' + 100*spellbook[i].experience/spellbook[i].nextLevel + '%;"><span id="' + spellbook[i].id + 'progall">' + 100*spellbook[i].experience/spellbook[i].nextLevel + '%</span></div></div></div></div><div class="row"><div class="col-xs-5">Level: <span id="' + spellbook[i].id + 'levelall">0</span></div><div class="col-xs-6"><p class="text-right">Mana Cost: <span id="' + spellbook[i].id + 'costall">0</span></p></div></div>';
+				document.getElementById("spellbook" + spellbook[i].type).innerHTML += '<div class="row"><div class="col-xs-5"><button class="btn ' + spellColor + ' btn-block" data-toggle="tooltip" data-placement="top" title="' + spellbook[i].description + '" onClick="spells.castSpell(\'' + spellbook[i].id + '\')">' + spellbook[i].name + '</button></div><div class="col-xs-7"><div class="progress"><div id="' + spellbook[i].id + 'xp" class="progress-bar" role="progressbar" style="width: ' + 100*spellbook[i].experience/spellbook[i].nextLevel + '%;"><span id="' + spellbook[i].id + 'prog">' + 100*spellbook[i].experience/spellbook[i].nextLevel + '%</span></div></div></div></div><div class="row"><div class="col-xs-5">Level: <span id="' + spellbook[i].id + 'level">0</span></div><div class="col-xs-6"><p class="text-right">Mana Cost: <span id="' + spellbook[i].id + 'cost">0</span></p></div></div>';
+				spellbook[i].learned = true;
+				updateSpellHtml(spellbook[i]);
+			}
+		}
+
+		$(document).ready(function(){
+			$('[data-toggle="tooltip"]').tooltip(); 
+		});
+	};
+
+	var updateSpellHtml = function(spell) {
+		document.getElementById(spell.id + "costall").innerHTML = Math.floor(spell.baseMana + Math.pow(spell.level, 2));
+		document.getElementById(spell.id + "cost").innerHTML = Math.floor(spell.baseMana + Math.pow(spell.level, 2));
+		document.getElementById(spell.id + "xpall").style.width = 100*(spell.experience/spell.nextLevel) + "%";
+		document.getElementById(spell.id + "progall").innerHTML = Math.round(100 * (100 * (spell.experience/spell.nextLevel)))/100 + "%";
+		document.getElementById(spell.id + "levelall").innerHTML = spell.level;
+		document.getElementById(spell.id + "xp").style.width = 100*(spell.experience/spell.nextLevel) + "%";
+		document.getElementById(spell.id + "prog").innerHTML = Math.round(100 * (100 * (spell.experience/spell.nextLevel)))/100 + "%";
+		document.getElementById(spell.id + "level").innerHTML = spell.level;
+	};
+
+	self.castSpell = function(spellId) {
+		var spell = findSpell(spellId);
+		var manaCost = spellCost(spellbook[spell]);
+
+		if (player.getManaCurrentValue() >= manaCost && buffs.getRageTimeLeft() === 0 && !player.getResting()) {
+			var castSuccessful;
+			if (spellbook[spell].id == "cure") {
+				castSuccessful = castCure(spellbook[spell]);
+			}
+			else if (spellbook[spell].id == "fireball") {
+				castSuccessful = castFireball(spellbook[spell]);
+			}
+			else if (spellbook[spell].id == "barrier") {
+				castSuccessful = castBarrier(spellbook[spell]);
+			}
+			else if (spellbook[spell].id == "slow") {
+				castSuccessful = castSlow(spellbook[spell]);
+			}
+			else if (spellbook[spell].id == "aegis") {
+				castSuccessful = castAegis(spellbook[spell]);
+			}
+			else if (spellbook[spell].id == "rage") {
+				castSuccessful = castRage(spellbook[spell]);
+			}
+
+			if (castSuccessful) {
+				player.setManaCurrentValue(player.getManaCurrentValue() - manaCost);
+				levelSpell(spellbook[spell], buffs.getSpellLevelingMultiplier() * manaCost);
+				player.setMagicExperience(player.getMagicExperience() + spellbook[spell].level + 1 + manaCost/10);
+				return true;
+			}
+		}
+
+		return false;
+	};
+
+	var castCure = function(cure) {
+    var currentHealth = player.getHealthCurrentValue();
+		var maximumHealth = player.getHealthMaximumValue();
+		if (currentHealth == maximumHealth) {
+			return false;
+		}
+		else {
+			var cureValue = curePotency(cure);
+			if (maximumHealth - currentHealth < cureValue) {
+				cureValue = maximumHealth - currentHealth;
+			}
+			player.setHealthCurrentValue(currentHealth + cureValue);
+			if (player.getInBattle()) {
+				document.getElementById("combatlog").innerHTML = '';
+				document.getElementById("combatlog").innerHTML += "You healed yourself for " + Math.round(cureValue) + " HP with Cure.<br>";
+				monsters.battle(monsters.getInstancedMonster(), true);
+			}
+			return true;
+		}
+	};
+
+	var curePotency = function(cure) {
+		var cureBasePotency = 25;
+		var cureLevelPotency = Math.pow(1.5, cure.level);
+		var cureMagicPotency = Math.pow(1.1, player.getMagicLevel() - 5) - 1;
+		return Math.floor(cureBasePotency * cureLevelPotency + cureMagicPotency);
+	};
+
+	var castFireball = function(fireball) {
+		if (!player.getInBattle()) {
+			return false;
+		}
+		else {
+			var monster = monsters.getInstancedMonster();
+			var fireballDamage = fireballPotency(fireball);
+			if (monster.currentHealth <= fireballDamage) {
+				fireballDamage = monster.currentHealth;
+			}
+			document.getElementById("combatlog").innerHTML = '';
+			document.getElementById("combatlog").innerHTML += "Your fireball hit the " + monster.name + " for " + Math.floor(fireballDamage) + " damage.<br>";
+			if (!monsters.monsterTakeDamage(monsters.getInstancedMonster(), fireballDamage)) {
+				monsters.battle(monsters.getInstancedMonster(), true);
+			}
+			return true;
+		}
+	};
+
+	var fireballPotency = function(fireball) {
+		var fireballBasePotency = 15;
+		var fireballLevelPotency = Math.pow(1.5, fireball.level);
+		var fireballMagicPotency = Math.pow(1.1, player.getMagicLevel() - 5) - 1;
+		return Math.floor(fireballBasePotency * fireballLevelPotency + fireballMagicPotency);
+	};
+
+	var castBarrier = function(barrier) {
+		var barrierValue = barrierPotency(barrier);
+		if (buffs.getBarrierLeft() == barrierValue) {
+			return false;
+		}
+		else {
+			buffs.setBarrierLeft(barrierValue);
+			buffs.updateTemporaryBuffs(false);
+			if (player.getInBattle()) {
+				document.getElementById("combatlog").innerHTML = '';
+				document.getElementById("combatlog").innerHTML += "You created a magical barrier.<br>";
+				monsters.battle(monsters.getInstancedMonster(), true);
+			}
+			return true;
+		}
+	};
+
+	var barrierPotency = function(barrier) {
+		var barrierBasePotency = 50;
+		var barrierLevelPotency = 50 * barrier.level;
+		var barrierMagicPotency = (10 * (player.getMagicLevel() - 10));
+		return Math.floor(barrierBasePotency + barrierLevelPotency + barrierMagicPotency);
+	};
+
+	var castAegis = function(aegis) {
+		if (buffs.getAegisTimeLeft !== 0) {
+			return false;
+		}
+		else {
+			buffs.setAegisTimeLeft(aegisPotency(aegis));
+			buffs.updateTemporaryBuffs(false);
+			if (player.getInBattle()) {
+				document.getElementById("combatlog").innerHTML = '';
+				document.getElementById("combatlog").innerHTML += "You summon the heavenly shield, Aegis.<br>";
+				monsters.battle(monsters.getInstancedMonster(), true);
+			}
+			return true;
+		}
+	};
+
+	var aegisPotency = function(aegis) {
+		var aegisBasePotency = 5;
+		var aegisLevelPotency = 5 * aegis.level;
+		var aegisMagicPotency = player.getMagicLevel() - 50;
+		return Math.floor(aegisBasePotency + aegisLevelPotency + aegisMagicPotency);
+	};
+
+	var castSlow = function(slow) {
+		var monster = monsters.getInstancedMonster();
+		if (!player.getInBattle() && monster.status !== 0) {
+			return false;
+		}
+		else {
+			monster.status = 1;
+			monster.dexterity = monster.dexterity/2;
+			document.getElementById("monsterdex").innerHTML = monster.dexterity;
+			document.getElementById("combatlog").innerHTML = '';
+			document.getElementById("combatlog").innerHTML += "You have cast slow on the " + monster.name + ". Its DEX has been halved.<br>";
+			monsters.setInstancedMonster(monster);
+			monsters.battle(monsters.getInstancedMonster(), true);
+			return true;
+		}
+	};
+
+	var castRage = function(rage) {
+		if (!player.getInBattle()) {
+			return false;
+		}
+		else {
+			buffs.setRageTimeLeft(ragePotency(rage));
+			buffs.updateTemporaryBuffs(false);
+			document.getElementById("combatlog").innerHTML = '';
+			document.getElementById("combatlog").innerHTML += "You have entered a state of frenzy!<br>";
+			monsters.battle(monsters.getInstancedMonster(), true);
+			return true;
+		}
+	};
+
+	var ragePotency = function(rage) {
+		var rageBasePotency = 5;
+		var rageLevelPotency = rage.level;
+		var rageMagicPotency = (0.2 * (player.getMagicLevel() - 25));
+		return Math.floor(rageBasePotency + rageLevelPotency + rageMagicPotency);
+	};
+};
+
+var Upgrades = function() {
+	var excelia = 0;
+
+	var upgradeList = [];
+	upgradeList.push({name: "Time Warp",
+		id: "timewarp1",
+		exceliaCost: 10,
+		required: "",
+		shown: false,
+		purchased: false,
+		description:"Is progress too slow? Make everything go at twice the speed!"});
+
+	upgradeList.push({name: "Aetheric Attunement",
+		id: "aetheric",
+		exceliaCost: 100,
+		required: "",
+		shown: false,
+		purchased: false,
+		description:"Tap into the mana around you. Recover +1 MP per second while exploring."});
+
+	upgradeList.push({name: "Time Warp 2",
+		id: "timewarp2",
+		exceliaCost: 100,
+		required: "timewarp1",
+		shown: false,
+		purchased: false,
+		description:"Change to the next gear! With this, everything is five times faster!"});
+
+	upgradeList.push({name: "Blessings",
+		id: "blessings",
+		exceliaCost: 100,
+		required: "",
+		shown:false,
+		purchased: false,
+		description:"Keep 10% of your excelia upon death."});
+
+	upgradeList.push({name: "Auto-Shooting",
+		id: "autoshoot",
+		exceliaCost: 500,
+		required: "",
+		shown: false,
+		purchased: false,
+		description:"Shoot a fireball at the start of every battle without losing a turn!"});
+
+	upgradeList.push({name: "Excelia x2",
+		id: "doubleexcelia",
+		exceliaCost: 2000,
+		required: "",
+		shown: false,
+		purchased: false,
+		description:"Double the amount of Excelia you gain per monster."});
+
+	upgradeList.push({name: "Adept Mage",
+		id: "adeptmage",
+		exceliaCost: 5000,
+		required: "",
+		shown: false,
+		purchased: false,
+		description:"Master spells twice as fast. Blow yourself up twice as much."});
+
+	upgradeList.push({name: "Battle Healing",
+		id: "battlehealing",
+		exceliaCost: 5000,
+		required: "",
+		shown: false,
+		purchased: false,
+		description:"Cast Cure whenever you get under 50% HP during battle."});
+
+	var self = this;
+	//Save Method
+	self.save = function() {
+		var upgradesSave = {
+      savedExcelia: excelia,
+      savedUpgradeList: upgradeList
+		};
+		localStorage.setItem("upgradesSave",JSON.stringify(upgradesSave));
+	};
+
+	//Load Method
+	self.load = function() {
+		var upgradesSave = JSON.parse(localStorage.getItem("upgradesSave"));
+		if (upgradesSave) {
+			if (upgradesSave.savedExcelia !== undefined) {
+				excelia = upgradesSave.savedExcelia;
+			}
+			if (upgradesSave.savedUpgradeList !== undefined) {
+				loadUpgradeList(upgradesSave.savedUpgradeList);
+			}
+		}
+	};
+
+	var loadUpgradeList = function(savedUpgradeList) {
+		for (var i = 0; i < savedUpgradeList.length; i++) {
+			if (i == upgradeList.length) {
+				break;
+			}
+			if (savedUpgradeList[i].shown !== undefined) {
+				upgradeList[i].shown = savedUpgradeList[i].shown;
+			}
+			if (savedUpgradeList[i].purchased !== undefined) {
+				upgradeList[i].purchased = savedUpgradeList[i].purchased;
+			}
+		}
+	};
+
+	//Getters
+	self.getExcelia = function() {
+		return excelia;
+	};
+
+	//Setters
+
+	//Other Methods
+	self.loadExcelia = function() {
+		document.getElementById("excelia").innerHTML = Math.round(100*excelia)/100;
+	};
+
+	self.loadTimeUpgrades = function() {
+		for (var i = 0; i < upgradeList.length; i++) {
+			if (upgradeList[i].id == "timewarp1" && upgradeList[i].purchased === true) {
+				document.getElementById("speed2").innerHTML = '<button class="btn btn-primary" onClick="system.gameSpeed(500)">x2</button>';
+			}
+			else if (upgradeList[i].id == "timewarp2" && upgradeList[i].purchased === true) {
+				document.getElementById("speed5").innerHTML = '<button class="btn btn-primary" onClick="system.gameSpeed(200)">x5</button>';
+			}
+		}
+	};
+
+	self.gainExcelia = function(monster) {
+		var gain = buffs.getExceliaMultiplier() * (monster.strength + monster.constitution + monster.dexterity)/15;
+		self.updateExcelia(gain);
+		self.updateUpgrades();
+	};
+
+	self.updateExcelia = function(moreExcelia) {
+		excelia += moreExcelia;
+		self.loadExcelia();
+	};
+
+	self.updateUpgrades = function() {
+		document.getElementById("upgrades").innerHTML = '';
+		for (var i = 0; i < upgradeList.length; i++) {
+			if ((excelia >= upgradeList[i].exceliaCost || upgradeList[i].shown === true) && upgradeList[i].purchased === false && self.isUpgradePurchased(upgradeList[i].required)) {
+				upgradeList[i].shown = true;
+				document.getElementById("upgrades").innerHTML += '<div class="row"><div class="col-xs-7"><button class="btn btn-primary btn-block" data-toggle="tooltip" data-placement="top" title="' + upgradeList[i].description + '" onClick="upgrades.buyUpgrade(\'' + upgradeList[i].id + '\')">' + upgradeList[i].name + '</button></div><div class="col-xs-5"><p>(Cost: ' + upgradeList[i].exceliaCost + ')</p></div></div><div class="row" style="height: 5px;"></div>';
+			}
+		}
+		$(document).ready(function(){
+			$('[data-toggle="tooltip"]').tooltip(); 
+		});
+	};
+
+	self.isUpgradePurchased = function(upgradeId) {
+		if (upgradeId === "") {
+			return true;
+		}
+		else {
+			for (var i = 0; i < upgradeList.length; i++) {
+				if (upgradeList[i].id == upgradeId) {
+					if (upgradeList[i].purchased) {
+						return true;
+					}
+					else {
+						return false;
+					}
+				}
+			}
+			return false;
+		}
+	};
+
+	self.buyUpgrade = function(upgradeId) {
+		for (var i = 0; i < upgradeList.length; i++) {
+			if (upgradeList[i].id == upgradeId) {
+				break;
+			}
+		}
+		if (excelia >= upgradeList[i].exceliaCost) {
+			self.updateExcelia(-upgradeList[i].exceliaCost);
+			upgradeList[i].purchased = true;
+			activateUpgrade(upgradeList[i]);
+			self.updateUpgrades();
+		}
+		buffs.updatePermanentBuffs();
+		buffs.updateToggleableBuffs();
+	};
+
+	var activateUpgrade = function(upgrade) {
+		if (upgrade.id == "timewarp1") {
+			document.getElementById("speed2").innerHTML = '<button class="btn btn-primary" onClick="system.gameSpeed(500)">x2</button>';
+		}
+		else if (upgrade.id == "timewarp2") {
+			document.getElementById("speed5").innerHTML = '<button class="btn btn-primary" onClick="system.gameSpeed(200)">x5</button>';
+		}
+		else if (upgrade.id == "aetheric") {
+			buffs.setManaPerSecond(buffs.getManaPerSecond() + 1);
+		}
+		else if (upgrade.id == "battleHealing") {
+			buffs.setCastCureInBattle(true);
+		}
+		else if (upgrade.id == "doubleexcelia") {
+			buffs.setExceliaMultiplier(buffs.getExceliaMultiplier() * 2);
+		}
+		else if (upgrade.id == "adeptmage") {
+			buffs.setSpellLevelingMultiplier(buffs.getSpellLevelingMultiplier() * 2);
+		}
+		else if (upgrade.id == "blessings") {
+			buffs.setExceliaSavedOnDeath(buffs.getExceliaSavedOnDeath() + 10);
+		}
+		else if (upgrade.id == "autoshoot") {
+			buffs.setCastFireballInBattle(true);
+		}
+	};
+};
+
+var Buffs = function() {
+	//Multipliers
+	var exceliaMultiplier = 1;
+	var spellLevelingMultiplier = 1;
+
+	//Adders
+	var manaPerSecond = 0;
+
+	//Percenters
+	var exceliaSavedOnDeath = 0;
+
+	//Toggleables
+	var castCureInBattle = false;
+	var castFireballInBattle = false;
+
+	//Timed Buffs
+	var aegisTimeLeft = 0;
+	var rageTimeLeft = 0;
+
+	//Non-timed Temporary Buffs
+	var barrierLeft = 0;
+
+	var self = this;
+	//Save Method
+	self.save = function() {
+		var buffsSave = {
+			savedExceliaMultiplier: exceliaMultiplier,
+			savedSpellLevelingMultiplier: spellLevelingMultiplier,
+			savedManaPerSecond: manaPerSecond,
+			savedExceliaSavedOnDeath: exceliaSavedOnDeath,
+			savedCastCureInBattle: castCureInBattle,
+			savedCastFireballInBattle: castFireballInBattle,
+			savedAegisTimeLeft: aegisTimeLeft,
+			savedRageTimeLeft: rageTimeLeft,
+			savedBarrierLeft: barrierLeft
+		};
+		localStorage.setItem("buffsSave",JSON.stringify(buffsSave));
+	};
+
+	//Load Method
+	self.load = function() {
+		var buffsSave = JSON.parse(localStorage.getItem("buffsSave"));
+		if (buffsSave) {
+			loadMultiplierBuffs(buffsSave);
+			loadAdderBuffs(buffsSave);
+			loadPercenterBuffs(buffsSave);
+			loadToggleableBuffs(buffsSave);
+			loadTimedBuffs(buffsSave);
+			loadTemporaryBuffs(buffsSave);
+		}
+	};
+
+	var loadMultiplierBuffs = function(buffsSave) {
+		if (buffsSave.savedExceliaMultiplier !== undefined) {
+			exceliaMultiplier = buffsSave.savedExceliaMultiplier;
+		}
+		if (buffsSave.savedSpellLevelingMultiplier !== undefined) {
+			spellLevelingMultiplier = buffsSave.savedSpellLevelingMultiplier;
+		}
+	};
+
+	var loadAdderBuffs = function(buffsSave) {
+		if (buffsSave.savedManaPerSecond !== undefined) {
+			manaPerSecond = buffsSave.savedManaPerSecond;
+		}
+	};
+
+	var loadPercenterBuffs = function(buffsSave) {
+		if (buffsSave.savedExceliaSavedOnDeath !== undefined) {
+			exceliaSavedOnDeath = buffsSave.savedExceliaSavedOnDeath;
+		}
+	};
+
+	var loadToggleableBuffs = function(buffsSave) {
+		if (buffsSave.savedCastCureInBattle !== undefined) {
+			castCureInBattle = buffsSave.savedCastCureInBattle;
+		}
+		if (buffsSave.savedCastFireballInBattle !== undefined) {
+			castFireballInBattle = buffsSave.savedCastFireballInBattle;
+		}
+	};
+
+	var loadTimedBuffs = function(buffsSave) {
+		if (buffsSave.savedAegisTimeLeft !== undefined) {
+			aegisTimeLeft = buffsSave.savedAegisTimeLeft;
+		}
+		if (buffsSave.savedRageTimeLeft !== undefined) {
+			rageTimeLeft = buffsSave.savedRageTimeLeft;
+		}
+	};
+
+	var loadTemporaryBuffs = function(buffsSave) {
+		if (buffsSave.savedBarrierLeft !== undefined) {
+			barrierLeft = buffsSave.savedBarrierLeft;
+		}
+	};
+
+	//Getters
+	self.getCastFireballInBattle = function() {
+		return castFireballInBattle;
+	};
+
+	self.getRageTimeLeft = function() {
+		return rageTimeLeft;
+	};
+
+	self.getSpellLevelingMultiplier = function() {
+		return spellLevelingMultiplier;
+	};
+
+	self.getBarrierLeft = function() {
+		return barrierLeft;
+	};
+
+	self.getAegisTimeLeft = function() {
+		return aegisTimeLeft;
+	};
+
+	self.getCastCureInBattle = function() {
+		return castCureInBattle;
+	};
+
+	self.getExceliaMultiplier = function() {
+		return exceliaMultiplier;
+	};
+
+	self.getManaPerSecond = function() {
+		return manaPerSecond;
+	};
+
+	self.getExceliaSavedOnDeath = function() {
+		return exceliaSavedOnDeath;
+	};
+
+	//Setters
+	self.setBarrierLeft = function(barrierValue) {
+		barrierLeft = barrierValue;
+	};
+
+	self.setAegisTimeLeft = function(aegisTime) {
+		aegisTimeLeft = aegisTime;
+	};
+
+	self.setRageTimeLeft = function(rageTime) {
+		rageTimeLeft = rageTime;
+	};
+
+	self.setManaPerSecond = function(newManaPerSecond) {
+		manaPerSecond = newManaPerSecond;
+	};
+
+	self.setCastCureInBattle = function(boolean) {
+		castCureInBattle = boolean;
+	};
+
+	self.setExceliaMultiplier = function(newMultiplier) {
+		exceliaMultiplier = newMultiplier;
+	};
+
+	self.setSpellLevelingMultiplier = function(newMultiplier) {
+		spellLevelingMultiplier = newMultiplier;
+	};
+
+	self.setExceliaSavedOnDeath = function(newPercentage) {
+		exceliaSavedOnDeath = newPercentage;
+	};
+
+	self.setCastFireballInBattle = function(boolean) {
+		castFireballInBattle = boolean;
+	};
+
+	//Other Methods
+	self.updateTemporaryBuffs = function(decrease) {
+		document.getElementById("temporary").innerHTML = '';
+
+		if (aegisTimeLeft !== 0) {
+			if (decrease) {
+				aegisTimeLeft--;
+			}
+			document.getElementById("temporary").innerHTML += '<li class="list-group-item list-group-item-info"><span class="badge">' + Math.round(aegisTimeLeft) + '</span>Aegis</li>';
+		}
+
+		if (barrierLeft !== 0) {
+			document.getElementById("temporary").innerHTML += '<li class="list-group-item list-group-item-info"><span class="badge">' + Math.round(barrierLeft) + '</span>Barrier</li>';
+		}
+
+		if (rageTimeLeft !== 0) {
+			if (decrease) {
+				rageTimeLeft--;
+			}
+			document.getElementById("temporary").innerHTML += '<li class="list-group-item list-group-item-info"><span class="badge">' + Math.round(rageTimeLeft) + '</span>Rage</li>';
+		}
+	};
+
+	self.updateToggleableBuffs = function() {
+		document.getElementById("toggleable").innerHTML = '';
+		var toggleStatusText;
+
+		if (castFireballInBattle || upgrades.isUpgradePurchased("autoshoot")) {
+			if (castFireballInBattle) {
+				toggleStatusText = "ON";
+			}
+			else {
+				toggleStatusText = "OFF";
+			}
+			document.getElementById("toggleable").innerHTML += '<button type="button" class="list-group-item" onClick="buffs.toggleBuff(\'castFireballInBattle\')"><span class="badge">' + toggleStatusText + '</span>Auto-Shooting</button>';
+		}
+
+		if (castCureInBattle || upgrades.isUpgradePurchased("battlehealing")) {
+			if (castCureInBattle) {
+				toggleStatusText = "ON";
+			}
+			else {
+				toggleStatusText = "OFF";
+			}
+			document.getElementById("toggleable").innerHTML += '<button type="button" class="list-group-item" onClick="buffs.toggleBuff(\'castCureInBattle\')"><span class="badge">' + toggleStatusText + '</span>Battle Healing</button>';
+		}
+	};
+
+	self.updatePermanentBuffs = function() {
+		document.getElementById("permanent").innerHTML = '';
+		if (exceliaMultiplier !== 1) {
+			document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">x' + exceliaMultiplier + '</span>Excelia Gain</li>';
+		}
+		if (exceliaSavedOnDeath !== 0) {
+			document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">' + exceliaSavedOnDeath + '%</span>Excelia Saved Upon Death</li>';
+		}
+		if (manaPerSecond !== 0) {
+			document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">+' + manaPerSecond + '</span>Exploration Mana per Second</li>';
+		}
+		if (spellLevelingMultiplier !== 1) {
+			document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">x' + spellLevelingMultiplier + '</span>Spell Level Gain</li>';
+		}
+	};
+
+	self.toggleBuff = function(buffId) {
+		if (buffId == "castCureInBattle") {
+			castCureInBattle = !castCureInBattle;
+		}
+		else if (buffId == "castFireballInBattle") {
+			castFireballInBattle = !castFireballInBattle;
+		}
+		self.updateToggleableBuffs();
+	};
+};
+
+var Monsters = function() {
+	var monsterList = [
+		//First Tier
+		{name:"Rat", killed:0},
+		{name:"Bat", killed:0},
+		{name:"Slime", killed:0},
+		{name:"Kobold", killed:0},
+		{name:"Wolf", killed:0},
+		{name:"Lizard", killed:0},
+		{name:"Goblin", killed:0},
+		{name:"Bandit", killed:0},
+		{name:"Spider", killed:0},
+		{name:"Eagle", killed:0},
+
+		//Second Tier
+		{name:"Bear", killed:0},
+		{name:"Snake", killed:0},
+		{name:"Troll", killed:0},
+		{name:"Kobold Warrior", killed:0},
+		{name:"Giant Wolf", killed:0},
+		{name:"Ghoul", killed:0},
+		{name:"Alligator", killed:0},
+		{name:"Giant Lizard", killed:0},
+		{name:"Giant Rat", killed: 0},
+		{name:"Orc Child", killed:0}
+	];
+
+	var instancedMonster = {
+		name: "",
+		currentHealth: 0,
+		maximumHealth: 0,
+		strength: 0,
+		dexterity: 0,
+		constitution: 0,
+		status: 0
+	};
+
+	var self = this;
+	//Save Method
+	self.save = function() {
+		var monstersSave = {
+			savedMonsterList: monsterList,
+			savedInstancedMonster: instancedMonster
+		};
+		localStorage.setItem("monstersSave",JSON.stringify(monstersSave));
+	};
+
+	//Load Method
+	self.load = function() {
+		var monstersSave = JSON.parse(localStorage.getItem("monstersSave"));
+		if (monstersSave) {
+			if (monstersSave.savedMonsterList !== undefined) {
+				loadMonsterList(monstersSave.savedMonsterList);
+			}
+			if (monstersSave.savedInstancedMonster !== undefined) {
+				loadInstancedMonster(monstersSave.savedInstancedMonster);
+			}
+		}
+	};
+
+	var loadMonsterList = function(savedMonsterList) {
+		for (var i = 0; i < savedMonsterList.length; i++) {
+			if (i == monsterList.length) {
+				break;
+			}
+			if (savedMonsterList[i].killed !== undefined) {
+				monsterList[i].killed = savedMonsterList[i].killed;
+			}
+		}
+	};
+
+	var loadInstancedMonster = function(savedInstancedMonster) {
+		if (savedInstancedMonster.name !== undefined) {
+			instancedMonster.name = savedInstancedMonster.name;
+		}
+		if (savedInstancedMonster.currentHealth !== undefined) {
+			instancedMonster.currentHealth = savedInstancedMonster.currentHealth;
+		}
+		if (savedInstancedMonster.maximumHealth !== undefined) {
+			instancedMonster.maximumHealth = savedInstancedMonster.maximumHealth;
+		}
+		if (savedInstancedMonster.strength !== undefined) {
+			instancedMonster.strength = savedInstancedMonster.strength;
+		}
+		if (savedInstancedMonster.dexterity !== undefined) {
+			instancedMonster.dexterity = savedInstancedMonster.dexterity;
+		}
+		if (savedInstancedMonster.constitution !== undefined) {
+			instancedMonster.constitution = savedInstancedMonster.constitution;
+		}
+		if (savedInstancedMonster.status !== undefined) {
+			instancedMonster.status = savedInstancedMonster.status;
+		}
+	};
+
+	//Getters
+	self.getMonsterList = function() {
+		return monsterList;
+	};
+
+	self.getInstancedMonster = function() {
+		return instancedMonster;
+	};
+
+	//Setters
+	self.setInstancedMonster = function(updatedMonster) {
+		instancedMonster = updatedMonster;
+	};
+
+	//Other Methods
+	self.attackMelee = function() {
+		if(player.getInBattle()) {
+			self.battle(instancedMonster, false);
+		}
+	};
+
+	self.loadMonsterInfo = function(monster) {
+		if (monster !== undefined) {
+			document.getElementById("monstername").innerHTML = monster.name;
+			document.getElementById("monsterhp").innerHTML = Math.round(monster.currentHealth);
+			document.getElementById("monsterstr").innerHTML = monster.strength;
+			document.getElementById("monsterdex").innerHTML = monster.dexterity;
+			document.getElementById("monstercon").innerHTML = monster.constitution;
+			document.getElementById("monsterbar").style.width = 100*(monster.currentHealth/monster.maximumHealth) + "%";
+			document.getElementById("combatlog").innerHTML = "You are attacked by a " + monster.name + "!<br>";
+			player.setInBattle(true);
+		}
+		else {
+			document.getElementById("monstername").innerHTML = "None";
+			document.getElementById("monsterhp").innerHTML = "0";
+			document.getElementById("monsterstr").innerHTML = "0";
+			document.getElementById("monsterdex").innerHTML = "0";
+			document.getElementById("monstercon").innerHTML = "0";
+			document.getElementById("monsterbar").style.width = "0%";
+		}
+	};
+
+	self.battle = function(monster, spellCast) {
+		if(!player.getInBattle()) {
+			player.setInBattle(true);
+			player.loadRestButton();
+			player.loadExploreButton();
+			self.loadMonsterInfo(monster);
+			if (buffs.getCastFireballInBattle()) {
+				spells.castSpell("fireball");
+			}
+		}
+		else {
+			var isDead = false;
+			if (!spellCast) {
+				document.getElementById("combatlog").innerHTML = '';
+				if (buffs.getCastCureInBattle() && player.getHealthCurrentValue() <= player.getHealthMaximumValue()/2) {
+					if (!spells.castSpell("cure")) {
+						isDead = playerAttacks(monster);
+					}
+					else {
+						return true;
+					}
+				}
+				else {
+					isDead = playerAttacks(monster);
+				}
+			}
+			if (!isDead) {
+				isDead = monsterAttacks(monster);
+				if (!isDead) {
+					player.gainExperience(monster);
+				}
+			}
+		}
+	};
+
+	var playerAttacks = function(monster) {
+		var damage = damageFormula(player.getStrengthLevel(), player.getDexterityLevel(), monster.constitution, monster.currentHealth);
+		if (buffs.getRageTimeLeft() !== 0) {
+			damage *= 5;
+		}
+		if (damage >= monster.currentHealth) {
+			damage = monster.currentHealth;
+		}
+		document.getElementById("combatlog").innerHTML += "You dealt " + Math.round(damage) + " damage to the " + monster.name + ".<br>";
+		return self.monsterTakeDamage(monster, damage);
+	};
+
+	self.monsterTakeDamage = function(monster, damage) {
+		monster.currentHealth -= damage;
+		document.getElementById("monsterhp").innerHTML = Math.floor(monster.currentHealth);
+		document.getElementById("monsterbar").style.width = 100*(monster.currentHealth/monster.maximumHealth) + "%";
+		if (monster.currentHealth <= 0) {
+			monsterDeath(monster);
+			return true;
+		}
+		return false;
+	};
+
+	var monsterDeath = function(monster) {
+		player.setInBattle(false);
+		document.getElementById("combatlog").innerHTML += "You have defeated the " + monster.name + "!";
+		updateMonsterKilled(monster.name);
+		upgrades.gainExcelia(monster);
+		player.loadRestButton();
+		player.loadExploreButton();
+		self.loadMonsterInfo();
+	};
+
+	var updateMonsterKilled = function(name) {
+		for (var i = 0; i < monsterList.length; i++) {
+			if (monsterList[i].name == name) {
+				monsterList[i].killed++;
+			}
+		}
+	};
+
+	var damageFormula = function(attackerStrength, attackerDexterity, defenderConstitution, defenderHealth) {
+		var strengthWeigth = 2;
+		var dexterityWeigth = 0.1;
+		var constitutionWeigth = 0.5;
+		var damage = ((attackerStrength * strengthWeigth) - (defenderConstitution * constitutionWeigth)) * (attackerDexterity * dexterityWeigth);
+
+		if (damage < 0) {
+			damage = 0;
+		}
+		else if (damage > defenderHealth) {
+			damage = defenderHealth;
+		}
+		return damage;
+	};
+
+	var monsterAttacks = function(monster) {
+		var damage = damageFormula(monster.strength, monster.dexterity, player.getConstitutionLevel(), player.getHealthCurrentValue());
+		if (buffs.getAegisTimeLeft() === 0) {
+			var barrier = buffs.getBarrierLeft();
+			if (barrier > 0) {
+				if (barrier >= damage) {
+					buffs.setBarrierLeft(barrier - damage);
+					document.getElementById("combatlog").innerHTML += "Your barrier absorbed " + Math.round(damage) + " damage from " + monster.name + "'s attack.<br>";
+					buffs.updateTemporaryBuffs(false);
+					return false;
+				}
+				else {
+					document.getElementById("combatlog").innerHTML += "Your barrier absorbed " + Math.round(barrier) + " damage from " + monster.name + "'s attack.<br>";
+					document.getElementById("combatlog").innerHTML += "Your barrier has shattered.<br>";
+					damage -= barrier;
+					buffs.setBarrierLeft(0);
+					buffs.updateTemporaryBuffs(false);
+				}
+			}
+			player.setHealthCurrentValue(player.getHealthCurrentValue() - damage);
+			document.getElementById("combatlog").innerHTML += "You took " + Math.round(damage) + " damage from the " + monster.name + "'s attack.<br>";
+			if (player.getHealthCurrentValue() === 0) {
+				player.death(monster);
+				return true;
+			}
+		}
+		else {
+			document.getElementById("combatlog").innerHTML += "Aegis absorbed " + Math.round(damage) + " damage from " + monster.name + "'s attack.<br>";
+		}
+		return false;
+	};
+
+	self.battleChance = function(boolean) {
+		if (boolean) {
+			rollMonster();
+			return true;
+		}
+		else {
+			var check = Math.random()*100;
+			if (check <= tower.getFloorMonsterDensity(player.getCurrentFloor())) {
+				rollMonster();
+				return true;
+			}
+			return false;
+		}
+	};
+
+	var rollMonster = function() {
+		var tier = Math.floor((player.getCurrentFloor()-1)/10);
+		var monster = Math.floor(Math.random()*10);
+		while(monster == 10) {
+			monster = Math.floor(Math.random()*10);
+		}
+		instancedMonster = createMonster((tier*10) + monster);
+		self.battle(instancedMonster, false);
+	};
+
+	var createMonster = function(number) {
+		var tempMonster = {name: "", currentHealth: 0, maximumHealth:0 , strength: 0, dexterity: 0, constitution: 0, status: 0};
+		var statPool = Math.round((player.getCurrentFloor() * 15) + Math.pow(1.1, player.getCurrentFloor() - 1) - 1);
+		tempMonster.name = monsterList[number].name;
+		tempMonster.strength++;
+		tempMonster.dexterity++;
+		tempMonster.constitution++;
+		statPool -= 3;
+		distributeStats(tempMonster, statPool);
+		tempMonster.maximumHealth = calculateHealth(tempMonster.constitution);
+		tempMonster.currentHealth = tempMonster.maximumHealth;
+		return tempMonster;
+	};
+
+	var distributeStats = function(monster, statPool) {
+		var choice;
+		while (statPool !== 0) {
+			choice = Math.floor(Math.random()*3);
+			while (choice == 3) {
+				choice = Math.floor(Math.random()*3);
+			}
+			if (choice === 0) {
+				monster.strength++;
+			}
+			else if (choice == 1) {
+				monster.dexterity++;
+			}
+			else if (choice == 2) {
+				monster.constitution++;
+			}
+			statPool--;
+		}
+	};
+
+	var calculateHealth = function(constitution) {
+		return (Math.pow(constitution, 2) * 4);
+	};
+
+	self.runAway = function() {
+		if (player.getInBattle()) {
 			document.getElementById("combatlog").innerHTML = "";
-			document.getElementById("combatlog").innerHTML += "You failed to run away.<br>";
-			battle(monsterInstance, true);
-		}
-		exploreRestButtonLoad();
-	}
-};
-
-//----------------------------------------------------------------//
-//--------------------- EXPLORATION FUNCTIONS --------------------//
-//----------------------------------------------------------------//
-
-//A good night of sleep
-var startRest = function() {
-	if (player.hp.curval != player.hp.maxval || player.mp.curval != player.mp.maxval) {
-		game.resting = true;
-	}
-	exploreRestButtonLoad();
-};
-
-//I'm walking down the street on the boulevard of broken dreams
-var exploreFloor = function() {
-	//Absorb the aether
-	updateCondition(player.mp, buffs.aethericLevel);
-	
-	//There is still more to see
-	if (tower[player.curfloor].explored < tower[player.curfloor].size) {
-		tower[player.curfloor].explored += player.spd.val/10;
-		if (tower[player.curfloor].explored > tower[player.curfloor].size) {
-			tower[player.curfloor].explored = tower[player.curfloor].size;
-		}
-		document.getElementById("floorbar").style.width = percentage(tower[player.curfloor].explored, tower[player.curfloor].size) + "%";
-		document.getElementById("explperc").innerHTML = Math.round(100 * percentage(tower[player.curfloor].explored, tower[player.curfloor].size))/100 + "%";
-		
-		//Are we there yet?
-		if (tower[player.curfloor].stairpos <= tower[player.curfloor].explored && tower[player.curfloor].advallowed === 0 && player.curfloor < monsterList.length) {
-			tower[player.curfloor].advallowed = 1;
-			document.getElementById("advbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(1)">Next Floor</button>';
-		}
-		
-		//My calfs are getting tougher
-		if (tower[player.curfloor].explored != tower[player.curfloor].size) {
-			updateStat(player.spd, player.spd.val/10);
-		}
-		battleChance();
-	}
-	else {
-		while(!battleChance()) {
-			updateCondition(player.mp, buffs.aethericLevel);
+			var runRoll = Math.random() * (instancedMonster.strength + instancedMonster.dexterity + instancedMonster.constitution);
+			if (runRoll < player.getSpeedLevel()) {
+				document.getElementById("combatlog").innerHTML += "You escaped from the battle against " + instancedMonster.name + ".";
+				self.loadMonsterInfo();
+				player.setSpeedExperience(player.getSpeedExperience() + runRoll);
+				player.setInBattle(false);
+				player.loadExploreButton();
+				player.loadRestButton();
+			}
+			else {
+				document.getElementById("combatlog").innerHTML += "You failed to run away.<br>";
+				self.battle(instancedMonster, true);
+			}
 		}
 	}
 };
 
-//I hate stairs so much
-var changeFloor = function(number) {
-	if (!game.inbattle) {
-		//This many floors!
-		player.curfloor += number;
-		document.getElementById("floor").innerHTML = player.curfloor;
-		document.getElementById("floorbar").style.width = percentage(tower[player.curfloor].explored, tower[player.curfloor].size) + "%";
-		document.getElementById("explperc").innerHTML = Math.round(100 * percentage(tower[player.curfloor].explored, tower[player.curfloor].size))/100 + "%";
-		
-		//I can go to the next floor
-		if (tower[player.curfloor].advallowed == 1 && player.curfloor < monsterList.length) {
-			document.getElementById("advbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(1)">Next Floor</button>';
+var Tower = function() {
+	var floors = [];
+	for (var i = 0; i < monsters.getMonsterList().length; i++) {
+		if (i === 0) {
+			floors.push({size: 100, explored: 100, canAdvance: true, stairsPosition: 0, monsterDensity: 0});
+		}
+		else {
+			floors.push({size: Math.floor(2*floors[i-1].size),
+				explored: 0,
+				canAdvance: false,
+				stairsPosition: Math.floor(Math.random() * Math.floor(2*floors[i-1].size)),
+				monsterDensity: 10 + Math.random()*40});
+		}
+	}
+
+	var self = this;
+	//Save Method
+	self.save = function() {
+		var towerSave = {
+			savedFloors: floors
+		};
+		localStorage.setItem("towerSave",JSON.stringify(towerSave));
+	};
+
+	//Load Method
+	self.load = function() {
+		var towerSave = JSON.parse(localStorage.getItem("towerSave"));
+		if (towerSave) {
+			if (towerSave.savedFloors !== undefined) {
+				loadFloors(towerSave.savedFloors);
+			}
+		}
+	};
+
+	var loadFloors = function(savedFloors) {
+		for (var i = 0; i < savedFloors.length; i++) {
+			if (i == floors.length) {
+				break;
+			}
+			if (savedFloors[i].explored !== undefined) {
+				floors[i].explored = savedFloors[i].explored;
+			}
+			if (savedFloors[i].canAdvance !== undefined) {
+				floors[i].canAdvance = savedFloors[i].canAdvance;
+			}
+			if (savedFloors[i].stairsPosition !== undefined) {
+				floors[i].stairsPosition = savedFloors[i].stairsPosition;
+			}
+			if (savedFloors[i].monsterDensity !== undefined) {
+				floors[i].monsterDensity = savedFloors[i].monsterDensity;
+			}
+		}
+	};
+
+	//Getters
+	self.getFloorMonsterDensity = function(floor) {
+		return floors[floor].monsterDensity;
+	};
+
+	//Setters
+
+	//Other Methods
+	self.floorExplorationComplete = function(floor) {
+		if (floors[floor].size == floors[floor].explored) {
+			return true;
+		}
+		return false;
+	};
+
+	self.loadTowerScreen = function() {
+		var currentFloor = player.getCurrentFloor();
+		document.getElementById("floor").innerHTML = currentFloor;
+		document.getElementById("explperc").innerHTML = Math.round(100*(floors[currentFloor].explored/floors[currentFloor].size)*100)/100 + "%";
+		document.getElementById("floorbar").style.width = 100*(floors[currentFloor].explored/floors[currentFloor].size) + "%";
+		if (floors[currentFloor].canAdvance && currentFloor < monsters.getMonsterList().length) {
+			document.getElementById("advbut").innerHTML = '<button class="btn btn-default btn-block" onClick="tower.changeFloor(1)">Next Floor</button>';
 		}
 		else {
 			document.getElementById("advbut").innerHTML = '';
 		}
-		
-		//If I'm not at the bottom, I can go down
-		if (player.curfloor !== 0) {
-			document.getElementById("retbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(-1)">Previous Floor</button>';
-			game.resting = false;
+		if (currentFloor !== 0) {
+			document.getElementById("retbut").innerHTML = '<button class="btn btn-default btn-block" onClick="tower.changeFloor(-1)">Previous Floor</button>';
 		}
 		else {
 			document.getElementById("retbut").innerHTML = '';
 		}
-		
-		//Have I reached the bottom?
-		if (player.curfloor === 0) {
-			game.resting = true;
-			document.getElementById("exploreButton").innerHTML = '';
-			document.getElementById("restButton").innerHTML = '';
-		}
-		
-		exploreRestButtonLoad();
-	}
-};
+	};
 
-//----------------------------------------------------------------//
-//---------------------- RESOURCES FUNCTIONS ---------------------//
-//----------------------------------------------------------------//
+	self.changeFloor = function(floorsChanged) {
+		if (!player.getInBattle()) {
+			player.setCurrentFloor(player.getCurrentFloor() + floorsChanged);
+			self.loadTowerScreen();
+			player.loadRestButton();
+			player.loadExploreButton();
+		}
+	};
 
-//Give me souls! More souls!
-var gainExcelia = function(arg) {
-	var gain = buffs.exceliaMultiplier * (arg.str + arg.con + arg.dex)/15;
-	updateExcelia(gain);
-	readUpgrades();
-};
-
-//Where has my stuff gone?
-var updateExcelia = function(number) {
-	resources.excelia += number;
-	document.getElementById("excelia").innerHTML = Math.round(100*resources.excelia)/100;
-};
-
-//----------------------------------------------------------------//
-//----------------------- UPGRADE FUNCTIONS ----------------------//
-//----------------------------------------------------------------//
-
-//Where is our upgrade?
-var findUpgrade = function(upgradeId) {
-	for (i = 0; i < upgrades.length; i++) {
-		if (upgrades[i].id == upgradeId) break;
-	}
-	return upgrades[i];
-};
-
-//Let's cheat our way up!
-var buyUpgrade = function(upgradeId) {
-	//Where's the one we want?
-	for (i = 0; i < upgrades.length; i++) {
-		if (upgrades[i].id == upgradeId) break;
-	}
-	
-	//Oh, here it is. Do we have enough?
-	if (resources.excelia >= upgrades[i].exceliacost) {
-		updateExcelia(-upgrades[i].exceliacost);
-		upgrades[i].purchased = true;
-		readUpgrades();
-		
-		//Let's activate it!
-		//You don't even need any higher than that.
-		if (upgrades[i].id == "timewarp1") {
-			document.getElementById("speed2").innerHTML = '<button class="btn btn-primary" onClick="gameSpeed(500)">x2</button>';
-		}
-		else if (upgrades[i].id == "aetheric") {
-			buffs.aethericLevel += 1;
-		}
-		else if (upgrades[i].id == "timewarp2") {
-			document.getElementById("speed5").innerHTML = '<button class="btn btn-primary" onClick="gameSpeed(200)">x5</button>';
-		}
-		else if (upgrades[i].id == "battlehealing") {
-			buffs.battleHealing = true;
-		}
-		else if (upgrades[i].id == "doubleexcelia") {
-			buffs.exceliaMultiplier *= 2;
-		}
-		else if (upgrades[i].id == "adeptmage") {
-			buffs.spellMasteryMultiplier *= 2;
-		}
-		else if (upgrades[i].id == "blessings") {
-			buffs.exceliaBless += 10;
-		}
-		else if (upgrades[i].id == "autoshoot") {
-			buffs.autoFireball = true;
-		}
-	}
-	
-	readPermBuffs();
-	readToggBuffs();
-};
-
-var switchToggBuff = function(buffId) {
-	if (buffId == "battlehealing") {
-		buffs.battleHealing = !buffs.battleHealing;
-	}
-	else if (buffId == "autoshoot") {
-		buffs.autoFireball = !buffs.autoFireball;
-	}
-	readToggBuffs();
-};
-
-//----------------------------------------------------------------//
-//------------------------ SPELL FUNCTIONS -----------------------//
-//----------------------------------------------------------------//
-
-//Describe Spells:
-var addSpellDescriptions = function() {
-	for (i = 0; i < spellbook.length; i++) {
-		if (spellbook[i].id == "cure") {
-			spellbook[i].desc = "Heal " + curePotency(spellbook[i]) + " HP";
-		}
-		else if (spellbook[i].id == "fireball") {
-			spellbook[i].desc = "Deal " + fireballPotency(spellbook[i]) + " fire damage.";
-		}
-		else if (spellbook[i].id == "barrier") {
-			spellbook[i].desc = "Put up a barrier that will protect you from " + barrierPotency(spellbook[i]) + " damage.";
-		}
-		else if (spellbook[i].id == "aegis") {
-			spellbook[i].desc = "Take no damage for " + aegisPotency(spellbook[i]) + " seconds.";
-		}
-		else if (spellbook[i].id == "slow") {
-			spellbook[i].desc = "Halve an enemy's DEX.";
-		}
-		else if (spellbook[i].id == "rage") {
-			spellbook[i].desc = "Fill yourself with rage for " + ragePotency(spellbook[i]) + " seconds. You deal 5x damage, however, you take 2x damage and cannot cast other spells.";
-		}
-		else if (spellbook[i].id == "clairvoyance") {
-			spellbook[i].desc = "Project your mind further into the tower, trying to find the stairs. It's very exausting, so you can only do it so often.";
-		}
-	}
-};
-
-//Spell, spell, which type are you?
-var spellType = function(number) {
-	//Good spell!
-	if (number === 0) {
-		return "btn-info";
-	}
-	
-	//Even better spell!
-	else if (number == 1) {
-		return "btn-danger";
-	}
-	
-	//Saboteur
-	else if (number == 2) {
-		return "btn-warning";
-	}
-	
-	//Hacker
-	else if (number == 3) {
-		return "btn-success";
-	}
-};
-
-//The more we cast, the better we get
-//Arg can be any spell, number can be any number (most useful comment ever)
-var spellLevel = function(arg, number) {
-	//Increase spell exp
-	arg.xp += number;
-	
-	//Did our spell level up?
-	while (arg.xp >= arg.next) {
-		arg.level++;
-		arg.xp -= arg.next;
-		arg.next = Math.pow(2,arg.level) * arg.baseNext;
-		document.getElementById(arg.id + "costall").innerHTML = Math.floor(arg.baseMP + Math.pow(arg.level, 2));
-		document.getElementById(arg.id + "cost").innerHTML = Math.floor(arg.baseMP + Math.pow(arg.level, 2));
-		readSpells();
-	}
-	
-	//Dynamic HTML is our friend
-	document.getElementById(arg.id + "xpall").style.width = percentage(arg.xp, arg.next) + "%";
-	document.getElementById(arg.id + "progall").innerHTML = Math.round(100 * percentage(arg.xp, arg.next))/100 + "%";
-	document.getElementById(arg.id + "levelall").innerHTML = arg.level;
-	document.getElementById(arg.id + "xp").style.width = percentage(arg.xp, arg.next) + "%";
-	document.getElementById(arg.id + "prog").innerHTML = Math.round(100 * percentage(arg.xp, arg.next))/100 + "%";
-	document.getElementById(arg.id + "level").innerHTML = arg.level;
-};
-
-//Do you wanna cast a spell? It doesn't have to be a spell!
-var castSpell = function(spellId) {
-	//I wish you would tell me which.
-	for (var i = 0; i < spellbook.length; i++) {
-		if (spellbook[i].id == spellId) break;
-	}
-	
-	//Go away, Anna
-	var mpCost = spellCost(spellbook[i]);
-	if (player.mp.curval >= mpCost && buffs.rage === 0 && !game.resting) {
-		//Let it cast! Let it cast! Can't hold it back anymore!
-		var castSuccess;
-		if (spellbook[i].id == "cure") {
-			castSuccess = castCure(spellbook[i]);
-		}
-		else if (spellbook[i].id == "fireball") {
-			castSuccess = castFireball(spellbook[i]);
-		}
-		else if (spellbook[i].id == "barrier") {
-			castSuccess = castBarrier(spellbook[i]);
-		}
-		else if (spellbook[i].id == "slow") {
-			castSuccess = castSlow(spellbook[i]);
-		}
-		else if (spellbook[i].id == "aegis") {
-			castSuccess = castAegis(spellbook[i]);
-		}
-		else if (spellbook[i].id == "rage") {
-			castSuccess = castRage(spellbook[i]);
-		}
-		else if (spellbook[i].id == "clairvoyance") {
-			castSuccess = castClairvoyance(spellbook[i]);
-		}
-		
-		//These spells never bothered me anyway.
-		if (castSuccess === true) {
-			updateCondition(player.mp, -mpCost);
-			spellLevel(spellbook[i], (buffs.spellMasteryMultiplier * mpCost));
-			updateStat(player.mgc, (spellbook[i].level + 1 + mpCost/10));
-			updateCondition(player.mp, 0);
+	var hasFoundStairs = function(currentFloor) {
+		if (floors[currentFloor].explored > floors[currentFloor].stairsPosition) {
 			return true;
 		}
-	}
-	return false;
-};
-
-//Voodoo magic!
-var castCure = function(arg) {
-	//Don't be a crybaby, you're not even hurt.
-	if (player.hp.curval == player.hp.maxval) {
 		return false;
-	}
-	
-	//Okay, time for your medicine.
-	else {
-		var cureValue = curePotency(arg);
-		if (player.hp.maxval - player.hp.curval < cureValue) {
-			cureValue = player.hp.maxval - player.hp.curval;
+	};
+
+	self.exploreFloor = function() {
+		var currentFloor = player.getCurrentFloor();
+		player.setManaCurrentValue(player.getManaCurrentValue() + buffs.getManaPerSecond());
+		if (!self.floorExplorationComplete(currentFloor)) {
+			var explored = player.getSpeedLevel()/10;
+			var explorationLeft = floors[currentFloor].size - floors[currentFloor].explored;
+			if (explored > explorationLeft) {
+				explored = explorationLeft;
+			}
+			floors[currentFloor].explored += explored;
+			if (hasFoundStairs(currentFloor) && !floors[currentFloor].canAdvance && currentFloor < monsters.getMonsterList().length) {
+				floors[currentFloor].canAdvance = true;
+			}
+			player.setSpeedExperience(player.getSpeedExperience() + explored);
+			self.loadTowerScreen();
+			monsters.battleChance(false);
 		}
-		updateCondition(player.hp, cureValue);
-		if (game.inbattle) {
-			document.getElementById("combatlog").innerHTML = '';
-			document.getElementById("combatlog").innerHTML += "You healed yourself for " + Math.round(cureValue) + " HP with Cure.<br>";
-			battle(monsterInstance, true);
+		else {
+			monsters.battleChance(true);
 		}
-		return true;
-	}
+	};
 };
 
-//How much will I heal?
-var curePotency = function(arg) {
-	return Math.floor(25 * Math.pow(1.5, arg.level) + Math.pow(1.1, player.mgc.val)-1);
-};
-
-//Your own personal fireplace.
-var castFireball = function(arg) {
-	//Jeez, you're not even fighting. Let's not start a fire, okay?
-	if (game.inbattle === false) {
-		return false;
-	}
-	
-	//BURN IT!!!!
-	else {
-		var damageValue = fireballPotency(arg);
-		if (monsterInstance.curhp <= damageValue) {
-			damageValue = monsterInstance.curhp;
-		}
-		document.getElementById("combatlog").innerHTML = '';
-		document.getElementById("combatlog").innerHTML += "Your fireball hit the " + monsterInstance.name + " for " + Math.floor(damageValue) + " damage.<br>";
-		if (!monsterDamage(monsterInstance, damageValue)) {
-			battle(monsterInstance, true);
-		}
-		return true;
-	}
-};
-
-//How much will my fireball hit for?
-var fireballPotency = function(arg) {
-	return Math.floor(15 * Math.pow(1.5, arg.level) + Math.pow(1.1, player.mgc.val)-1);
-};
-
-//Gain a shield.
-var castBarrier = function(arg) {
-	var potency = barrierPotency(arg);
-	if (buffs.barrier == potency) {
-		return false;
-	}
-	else {
-		buffs.barrier = potency;
-		readTempBuffs(false);
-		if (game.inbattle) {
-			document.getElementById("combatlog").innerHTML = '';
-			document.getElementById("combatlog").innerHTML += "You created a magical barrier.<br>";
-			battle(monsterInstance, true);
-		}
-		return true;
-	}
-};
-
-//How much will I block?
-var barrierPotency = function(arg) {
-	return Math.floor(50 + 50*arg.level + (10*player.mgc.val)-100);
-};
-
-//Become invulnerable
-var castAegis = function(arg) {
-	if (buffs.aegis !== 0) {
-		return false;
-	}
-	else {
-		buffs.aegis = aegisPotency(arg);
-		readTempBuffs(false);
-		if (game.inbattle) {
-			document.getElementById("combatlog").innerHTML = '';
-			document.getElementById("combatlog").innerHTML += "You summon the heavenly shield, Aegis.<br>";
-			battle(monsterInstance, true);
-		}
-		return true;
-	}
-};
-
-//How long do I have magic star?
-var aegisPotency = function(arg) {
-	return Math.floor(5 + 5*arg.level + (1*player.mgc.val)-50);
-};
-
-//The monsters are gonna get behind
-var castSlow = function(arg) {
-	if (game.inbattle === false || monsterInstance.status !== 0) {
-		return false;
-	}
-	else {
-		monsterInstance.status = 1;
-		document.getElementById("monsterdex").innerHTML = monsterInstance.dex/2;
-		document.getElementById("combatlog").innerHTML = '';
-		document.getElementById("combatlog").innerHTML += "You have cast slow on the " + monsterInstance.name + ". Its DEX has been halved.<br>";
-		battle(monsterInstance, true);
-		return true;
-	}
-};
-
-//I'M SO MAD RIGHT NOW
-var castRage = function(arg) {
-	if (game.inbattle === false) {
-		return false;
-	}
-	else {
-		buffs.rage = ragePotency(arg);
-		readTempBuffs(false);
-		document.getElementById("combatlog").innerHTML = '';
-		document.getElementById("combatlog").innerHTML += "You have entered a state of frenzy!<br>";
-		battle(monsterInstance, true);
-		return true;
-	}
-};
-
-//Count to 10
-var ragePotency = function(arg) {
-	return Math.floor(5 + 1*arg.level + (0.2*player.mgc.val)-5);
-};
-
-//Look deep into the dungeon
-var castClairvoyance = function(arg) {
-	if (tower[player.curfloor].advallowed == 1 || player.curfloor >= monsterList.length || buffs.exhaustedMind !== 0 || game.inbattle === true) {
-		return false;
-	}
-	else {
-		tower[player.curfloor].stairpos = Math.floor(Math.random() * Math.floor(tower[player.curfloor].size));
-		if (tower[player.curfloor].explored >= tower[player.curfloor].stairpos) {
-			tower[player.curfloor].advallowed = 1;
-			document.getElementById("advbut").innerHTML = '<button class="btn btn-default btn-block" onClick="changeFloor(1)">Next Floor</button>';
-			document.getElementById("nextfloor").innerHTML = player.curfloor + 1;
-		}
-		buffs.exhaustedMind = 600 + 600*arg.level;
-		readTempBuffs(false);
-		return true;
-	}
-};
-
-//Now all that is left...
-runGame();
+var tower = new Tower();
+var monsters = new Monsters();
+var buffs = new Buffs();
+var upgrades = new Upgrades();
+var spells = new Spells();
+var player = new Player();
+var system = new System();
+system.runGame();
