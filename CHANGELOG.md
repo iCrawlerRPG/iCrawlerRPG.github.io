@@ -8,6 +8,7 @@
 
 *Upgrades Changes!*
 - Upgrades now have requirements. For example: You can only get Time Warp (x5) after Time Warp (x2).
+- New upgrade tiers for Time Warp, Aetheric Attunement and Blessings!
 - (Still in-dev) New upgrades.
 
 *More Floors!*
