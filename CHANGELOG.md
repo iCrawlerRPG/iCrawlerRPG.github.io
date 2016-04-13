@@ -10,7 +10,7 @@
 - Several upgrade costs have been changed.
 - Upgrades now have requirements. For example: You can only get Time Warp (x5) after Time Warp (x2).
 - New upgrade tiers for Time Warp, Aetheric Attunement and Blessings!
-- (Still in-dev) New upgrades.
+- New upgrades: Resting Speed and Lower Death Penalty.
 
 *More Floors!*
 - You can now go up to floor 50!
