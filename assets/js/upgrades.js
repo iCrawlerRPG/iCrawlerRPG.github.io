@@ -34,6 +34,14 @@ var Upgrades = function() {
 		purchased: false,
 		description:"Shoot a fireball at the start of every battle without losing a turn!"});
 
+	upgradeList.push({name: "Faster Resting",
+		id: "fastresting",
+		exceliaCost: 500,
+		required: "",
+		shown: false,
+		purchased: false,
+		description:"Recover at twice the normal speed."});
+
 	upgradeList.push({name: "Time Warp 2",
 		id: "timewarp2",
 		exceliaCost: 1000,
@@ -49,6 +57,14 @@ var Upgrades = function() {
 		shown: false,
 		purchased: false,
 		description:"Double the amount of Excelia you gain per monster."});
+
+	upgradeList.push({name: "Muscle Memory",
+		id: "musclememory",
+		exceliaCost: 3000,
+		required: "",
+		shown: false,
+		purchased: false,
+		description:"Lose 1% less stats when dying."});
 
 	upgradeList.push({name: "Adept Mage",
 		id: "adeptmage",
@@ -241,6 +257,12 @@ var Upgrades = function() {
 		}
 		else if (upgrade.id == "autoshoot") {
 			buffs.setCastFireballInBattle(true);
+		}
+		else if (upgrade.id == "fastresting") {
+			buffs.setRestingMultiplier(buffs.getRestingMultiplier() * 2);
+		}
+		else if (upgrade.id == "musclememory") {
+			buffs.setDeathPenaltyReduction(buffs.getDeathPenaltyReduction() + 1);
 		}
 	};
 };

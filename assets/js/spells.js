@@ -201,7 +201,7 @@ var Spells = function() {
 			spell.nextLevel = Math.pow(2, spell.level) * spell.baseNextLevel;
 			self.updateSpellbook();
 		}
-		updateSpellHtml(spell);
+		updateSpellHtml(spell, true);
 	};
 
 	self.updateSpellbook = function() {
@@ -284,12 +284,12 @@ var Spells = function() {
 		return false;
 	};
 
-	self.castSpell = function(spellId) {
+	self.buySpell = function(spellId) {
 		var spell = findSpell(spellId);
 		if (arcania >= spellbook[spell].arcaniaCost) {
 			spellbook[spell].learned = true;
 		}
-		self.loadSpellbook();
+		self.updateSpellbook();
 	}
 
 	var castCure = function(cure) {

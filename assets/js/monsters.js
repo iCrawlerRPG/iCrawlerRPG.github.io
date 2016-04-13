@@ -32,7 +32,7 @@ var Monsters = function() {
 		{name: "Troll Warrior", killed: 0},
 		{name: "Wisp", killed: 0},
 		{name: "Dragon Hatchling", killed: 0},
-		{name: "Goblin", killed: 0},
+		{name: "Goblin Shaman", killed: 0},
 		{name: "Giant Snake", killed: 0},
 		{name: "Mummy", killed: 0},
 
@@ -199,9 +199,6 @@ var Monsters = function() {
 			}
 			if (!isDead) {
 				isDead = monsterAttacks(monster);
-				if (!isDead) {
-					player.gainExperience(monster);
-				}
 			}
 		}
 	};
@@ -215,6 +212,7 @@ var Monsters = function() {
 			damage = monster.currentHealth;
 		}
 		document.getElementById("combatlog").innerHTML += "You dealt " + Math.round(damage) + " damage to the " + monster.name + ".<br>";
+		player.gainExperience(monster);
 		return self.monsterTakeDamage(monster, damage);
 	};
 

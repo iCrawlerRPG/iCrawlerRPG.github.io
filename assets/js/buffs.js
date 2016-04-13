@@ -2,12 +2,14 @@ var Buffs = function() {
 	//Multipliers
 	var exceliaMultiplier = 1;
 	var spellLevelingMultiplier = 1;
+	var restingMultiplier = 1;
 
 	//Adders
 	var manaPerSecond = 0;
 
 	//Percenters
 	var exceliaSavedOnDeath = 0;
+	var deathPenaltyReduction = 0;
 
 	//Toggleables
 	var castCureInBattle = false;
@@ -26,8 +28,10 @@ var Buffs = function() {
 		var buffsSave = {
 			savedExceliaMultiplier: exceliaMultiplier,
 			savedSpellLevelingMultiplier: spellLevelingMultiplier,
+			savedRestingMultiplier: restingMultiplier,
 			savedManaPerSecond: manaPerSecond,
 			savedExceliaSavedOnDeath: exceliaSavedOnDeath,
+			savedDeathPenaltyReduction: deathPenaltyReduction,
 			savedCastCureInBattle: castCureInBattle,
 			savedCastFireballInBattle: castFireballInBattle,
 			savedAegisTimeLeft: aegisTimeLeft,
@@ -57,6 +61,9 @@ var Buffs = function() {
 		if (buffsSave.savedSpellLevelingMultiplier !== undefined) {
 			spellLevelingMultiplier = buffsSave.savedSpellLevelingMultiplier;
 		}
+		if (buffsSave.savedRestingMultiplier !== undefined) {
+			restingMultiplier = buffsSave.savedRestingMultiplier;
+		}
 	};
 
 	var loadAdderBuffs = function(buffsSave) {
@@ -68,6 +75,9 @@ var Buffs = function() {
 	var loadPercenterBuffs = function(buffsSave) {
 		if (buffsSave.savedExceliaSavedOnDeath !== undefined) {
 			exceliaSavedOnDeath = buffsSave.savedExceliaSavedOnDeath;
+		}
+		if (buffsSave.deathPenaltyReduction !== undefined) {
+			deathPenaltyReduction = buffsSave.savedDeathPenaltyReduction;
 		}
 	};
 
@@ -132,6 +142,14 @@ var Buffs = function() {
 		return exceliaSavedOnDeath;
 	};
 
+	self.getRestingMultiplier = function() {
+		return restingMultiplier;
+	};
+
+	self.getDeathPenaltyReduction = function() {
+		return deathPenaltyReduction;
+	};
+
 	//Setters
 	self.setBarrierLeft = function(barrierValue) {
 		barrierLeft = barrierValue;
@@ -167,6 +185,14 @@ var Buffs = function() {
 
 	self.setCastFireballInBattle = function(boolean) {
 		castFireballInBattle = boolean;
+	};
+
+	self.setRestingMultiplier = function(newMultiplier) {
+		restingMultiplier = newMultiplier;
+	};
+
+	self.setDeathPenaltyReduction = function(newPercentage) {
+		deathPenaltyReduction = newPercentage;
 	};
 
 	//Other Methods
@@ -219,6 +245,9 @@ var Buffs = function() {
 
 	self.updatePermanentBuffs = function() {
 		document.getElementById("permanent").innerHTML = '';
+		if (deathPenaltyReduction !== 0) {
+			document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">' + deathPenaltyReduction + '%</span>Death Penalty Reduction</li>';
+		}
 		if (exceliaMultiplier !== 1) {
 			document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">x' + exceliaMultiplier + '</span>Excelia Gain</li>';
 		}
@@ -227,6 +256,9 @@ var Buffs = function() {
 		}
 		if (manaPerSecond !== 0) {
 			document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">+' + manaPerSecond + '</span>Exploration Mana per Second</li>';
+		}
+		if (restingMultiplier !== 0) {
+			document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">x' + restingMultiplier + '</span>Rest Speed</li>';
 		}
 		if (spellLevelingMultiplier !== 1) {
 			document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">x' + spellLevelingMultiplier + '</span>Spell Level Gain</li>';

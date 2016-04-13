@@ -369,8 +369,8 @@ var Player = function() {
 
 	self.rest = function() {
 		if (resting) {
-			self.setHealthCurrentValue(health.currentValue + constitution.level);
-			self.setManaCurrentValue(mana.currentValue + magic.level);
+			self.setHealthCurrentValue(health.currentValue + (constitution.level * buffs.getRestingSpeed()));
+			self.setManaCurrentValue(mana.currentValue + (magic.level * buffs.getRestingSpeed()));
 			if (self.isFullyRested()) {
 				self.toggleRest();
 			}
@@ -439,7 +439,7 @@ var Player = function() {
 		}
 		tower.changeFloor(-currentFloor);
 		upgrades.updateExcelia(-((100 - buffs.getExceliaSavedOnDeath()) * upgrades.getExcelia())/100);
-		loseStats(10);
+		loseStats(10 - buffs.getDeathPenaltyReduction());
 		loseAllExperience();
 		monsters.loadMonsterInfo();
 		spells.updateSpellbook();
@@ -447,11 +447,11 @@ var Player = function() {
 	};
 
 	var loseStats = function(percentage) {
-		setStrengthLevel(strength.level - Math.floor(strength.level/percentage));
-		setDexterityLevel(dexterity.level - Math.floor(dexterity.level/percentage));
-		setConstitutionLevel(constitution.level - Math.floor(constitution.level/percentage));
-		setSpeedLevel(speed.level - Math.floor(speed.level/percentage));
-		setMagicLevel(magic.level - Math.floor(magic.level/percentage));
+		setStrengthLevel(strength.level - Math.floor(strength.level * (percentage/100)));
+		setDexterityLevel(dexterity.level - Math.floor(dexterity.level * (percentage/100)));
+		setConstitutionLevel(constitution.level - Math.floor(constitution.level * (percentage/100)));
+		setSpeedLevel(speed.level - Math.floor(speed.level * (percentage/100)));
+		setMagicLevel(magic.level - Math.floor(magic.level * (percentage/100)));
 	};
 
 	var loseAllExperience = function() {
