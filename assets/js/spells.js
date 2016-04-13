@@ -221,6 +221,7 @@ var Spells = function() {
 	};
 
 	var updateSpellHtml = function(spell) {
+		document.getElementById("arcania").innerHTML = Math.round(100*arcania)/100;
 		document.getElementById(spell.id + "costall").innerHTML = Math.floor(spell.baseMana + Math.pow(spell.level, 2));
 		document.getElementById(spell.id + "cost").innerHTML = Math.floor(spell.baseMana + Math.pow(spell.level, 2));
 		document.getElementById(spell.id + "xpall").style.width = 100*(spell.experience/spell.nextLevel) + "%";
@@ -257,6 +258,7 @@ var Spells = function() {
 			}
 
 			if (castSuccessful) {
+				arcania += spellbook[spell].level + manaCost/100;
 				player.setManaCurrentValue(player.getManaCurrentValue() - manaCost);
 				levelSpell(spellbook[spell], buffs.getSpellLevelingMultiplier() * manaCost);
 				player.setMagicExperience(player.getMagicExperience() + spellbook[spell].level + 1 + manaCost/10);

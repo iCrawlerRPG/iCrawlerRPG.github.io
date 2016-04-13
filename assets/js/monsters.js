@@ -22,7 +22,43 @@ var Monsters = function() {
 		{name:"Alligator", killed:0},
 		{name:"Giant Lizard", killed:0},
 		{name:"Giant Rat", killed: 0},
-		{name:"Orc Child", killed:0}
+		{name:"Orc Child", killed:0},
+
+		//Third Tier
+		{name: "Stone Golem", killed: 0},
+		{name: "Lesser Elemental", killed: 0},
+		{name: "Kobold Chieftain", killed: 0},
+		{name: "Weakened Minotaur", killed: 0},
+		{name: "Troll Warrior", killed: 0},
+		{name: "Wisp", killed: 0},
+		{name: "Dragon Hatchling", killed: 0},
+		{name: "Goblin", killed: 0},
+		{name: "Giant Snake", killed: 0},
+		{name: "Mummy", killed: 0},
+
+		//Fourth Tier
+		{name: "Elemental", killed: 0},
+		{name: "Lesser Imp", killed: 0},
+		{name: "Lizardman", killed: 0},
+		{name: "Orc", killed: 0},
+		{name: "Troll Chieftain", killed: 0},
+		{name: "Cyclops", killed: 0},
+		{name: "Young Vampire", killed: 0},
+		{name: "Harpy", killed: 0},
+		{name: "Empowered Wisp", killed: 0},
+		{name: "Ancient Mummy", killed: 0},
+
+		//Fifth Tier
+		{name: "Imp", killed: 0},
+		{name: "Orc Soldier", killed: 0},
+		{name: "Young Minotaur", killed: 0},
+		{name: "Floating Eye", killed: 0},
+		{name: "Banshee", killed: 0},
+		{name: "Young Dragon", killed: 0},
+		{name: "Cyclops Warrior", killed: 0},
+		{name: "Lizardman Archer", killed: 0},
+		{name: "Living Armor", killed: 0},
+		{name: "Frenzied Goblin", killed: 0}
 	];
 
 	var instancedMonster = {
