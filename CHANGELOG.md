@@ -12,7 +12,7 @@
 - (Still in-dev) New upgrades.
 
 *More Floors!*
-- (Still in-dev) You can now go up to floor 50!
+- You can now go up to floor 50!
 
 **Changes in alpha v0.8.1:**
 
