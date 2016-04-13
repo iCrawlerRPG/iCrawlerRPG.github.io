@@ -6,6 +6,7 @@ var Spells = function() {
 		id: "cure",
 		type: 0,
 		requiredMagic: 5,
+		arcaniaCost: 0,
 		learned: true,
 		baseMana: 15,
 		experience: 0,
@@ -18,6 +19,7 @@ var Spells = function() {
 		id: "fireball",
 		type: 1,
 		requiredMagic: 5,
+		arcaniaCost: 0,
 		learned: true,
 		baseMana: 10,
 		experience: 0,
@@ -30,6 +32,7 @@ var Spells = function() {
 		id: "barrier",
 		type: 0,
 		requiredMagic: 10,
+		arcaniaCost: 1000,
 		learned: false,
 		baseMana: 100,
 		experience: 0,
@@ -42,6 +45,7 @@ var Spells = function() {
 		id: "slow",
 		type: 2,
 		requiredMagic: 20,
+		arcaniaCost: 2000,
 		learned: false,
 		baseMana: 400,
 		experience: 0,
@@ -54,6 +58,7 @@ var Spells = function() {
 		id: "rage",
 		type: 1,
 		requiredMagic: 25,
+		arcaniaCost: 2500,
 		learned: false,
 		baseMana: 1250,
 		experience: 0,
@@ -66,6 +71,7 @@ var Spells = function() {
 		id: "aegis",
 		type: 0,
 		requiredMagic: 50,
+		arcaniaCost: 5000,
 		learned: false,
 		baseMana: 5000,
 		experience: 0,
@@ -205,13 +211,18 @@ var Spells = function() {
 		}
 		updateSpellDescriptions();
 		for (i = 0; i < spellbook.length; i++) {
-			if (player.getMagicLevel() >= spellbook[i].requiredMagic) {
+			if (player.getMagicLevel() >= spellbook[i].requiredMagic && spellbook[i].learned === false) {
 				var spellColor = spellType(spellbook[i].type);
-
+				document.getElementById("spellbook").innerHTML += '<div class="row"><div class="col-xs-5"><button class="btn ' + spellColor + ' btn-block" data-toggle="tooltip" data-placement="top" title="' + spellbook[i].description + '" onClick="spells.buySpell(\'' + spellbook[i].id + '\')"> Buy ' + spellbook[i].name + '</button></div><div class="col-xs-7"><p class="text-right">Arcania Cost: <span id="' + spellbook[i].id + 'arcaniacostall">0</span></p></div></div>';
+				document.getElementById("spellbook" + spellbook[i].type).innerHTML += '<div class="row"><div class="col-xs-5"><button class="btn ' + spellColor + ' btn-block" data-toggle="tooltip" data-placement="top" title="' + spellbook[i].description + '" onClick="spells.buySpell(\'' + spellbook[i].id + '\')"> Buy ' + spellbook[i].name + '</button></div><div class="col-xs-7"><p class="text-right">Arcania Cost: <span id="' + spellbook[i].id + 'arcaniacost">0</span></p></div></div>';
+				updateSpellHtml(spellbook[i], false);
+			}
+			else if (spellbook[i].learned === true) {
+				var spellColor = spellType(spellbook[i].type);
 				document.getElementById("spellbook").innerHTML += '<div class="row"><div class="col-xs-5"><button class="btn ' + spellColor + ' btn-block" data-toggle="tooltip" data-placement="top" title="' + spellbook[i].description + '" onClick="spells.castSpell(\'' + spellbook[i].id + '\')">' + spellbook[i].name + '</button></div><div class="col-xs-7"><div class="progress"><div id="' + spellbook[i].id + 'xpall" class="progress-bar" role="progressbar" style="width: ' + 100*spellbook[i].experience/spellbook[i].nextLevel + '%;"><span id="' + spellbook[i].id + 'progall">' + 100*spellbook[i].experience/spellbook[i].nextLevel + '%</span></div></div></div></div><div class="row"><div class="col-xs-5">Level: <span id="' + spellbook[i].id + 'levelall">0</span></div><div class="col-xs-6"><p class="text-right">Mana Cost: <span id="' + spellbook[i].id + 'costall">0</span></p></div></div>';
 				document.getElementById("spellbook" + spellbook[i].type).innerHTML += '<div class="row"><div class="col-xs-5"><button class="btn ' + spellColor + ' btn-block" data-toggle="tooltip" data-placement="top" title="' + spellbook[i].description + '" onClick="spells.castSpell(\'' + spellbook[i].id + '\')">' + spellbook[i].name + '</button></div><div class="col-xs-7"><div class="progress"><div id="' + spellbook[i].id + 'xp" class="progress-bar" role="progressbar" style="width: ' + 100*spellbook[i].experience/spellbook[i].nextLevel + '%;"><span id="' + spellbook[i].id + 'prog">' + 100*spellbook[i].experience/spellbook[i].nextLevel + '%</span></div></div></div></div><div class="row"><div class="col-xs-5">Level: <span id="' + spellbook[i].id + 'level">0</span></div><div class="col-xs-6"><p class="text-right">Mana Cost: <span id="' + spellbook[i].id + 'cost">0</span></p></div></div>';
 				spellbook[i].learned = true;
-				updateSpellHtml(spellbook[i]);
+				updateSpellHtml(spellbook[i], true);
 			}
 		}
 
@@ -220,16 +231,22 @@ var Spells = function() {
 		});
 	};
 
-	var updateSpellHtml = function(spell) {
+	var updateSpellHtml = function(spell, hasBought) {
 		document.getElementById("arcania").innerHTML = Math.round(100*arcania)/100;
-		document.getElementById(spell.id + "costall").innerHTML = Math.floor(spell.baseMana + Math.pow(spell.level, 2));
-		document.getElementById(spell.id + "cost").innerHTML = Math.floor(spell.baseMana + Math.pow(spell.level, 2));
-		document.getElementById(spell.id + "xpall").style.width = 100*(spell.experience/spell.nextLevel) + "%";
-		document.getElementById(spell.id + "progall").innerHTML = Math.round(100 * (100 * (spell.experience/spell.nextLevel)))/100 + "%";
-		document.getElementById(spell.id + "levelall").innerHTML = spell.level;
-		document.getElementById(spell.id + "xp").style.width = 100*(spell.experience/spell.nextLevel) + "%";
-		document.getElementById(spell.id + "prog").innerHTML = Math.round(100 * (100 * (spell.experience/spell.nextLevel)))/100 + "%";
-		document.getElementById(spell.id + "level").innerHTML = spell.level;
+		if (!hasBought) {
+			document.getElementById(spell.id + "arcaniacost").innerHTML = spell.arcaniaCost;
+			document.getElementById(spell.id + "arcaniacostall").innerHTML = spell.arcaniaCost;
+		}
+		else {
+			document.getElementById(spell.id + "costall").innerHTML = Math.floor(spell.baseMana + Math.pow(spell.level, 2));
+			document.getElementById(spell.id + "cost").innerHTML = Math.floor(spell.baseMana + Math.pow(spell.level, 2));
+			document.getElementById(spell.id + "xpall").style.width = 100*(spell.experience/spell.nextLevel) + "%";
+			document.getElementById(spell.id + "progall").innerHTML = Math.round(100 * (100 * (spell.experience/spell.nextLevel)))/100 + "%";
+			document.getElementById(spell.id + "levelall").innerHTML = spell.level;
+			document.getElementById(spell.id + "xp").style.width = 100*(spell.experience/spell.nextLevel) + "%";
+			document.getElementById(spell.id + "prog").innerHTML = Math.round(100 * (100 * (spell.experience/spell.nextLevel)))/100 + "%";
+			document.getElementById(spell.id + "level").innerHTML = spell.level;
+		}
 	};
 
 	self.castSpell = function(spellId) {
