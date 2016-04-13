@@ -273,7 +273,6 @@ var Spells = function() {
 			else if (spellbook[spell].id == "rage") {
 				castSuccessful = castRage(spellbook[spell]);
 			}
-
 			if (castSuccessful) {
 				arcania += spellbook[spell].level + manaCost/100;
 				player.setManaCurrentValue(player.getManaCurrentValue() - manaCost);
@@ -282,9 +281,16 @@ var Spells = function() {
 				return true;
 			}
 		}
-
 		return false;
 	};
+
+	self.castSpell = function(spellId) {
+		var spell = findSpell(spellId);
+		if (arcania >= spellbook[spell].arcaniaCost) {
+			spellbook[spell].learned = true;
+		}
+		self.loadSpellbook();
+	}
 
 	var castCure = function(cure) {
     var currentHealth = player.getHealthCurrentValue();
