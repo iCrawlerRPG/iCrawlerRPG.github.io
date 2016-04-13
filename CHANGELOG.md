@@ -1,5 +1,6 @@
 # Changelog
 **(In-development now) Changes coming in alpha v0.9:**
+
 *Spell Changes!*
 - Clairvoyance has been removed.
 - (Still in-dev) You have to buy new spells instead of getting them automatically.
