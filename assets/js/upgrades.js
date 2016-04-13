@@ -34,8 +34,8 @@ var Upgrades = function() {
 		purchased: false,
 		description:"Shoot a fireball at the start of every battle without losing a turn!"});
 
-	upgradeList.push({name: "Faster Resting",
-		id: "fastresting",
+	upgradeList.push({name: "Faster Resting 1",
+		id: "fastresting1",
 		exceliaCost: 500,
 		required: "",
 		shown: false,
@@ -89,6 +89,14 @@ var Upgrades = function() {
 		shown: false,
 		purchased: false,
 		description:"With this, you'll be able to keep 20% of your excelia upon death!"})
+
+	upgradeList.push({name: "Faster Resting 2",
+		id: "fastresting2",
+		exceliaCost: 7500,
+		required: "fastresting1",
+		shown: false,
+		purchased: false,
+		description:"Recover at four times the normal speed."});
 
 	upgradeList.push({name: "Time Warp 3",
 		id: "timewarp3",
@@ -258,7 +266,7 @@ var Upgrades = function() {
 		else if (upgrade.id == "autoshoot") {
 			buffs.setCastFireballInBattle(true);
 		}
-		else if (upgrade.id == "fastresting") {
+		else if (upgrade.id == "fastresting1" || upgrade.id == "fastresting2") {
 			buffs.setRestingMultiplier(buffs.getRestingMultiplier() * 2);
 		}
 		else if (upgrade.id == "musclememory") {
