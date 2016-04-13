@@ -3,10 +3,11 @@
 
 *Spell Changes!*
 - Clairvoyance has been removed.
-- (Still in-dev) You have to buy new spells instead of getting them automatically.
-- (Still in-dev) A new resource will be used for that. You'll get this resource by casting spells.
+- You have to buy new spells instead of getting them automatically.
+- A new resource will be used for that. You'll get this resource by casting spells.
 
 *Upgrades Changes!*
+- Several upgrade costs have been changed.
 - Upgrades now have requirements. For example: You can only get Time Warp (x5) after Time Warp (x2).
 - New upgrade tiers for Time Warp, Aetheric Attunement and Blessings!
 - (Still in-dev) New upgrades.
