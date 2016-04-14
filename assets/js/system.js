@@ -25,6 +25,7 @@ var System = function() {
 		buffs.save();
 		monsters.save();
 		tower.save();
+		inventory.save();
 	};
 
 	//Load Method
@@ -45,6 +46,7 @@ var System = function() {
 		buffs.load();
 		monsters.load();
 		tower.load();
+		inventory.load();
 	};
 
 	//Getters

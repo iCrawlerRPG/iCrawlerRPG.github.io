@@ -9,7 +9,7 @@ var Tower = function() {
 				explored: 0,
 				canAdvance: false,
 				stairsPosition: Math.floor(Math.random() * Math.floor(2*floors[i-1].size)),
-				monsterDensity: 10 + Math.random()*40});
+				monsterDensity: Math.floor(10 + Math.random()*40)});
 		}
 	}
 
@@ -117,10 +117,25 @@ var Tower = function() {
 			}
 			player.setSpeedExperience(player.getSpeedExperience() + explored);
 			self.loadTowerScreen();
-			monsters.battleChance(false);
+			if (!checkFloorEvent()) {
+				monsters.battleChance(false);
+			}
 		}
 		else {
 			monsters.battleChance(true);
+		}
+	};
+
+	var checkFloorEvent = function() {
+		var eventChance = 0.5;
+		var eventRoll = Math.random()*100;
+		if (eventRoll <= eventChance) {
+			inventory.findChest();
+			return true;
+		}
+		else {
+			document.getElementById("floorlog").innerHTML = "You walk around for a bit, finding nothing of interest."
+			return false;
 		}
 	};
 };
