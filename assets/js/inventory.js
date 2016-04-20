@@ -2,6 +2,9 @@ var Inventory = function() {
 	var gold = 0;
 	var keys = 0;
 	var bag = [];
+	var equippedWeapon;
+	var equippedArmor;
+	var equippedAccessory;
 
 	var self = this;
 	//Save Method
@@ -9,7 +12,10 @@ var Inventory = function() {
 		var inventorySave = {
 			savedGold: gold,
 			savedBag: bag,
-			savedKeys: keys
+			savedKeys: keys,
+			savedEquippedWeapon: equippedWeapon,
+			savedEquippedArmor: equippedArmor,
+			savedEquippedAccessory: equippedAccessory
 		};
 		localStorage.setItem("inventorySave",JSON.stringify(inventorySave));
 	};
@@ -26,6 +32,15 @@ var Inventory = function() {
 			}
 			if (inventorySave.savedKeys !== undefined) {
 				keys = inventorySave.savedKeys;
+			}
+			if (inventorySave.savedEquippedWeapon !== undefined) {
+				equippedWeapon = inventorySave.savedEquippedWeapon;
+			}
+			if (inventorySave.savedEquippedArmor !== undefined) {
+				equippedArmor = inventorySave.savedEquippedArmor;
+			}
+			if (inventorySave.savedEquippedAccessory !== undefined) {
+				equippedAccessory = inventorySave.savedEquippedAccessory;
 			}
 		}
 	};
