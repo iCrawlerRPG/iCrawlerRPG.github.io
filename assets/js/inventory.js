@@ -1,5 +1,6 @@
 var Inventory = function() {
 	var gold = 0;
+	var keys = 0;
 	var bag = [];
 
 	var self = this;
@@ -36,9 +37,17 @@ var Inventory = function() {
 		return gold;
 	};
 
+	self.getKeys = function() {
+		return keys;
+	};
+
 	//Setters
 	self.setGold = function(newGold) {
 		gold = newGold;
+	};
+
+	self.setKeys = function(newKeys) {
+		keys = newKeys;
 	};
 
 	//Other Methods
@@ -46,17 +55,154 @@ var Inventory = function() {
 		document.getElementById("inventory").innerHTML = "";
 		for (var i = 0; i < bag.length; i++) {
 			if (bag[i].type == "chest") {
-				printChest(bag[i]);
+				printChest(bag[i], i);
+			}
+			else if (bag[i].type == "weapon") {
+				printWeapon(bag[i], i);
 			}
 		}
 	};
 
-	var printChest = function(chest) {
-		document.getElementById("inventory").innerHTML += '<button type="button" class="list-group-item" onClick="inventory.openChest(' + chest + ')"><span class="badge">Open</span> ' + chest.name + '</button>';
+	var printChest = function(chest, number) {
+		document.getElementById("inventory").innerHTML += '<button type="button" class="list-group-item" onClick="inventory.openChest(' + number + ')"><span class="badge">Open</span> ' + chest.name + '</button>';
 	};
 
+	var printWeapon = function(weapon, number) {
+		document.getElementById("inventory").innerHTML += '<button type="button" class="list-group-item"><span class="badge">Equip</span>' + weapon.name + '</button>';
+	};
+
+	self.openChest = function(chest) {
+		var type = Math.floor(Math.random()*0);
+		if (type === 0) {
+			bag.push(createWeapon(bag[chest].rarity));
+		}
+		else if (type === 1) {
+			createArmor(bag[chest].rarity);
+		}
+		else if (type == 2) {
+			createAcessory(bag[chest].rarity);
+		}
+		else if (type == 3) {
+			createEnhancingStone(bag[chest].rarity)
+		}
+		bag.splice(chest, 1);
+		self.updateInventory();
+	};
+
+	var createWeapon = function(points) {
+		var weapon = {type: "weapon", name: "", damage: 0, speed: 0, defense: 0, magic: 0};
+		var roll;
+		while (points !== 0) {
+			roll = Math.floor(Math.random()*4);
+			if (roll === 0) {
+				weapon.damage += 0.1;
+			}
+			else if (roll == 1) {
+				weapon.speed += 0.1;
+			}
+			else if (roll == 2) {
+				weapon.defense += 0.1;
+			}
+			else if (roll == 3) {
+				weapon.magic += 0.1;
+			}
+			else if (roll == 4) {
+
+			}
+			points--;
+		}
+		weapon.name = nameWeapon(weapon);
+		return weapon;
+	};
+
+	var nameWeapon = function(weapon) {
+		var name = "";
+		name += nameDamageAttribute(weapon.damage);
+		name += nameSpeedAttribute(weapon.speed);
+		name += nameDefenseAttribute(weapon.defense);
+		name += nameMagicAttribute(weapon.magic);
+		name += nameWeaponType(weapon);
+		return name;
+	};
+
+	var nameDamageAttribute = function(damage) {
+		if (damage === 0) {
+			return "Broken ";
+		}
+		else if (damage < 2) {
+			return "Useless ";
+		}
+		else if (damage < 5) {
+			return "Blunt ";
+		}
+		else if (damage < 10) {
+			return "Weak ";
+		}
+	};
+
+	var nameSpeedAttribute = function(speed) {
+		if (speed === 0) {
+			return "Stagnant ";
+		}
+		else if (speed < 2) {
+			return "Lethargic ";
+		}
+		else if (speed < 5) {
+			return "Heavy ";
+		}
+		else if (speed < 10) {
+			return "Slow ";
+		}
+	};
+
+	var nameDefenseAttribute = function(defense) {
+		if (defense === 0) {
+			return "Feeble ";
+		}
+		else if (defense < 2) {
+			return "Decrepit ";
+		}
+		else if (defense < 5) {
+			return "Shabby ";
+		}
+		else if (defense < 10) {
+			return "Delicate ";
+		}
+	};
+
+	var nameMagicAttribute = function(magic) {
+		if (magic === 0) {
+			return "Plain ";
+		}
+		else if (magic < 2) {
+			return "Regular ";
+		}
+		else if (magic < 5) {
+			return "Unusual ";
+		}
+		else if (magic < 10) {
+			return "Eerie ";
+		}
+	};
+
+	var nameWeaponType = function(weapon) {
+		var highest = Math.max(weapon.damage, weapon.speed, weapon.defense, weapon.magic);
+		if (highest == weapon.damage) {
+			return "Sword";
+		}
+		else if (highest == weapon.speed) {
+			return "Daggers";
+		}
+		else if (highest == weapon.defense) {
+			return "Shield";
+		}
+		else if (highest == weapon.magic) {
+			return "Staff";
+		}
+	}
+
 	self.findChest = function(rarity) {
-		var chest = {type:"chest", name:"", rarity: rarity};
+		var chest = {type: "chest", name: "", rarity: rarity};
 		chest.name = nameChest(rarity) + " Chest";
 		bag.push(chest);
 		self.updateInventory();

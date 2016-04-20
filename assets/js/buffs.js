@@ -257,7 +257,7 @@ var Buffs = function() {
 		if (manaPerSecond !== 0) {
 			document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">+' + manaPerSecond + '</span>Exploration Mana per Second</li>';
 		}
-		if (restingMultiplier !== 0) {
+		if (restingMultiplier !== 1) {
 			document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">x' + restingMultiplier + '</span>Rest Speed</li>';
 		}
 		if (spellLevelingMultiplier !== 1) {
