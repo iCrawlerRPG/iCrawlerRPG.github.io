@@ -69,22 +69,7 @@ var Inventory = function() {
 
 	var nameChest = function(rarity) {
 		var name = "";
-		var extraRarity = Math.floor(Math.random() * 100);
-		if (extraRarity < 50) {
-			name += "Poor ";
-		}
-		else if (extraRarity < 75) {
-			name += "Regular ";
-		}
-		else if (extraRarity < 90) {
-			name += "Shiny ";
-		}
-		else if (extraRarity < 100) {
-			name += "Aetherial ";
-		}
-		else if (extraRarity == 100) {
-			name += "Heavenly ";
-		}
+		name += extraRarity();
 		if (rarity < 5) {
 			name += "Useless";
 		}
@@ -104,6 +89,26 @@ var Inventory = function() {
 			name += "Odd";
 		}
 		return name;
+	};
+
+	var extraRarity = function(chest) {
+		var rarity = Math.floor(Math.random() * 100);
+		if (rarity < 50) {
+			return "Poor ";
+		}
+		else if (rarity < 75) {
+			return "Regular ";
+		}
+		else if (rarity < 90) {
+			return "Shiny ";
+		}
+		else if (rarity < 100) {
+			return "Aetherial ";
+		}
+		else if (rarity == 100) {
+			return "Heavenly ";
+		}
+		chest.rarity += Math.floor(rarity/10);
 	};
 };
 

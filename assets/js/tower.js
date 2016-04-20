@@ -131,7 +131,7 @@ var Tower = function() {
 		var eventRoll = Math.random()*100;
 		if (eventRoll <= eventChance) {
 			document.getElementById("floorlog").innerHTML = "You turn a corner, finding a treasure chest."
-			inventory.findChest(player.getCurrentFloor() + Math.floor(Math.random * player.getCurrentFloor()));
+			inventory.findChest(player.getCurrentFloor() + Math.floor(Math.random() * player.getCurrentFloor()));
 			return true;
 		}
 		else {
