@@ -8,7 +8,7 @@
 - (Currently in-dev) Chest keys can be used to open treasure chests you may find on the dungeon.
 
 *Floor Events!*
-- (Currently in-dev) Find mysterious treasure chests while exploring, they might contain anything!
+- Find mysterious treasure chests while exploring, they might contain anything!
 - (Currently in-dev) Explore 100% of a floor for a special bonus.
 
 *Equipments!*
