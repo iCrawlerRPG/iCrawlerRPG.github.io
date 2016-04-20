@@ -369,8 +369,8 @@ var Player = function() {
 
 	self.rest = function() {
 		if (resting) {
-			self.setHealthCurrentValue(health.currentValue + (constitution.level * buffs.getRestingSpeed()));
-			self.setManaCurrentValue(mana.currentValue + (magic.level * buffs.getRestingSpeed()));
+			self.setHealthCurrentValue(health.currentValue + (constitution.level * buffs.getRestingMultiplier()));
+			self.setManaCurrentValue(mana.currentValue + (magic.level * buffs.getRestingMultiplier()));
 			if (self.isFullyRested()) {
 				self.toggleRest();
 			}
