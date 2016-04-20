@@ -40,6 +40,24 @@ var Inventory = function() {
 	self.setGold = function(newGold) {
 		gold = newGold;
 	};
+
+	//Other Methods
+	self.getChest = function(rarity) {
+		var chest = {type:"chest", name:"", rarity: rarity};
+		chest.name = nameChest(rarity) + " Chest";
+		bag.push(chest);
+	};
+
+	var nameChest = function(rarity) {
+		var name = "";
+		if (rarity === 0) {
+			name += "Useless";
+		}
+		else {
+			name += "Not Useless";
+		}
+		return name;
+	};
 };
 
 var inventory = new Inventory();
