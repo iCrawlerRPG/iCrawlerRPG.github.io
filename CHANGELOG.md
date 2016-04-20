@@ -14,7 +14,6 @@
 *Equipments!*
 - You can find equipments in treasure chests from floor events.
 - Equipments will have several stats, and each one will be different from the other.
-- (Currently in-dev) Some might even have real nice perks attached to them!
 
 *Spell Changes!*
 - Clairvoyance has been removed.
@@ -29,6 +28,9 @@
 
 *More Floors!*
 - You can now go up to floor 50!
+
+*Quality Changes*
+- Click on a panel heading to hide that panel.
 
 **Changes in alpha v0.8.1:**
 
