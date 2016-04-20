@@ -3,11 +3,11 @@ var Player = function() {
 
 	var health = {currentValue: 100, maximumValue: 100};
 	var mana = {currentValue: 50, maximumValue: 50};
-	var strength = {level: 5, experience: 0, nextLevel: 100};
-	var dexterity = {level: 5, experience: 0, nextLevel: 100};
-	var constitution = {level: 5, experience: 0, nextLevel: 100};
-	var speed = {level: 5, experience: 0, nextLevel: 100};
-	var magic = {level: 5, experience: 0, nextLevel: 100};
+	var strength = {level: 5, experience: 0, nextLevel: 100, bonus: 0};
+	var dexterity = {level: 5, experience: 0, nextLevel: 100, bonus: 0};
+	var constitution = {level: 5, experience: 0, nextLevel: 100, bonus: 0};
+	var speed = {level: 5, experience: 0, nextLevel: 100, bonus: 0};
+	var magic = {level: 5, experience: 0, nextLevel: 100, bonus: 0};
 
 	var currentFloor = 0;
 
@@ -103,6 +103,9 @@ var Player = function() {
 		if (savedStrength.nextLevel !== undefined) {
 			strength.nextLevel = savedStrength.nextLevel;
 		}
+		if (savedStrength.bonus !== undefined) {
+			strength.bonus = savedStrength.bonus;
+		}
 	};
 
 	var loadDexterity = function(savedDexterity) {
@@ -114,6 +117,9 @@ var Player = function() {
 		}
 		if (savedDexterity.nextLevel !== undefined) {
 			dexterity.nextLevel = savedDexterity.nextLevel;
+		}
+		if (savedDexterity.bonus !== undefined) {
+			dexterity.bonus = savedDexterity.bonus;
 		}
 	};
 
@@ -127,6 +133,9 @@ var Player = function() {
 		if (savedConstitution.nextLevel !== undefined) {
 			constitution.nextLevel = savedConstitution.nextLevel;
 		}
+		if (savedConstitution.bonus !== undefined) {
+			constitution.bonus = savedConstitution.bonus;
+		}
 	};
 
 	var loadSpeed = function(savedSpeed) {
@@ -139,6 +148,9 @@ var Player = function() {
 		if (savedSpeed.nextLevel !== undefined) {
 			speed.nextLevel = savedSpeed.nextLevel;
 		}
+		if (savedSpeed.bonus !== undefined) {
+			speed.bonus = savedSpeed.bonus;
+		}
 	};
 
 	var loadMagic = function(savedMagic) {
@@ -150,6 +162,9 @@ var Player = function() {
 		}
 		if (savedMagic.nextLevel !== undefined) {
 			magic.nextLevel = savedMagic.nextLevel;
+		}
+		if (savedMagic.bonus !== undefined) {
+			magic.bonus = savedMagic.bonus;
 		}
 	};
 
@@ -339,6 +354,31 @@ var Player = function() {
 		loadStatScreen("mgc", magic);
 	};
 
+	self.setStrengthBonus = function(bonus) {
+		strength.bonus = bonus;
+		loadStatScreen("str", strength);
+	};
+
+	self.setDexterityBonus = function(bonus) {
+		dexterity.bonus = bonus;
+		loadStatScreen("dex", dexterity);
+	};
+
+	self.setConstitutionBonus = function(bonus) {
+		constitution.bonus = bonus;
+		loadStatScreen("con", constitution);
+	};
+
+	self.setSpeedBonus = function(bonus) {
+		speed.bonus = bonus;
+		loadStatScreen("spd", speed);
+	};
+
+	self.setMagicBonus = function(bonus) {
+		magic.bonus = bonus;
+		loadStatScreen("mgc", magic);
+	};
+
 	//Other Methods
 	self.loadPlayerScreen = function() {
 		document.getElementById("name").innerHTML = name;
@@ -352,7 +392,7 @@ var Player = function() {
 	};
 
 	var loadStatScreen = function(statId, statName) {
-		document.getElementById(statId).innerHTML = statName.level;
+		document.getElementById(statId).innerHTML = statName.level + Math.round(100*statName.bonus)/100;
 		document.getElementById(statId + "per").innerHTML = Math.round(100*(100*(statName.experience/statName.nextLevel)))/100 + "%";
 		document.getElementById(statId + "prog").style.width = 100*(statName.experience/statName.nextLevel) + "%";
 	};

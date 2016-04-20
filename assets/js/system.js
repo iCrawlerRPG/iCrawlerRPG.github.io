@@ -158,7 +158,9 @@ var System = function() {
 			monsters.loadMonsterInfo(monsters.getInstancedMonster());
 		}
 		tower.loadTowerScreen();
+		inventory.updateInventoryHTML();
 		inventory.updateInventory();
+		inventory.updateEquipment();
 		self.gameSpeed(1000);
 		init = true;
 	};

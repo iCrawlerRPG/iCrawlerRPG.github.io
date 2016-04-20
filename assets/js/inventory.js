@@ -15,7 +15,7 @@ var Inventory = function() {
 			savedKeys: keys,
 			savedEquippedWeapon: equippedWeapon,
 			savedEquippedArmor: equippedArmor,
-			savedEquippedAccessory: equippedAccessory
+			savedEquippedAccessory: equippedAccessory,
 		};
 		localStorage.setItem("inventorySave",JSON.stringify(inventorySave));
 	};
@@ -60,16 +60,27 @@ var Inventory = function() {
 		return keys;
 	};
 
+	self.getBag = function() {
+		return bag;
+	};
+
 	//Setters
 	self.setGold = function(newGold) {
 		gold = newGold;
+		self.updateInventoryHTML();
 	};
 
 	self.setKeys = function(newKeys) {
 		keys = newKeys;
+		self.updateInventoryHTML();
 	};
 
 	//Other Methods
+	self.updateInventoryHTML = function() {
+		document.getElementById("gold").innerHTML = gold;
+		document.getElementById("keys").innerHTML = keys;
+	};
+
 	self.updateInventory = function() {
 		document.getElementById("inventory").innerHTML = "";
 		for (var i = 0; i < bag.length; i++) {
@@ -87,7 +98,18 @@ var Inventory = function() {
 	};
 
 	var printWeapon = function(weapon, number) {
-		document.getElementById("inventory").innerHTML += '<button type="button" class="list-group-item"><span class="badge">Equip</span>' + weapon.name + '</button>';
+		document.getElementById("inventory").innerHTML += '<button type="button" class="list-group-item" onClick="inventory.equipWeapon(' + number + ')"><span class="badge">Equip</span>' + weapon.name + '</button>';
+	};
+
+	self.updateEquipment = function() {
+		document.getElementById("equipment").innerHTML = '';
+		if (equippedWeapon !== undefined) {
+			printEquippedWeapon();
+		}
+	}
+
+	var printEquippedWeapon = function(weapon, number) {
+		document.getElementById("equipment").innerHTML += '<button type="button" class="list-group-item" onClick="inventory.unequipWeapon()"><span class="badge">Equipped</span>' + equippedWeapon.name + '</button>';
 	};
 
 	self.openChest = function(chest) {
@@ -108,42 +130,65 @@ var Inventory = function() {
 			bag.splice(chest, 1);
 			self.updateInventory();
 		}
+		self.setKeys(keys - 1);
 	};
 
 	var createWeapon = function(points) {
-		var weapon = {type: "weapon", name: "", damage: 0, speed: 0, defense: 0, magic: 0};
+		var weapon = {type: "weapon", name: "", damage: 0, speed: 0, defense: 0, magic: 0, rarity: 0};
 		var roll;
-		while (points !== 0) {
+		while (points > 1) {
 			roll = Math.floor(Math.random()*4);
 			if (roll === 0) {
-				weapon.damage += 0.1;
+				weapon.damage += 0.1 * Math.round(points/2);
 			}
 			else if (roll == 1) {
-				weapon.speed += 0.1;
+				weapon.speed += 0.1 * Math.round(points/2);
 			}
 			else if (roll == 2) {
-				weapon.defense += 0.1;
+				weapon.defense += 0.1 * Math.round(points/2);
 			}
 			else if (roll == 3) {
-				weapon.magic += 0.1;
+				weapon.magic += 0.1 * Math.round(points/2);
 			}
-			else if (roll == 4) {
-
-			}
-			points--;
+			points -= Math.round(points/2);
 		}
+		weapon.rarity = weaponRarity();
 		weapon.name = nameWeapon(weapon);
 		return weapon;
 	};
 
 	var nameWeapon = function(weapon) {
 		var name = "";
+		name += nameRarity(weapon.rarity);
 		name += nameDamageAttribute(weapon.damage);
 		name += nameSpeedAttribute(weapon.speed);
 		name += nameDefenseAttribute(weapon.defense);
 		name += nameMagicAttribute(weapon.magic);
 		name += nameWeaponType(weapon);
 		return name;
+	};
+
+	var weaponRarity = function() {
+		var rarity = Math.floor(Math.random()*101);
+		return rarity;
+	};
+
+	var nameRarity = function(rarity) {
+		if (rarity < 50) {
+			return "";
+		}
+		else if (rarity < 75) {
+			return "Uncommon ";
+		}
+		else if (rarity < 90) {
+			return "Rare ";
+		}
+		else if (rarity < 100) {
+			return "Epic ";
+		}
+		else if (rarity == 100) {
+			return "Legendary ";
+		}
 	};
 
 	var nameDamageAttribute = function(damage) {
@@ -158,6 +203,12 @@ var Inventory = function() {
 		}
 		else if (damage < 10) {
 			return "Weak ";
+		}
+		else if (damage < 20) {
+			return "Average ";
+		}
+		else {
+			return "Sharp ";
 		}
 	};
 
@@ -174,6 +225,12 @@ var Inventory = function() {
 		else if (speed < 10) {
 			return "Slow ";
 		}
+		else if (speed < 20) {
+			return "Flowy ";
+		}
+		else {
+			return "Light ";
+		}
 	};
 
 	var nameDefenseAttribute = function(defense) {
@@ -189,6 +246,12 @@ var Inventory = function() {
 		else if (defense < 10) {
 			return "Delicate ";
 		}
+		else if (defense < 20) {
+			return "Thick ";
+		}
+		else {
+			return "Sturdy ";
+		}
 	};
 
 	var nameMagicAttribute = function(magic) {
@@ -203,6 +266,12 @@ var Inventory = function() {
 		}
 		else if (magic < 10) {
 			return "Eerie ";
+		}
+		else if (magic < 20) {
+			return "Odd ";
+		}
+		else {
+			return "Magical ";
 		}
 	};
 
@@ -259,7 +328,7 @@ var Inventory = function() {
 	};
 
 	var extraRarity = function(chest) {
-		var rarity = Math.floor(Math.random() * 100);
+		var rarity = Math.floor(Math.random() * 101);
 		if (rarity < 50) {
 			return "Poor ";
 		}
@@ -276,6 +345,32 @@ var Inventory = function() {
 			return "Heavenly ";
 		}
 		chest.rarity += Math.floor(rarity/10);
+	};
+
+	self.equipWeapon = function(number) {
+		var weapon = bag[number];
+		if (equippedWeapon !== undefined) {
+			self.unequipWeapon(equippedWeapon);
+		}
+		equippedWeapon = weapon;
+		player.setStrengthBonus(weapon.damage);
+		player.setDexterityBonus(weapon.speed);
+		player.setConstitutionBonus(weapon.defense);
+		player.setMagicBonus(weapon.magic);
+		bag.splice(number, 1);
+		self.updateInventory();
+		self.updateEquipment();
+	};
+
+	self.unequipWeapon = function() {
+		bag.push(equippedWeapon);
+		player.setStrengthBonus(0);
+		player.setDexterityBonus(0);
+		player.setConstitutionBonus(0);
+		player.setMagicBonus(0);
+		equippedWeapon = undefined;
+		self.updateEquipment();
+		self.updateInventory();
 	};
 };
 
