@@ -8,7 +8,8 @@ var Inventory = function() {
 	self.save = function() {
 		var inventorySave = {
 			savedGold: gold,
-			savedBag: bag
+			savedBag: bag,
+			savedKeys: keys
 		};
 		localStorage.setItem("inventorySave",JSON.stringify(inventorySave));
 	};
@@ -22,6 +23,9 @@ var Inventory = function() {
 			}
 			if (inventorySave.savedBag !== undefined) {
 				loadBag(inventorySave.savedBag);
+			}
+			if (inventorySave.savedKeys !== undefined) {
+				keys = inventorySave.savedKeys;
 			}
 		}
 	};
@@ -72,21 +76,23 @@ var Inventory = function() {
 	};
 
 	self.openChest = function(chest) {
-		var type = Math.floor(Math.random()*0);
-		if (type === 0) {
-			bag.push(createWeapon(bag[chest].rarity));
+		if (keys > 0) {
+			var type = Math.floor(Math.random()*0);
+			if (type === 0) {
+				bag.push(createWeapon(bag[chest].rarity));
+			}
+			else if (type === 1) {
+				createArmor(bag[chest].rarity);
+			}
+			else if (type == 2) {
+				createAcessory(bag[chest].rarity);
+			}
+			else if (type == 3) {
+				createEnhancingStone(bag[chest].rarity)
+			}
+			bag.splice(chest, 1);
+			self.updateInventory();
 		}
-		else if (type === 1) {
-			createArmor(bag[chest].rarity);
-		}
-		else if (type == 2) {
-			createAcessory(bag[chest].rarity);
-		}
-		else if (type == 3) {
-			createEnhancingStone(bag[chest].rarity)
-		}
-		bag.splice(chest, 1);
-		self.updateInventory();
 	};
 
 	var createWeapon = function(points) {
