@@ -90,6 +90,9 @@ var Inventory = function() {
 			else if (bag[i].type == "weapon") {
 				printWeapon(bag[i], i);
 			}
+			else if (bag[i].type == "armor") {
+				printArmor(bag[i], i);
+			}
 		}
 	};
 
@@ -98,28 +101,40 @@ var Inventory = function() {
 	};
 
 	var printWeapon = function(weapon, number) {
-		document.getElementById("inventory").innerHTML += '<button type="button" class="list-group-item" onClick="inventory.equipWeapon(' + number + ')"><span class="badge">Equip</span>' + weapon.name + '</button>';
+		document.getElementById("inventory").innerHTML += '<button type="button" class="list-group-item" onClick="inventory.equipWeapon(' + number + ')"><span class="badge">Weapon</span>' + weapon.name + '</button>';
 	};
+
+	var printArmor = function(armor, number) {
+		document.getElementById("inventory").innerHTML += '<button type="button" class="list-group-item" onClick="inventory.equipArmor(' + number + ')"><span class="badge">Armor</span>' + armor.name + '</button>';
+	};
+
 
 	self.updateEquipment = function() {
 		document.getElementById("equipment").innerHTML = '';
 		if (equippedWeapon !== undefined) {
 			printEquippedWeapon();
 		}
+		if (equippedArmor !== undefined) {
+			printEquippedArmor();
+		}
 	}
 
-	var printEquippedWeapon = function(weapon, number) {
+	var printEquippedWeapon = function() {
 		document.getElementById("equipment").innerHTML += '<button type="button" class="list-group-item" onClick="inventory.unequipWeapon()"><span class="badge">Equipped</span>' + equippedWeapon.name + '</button>';
+	};
+
+	var printEquippedArmor = function() {
+		document.getElementById("equipment").innerHTML += '<button type="button" class="list-group-item" onClick="inventory.unequipArmor()"><span class="badge">Equipped</span>' + equippedArmor.name + '</button>';
 	};
 
 	self.openChest = function(chest) {
 		if (keys > 0) {
-			var type = Math.floor(Math.random()*0);
+			var type = Math.floor(Math.random()*2);
 			if (type === 0) {
 				bag.push(createWeapon(bag[chest].rarity));
 			}
 			else if (type === 1) {
-				createArmor(bag[chest].rarity);
+				bag.push(createArmor(bag[chest].rarity));
 			}
 			else if (type == 2) {
 				createAcessory(bag[chest].rarity);
@@ -152,14 +167,35 @@ var Inventory = function() {
 			}
 			points -= Math.round(points/2);
 		}
-		weapon.rarity = weaponRarity();
+		weapon.rarity = equipmentRarity();
 		weapon.name = nameWeapon(weapon);
 		return weapon;
 	};
 
+	var createArmor = function(points) {
+		var armor = {type: "armor", name: "", defense: 0, movement: 0, magic: 0, rarity: 0};
+		var roll;
+		while (points > 1) {
+			roll = Math.floor(Math.random()*3);
+			if (roll === 0) {
+				armor.defense += 0.1 * Math.round(points/2);
+			}
+			else if (roll == 1) {
+				armor.movement += 0.1 * Math.round(points/2);
+			}
+			else if (roll == 2) {
+				armor.movement += 0.1 * Math.round(points/2);
+			}
+			points -= Math.round(points/2);
+		}
+		armor.rarity = equipmentRarity();
+		armor.name = nameArmor(armor);
+		return armor;
+	};
+
 	var nameWeapon = function(weapon) {
 		var name = "";
-		name += nameRarity(weapon.rarity);
+		name += nameRarity(weapon);
 		name += nameDamageAttribute(weapon.damage);
 		name += nameSpeedAttribute(weapon.speed);
 		name += nameDefenseAttribute(weapon.defense);
@@ -168,25 +204,40 @@ var Inventory = function() {
 		return name;
 	};
 
-	var weaponRarity = function() {
+	var nameArmor = function(armor) {
+		var name = "";
+		name += nameRarity(armor);
+		name += nameDefenseAttribute(armor.defense);
+		name += nameSpeedAttribute(armor.movement);
+		name += nameMagicAttribute(armor.magic);
+		name += nameArmorType(armor);
+		return name;
+	}
+
+	var equipmentRarity = function() {
 		var rarity = Math.floor(Math.random()*101);
 		return rarity;
 	};
 
-	var nameRarity = function(rarity) {
-		if (rarity < 50) {
+	var nameRarity = function(equipment) {
+		if (equipment.rarity < 50) {
+			equipment.rarity = 1;
 			return "";
 		}
-		else if (rarity < 75) {
+		else if (equipment.rarity < 75) {
+			equipment.rarity = 1.25;
 			return "Uncommon ";
 		}
-		else if (rarity < 90) {
+		else if (equipment.rarity < 90) {
+			equipment.rarity = 1.5;
 			return "Rare ";
 		}
-		else if (rarity < 100) {
+		else if (equipment.rarity < 100) {
+			equipment.rarity = 2.0;
 			return "Epic ";
 		}
-		else if (rarity == 100) {
+		else if (equipment.rarity == 100) {
+			equipment.rarity = 2.5;
 			return "Legendary ";
 		}
 	};
@@ -291,6 +342,19 @@ var Inventory = function() {
 		}
 	}
 
+	var nameArmorType = function(armor) {
+		var highest = Math.max(armor.defense, armor.movement, armor.magic);
+		if (highest == armor.defense) {
+			return "Plate Armor";
+		}
+		else if (highest == armor.movement) {
+			return "Leather Vest";
+		}
+		else if (highest == armor.movement) {
+			return "Cloth Robe";
+		}
+	}
+
 	self.findChest = function(rarity) {
 		var chest = {type: "chest", name: "", rarity: rarity};
 		chest.name = nameChest(rarity) + " Chest";
@@ -350,13 +414,27 @@ var Inventory = function() {
 	self.equipWeapon = function(number) {
 		var weapon = bag[number];
 		if (equippedWeapon !== undefined) {
-			self.unequipWeapon(equippedWeapon);
+			self.unequipWeapon();
 		}
 		equippedWeapon = weapon;
-		player.setStrengthBonus(weapon.damage);
-		player.setDexterityBonus(weapon.speed);
-		player.setConstitutionBonus(weapon.defense);
-		player.setMagicBonus(weapon.magic);
+		player.setStrengthBonus(player.getStrengthBonus() + weapon.damage * weapon.rarity);
+		player.setDexterityBonus(player.getDexterityBonus() + weapon.speed * weapon.rarity);
+		player.setConstitutionBonus(player.getConstitutionBonus() + weapon.defense * weapon.rarity);
+		player.setMagicBonus(player.getMagicBonus() + weapon.magic * weapon.rarity);
+		bag.splice(number, 1);
+		self.updateInventory();
+		self.updateEquipment();
+	};
+
+	self.equipArmor = function(number) {
+		var armor = bag[number];
+		if (equippedArmor !== undefined) {
+			self.unequipArmor();
+		}
+		equippedArmor = armor;
+		player.setConstitutionBonus(player.getConstitutionBonus() + armor.defense * armor.rarity);
+		player.setSpeedBonus(player.getSpeedBonus() + armor.movement * armor.rarity);
+		player.setMagicBonus(player.getMagicBonus() + armor.magic * armor.rarity);
 		bag.splice(number, 1);
 		self.updateInventory();
 		self.updateEquipment();
@@ -364,14 +442,28 @@ var Inventory = function() {
 
 	self.unequipWeapon = function() {
 		bag.push(equippedWeapon);
-		player.setStrengthBonus(0);
-		player.setDexterityBonus(0);
-		player.setConstitutionBonus(0);
-		player.setMagicBonus(0);
+		player.setStrengthBonus(player.getStrengthBonus() - equippedWeapon.damage * equippedWeapon.rarity);
+		player.setDexterityBonus(player.getDexterityBonus() - equippedWeapon.speed * equippedWeapon.rarity);
+		player.setConstitutionBonus(player.getConstitutionBonus() - equippedWeapon.defense * equippedWeapon.rarity);
+		player.setMagicBonus(player.getMagicBonus() - equippedWeapon.magic * equippedWeapon.rarity);
+		player.setHealthCurrentValue(player.getHealthCurrentValue());
+		player.setManaCurrentValue(player.getManaCurrentValue());
 		equippedWeapon = undefined;
 		self.updateEquipment();
 		self.updateInventory();
 	};
+
+	self.unequipArmor = function() {
+		bag.push(equippedArmor);
+		player.setConstitutionBonus(player.getConstitutionBonus() - equippedArmor.defense * equippedArmor.rarity);
+		player.setSpeedBonus(player.getSpeedBonus() - equippedArmor.movement * equippedArmor.rarity);
+		player.setMagicBonus(player.getMagicBonus() - equippedArmor.magic * equippedArmor.rarity);
+		player.setHealthCurrentValue(player.getHealthCurrentValue());
+		player.setManaCurrentValue(player.getManaCurrentValue());
+		equippedArmor = undefined;
+		self.updateEquipment();
+		self.updateInventory();
+	}
 };
 
 var inventory = new Inventory();

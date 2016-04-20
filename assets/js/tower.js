@@ -106,7 +106,7 @@ var Tower = function() {
 		var currentFloor = player.getCurrentFloor();
 		player.setManaCurrentValue(player.getManaCurrentValue() + buffs.getManaPerSecond());
 		if (!self.floorExplorationComplete(currentFloor)) {
-			var explored = player.getSpeedLevel()/10;
+			var explored = (player.getSpeedLevel() + player.getSpeedBonus())/10;
 			var explorationLeft = floors[currentFloor].size - floors[currentFloor].explored;
 			if (explored > explorationLeft) {
 				explored = explorationLeft;

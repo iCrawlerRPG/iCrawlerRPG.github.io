@@ -204,7 +204,7 @@ var Monsters = function() {
 	};
 
 	var playerAttacks = function(monster) {
-		var damage = damageFormula(player.getStrengthLevel(), player.getDexterityLevel(), monster.constitution, monster.currentHealth);
+		var damage = damageFormula(player.getStrengthLevel() + player.getStrengthBonus(), player.getDexterityLevel() + player.getDexterityBonus(), monster.constitution, monster.currentHealth);
 		if (buffs.getRageTimeLeft() !== 0) {
 			damage *= 5;
 		}
@@ -261,7 +261,7 @@ var Monsters = function() {
 	};
 
 	var monsterAttacks = function(monster) {
-		var damage = damageFormula(monster.strength, monster.dexterity, player.getConstitutionLevel(), player.getHealthCurrentValue());
+		var damage = damageFormula(monster.strength, monster.dexterity, player.getConstitutionLevel() + player.getConstitutionBonus(), player.getHealthCurrentValue());
 		if (buffs.getAegisTimeLeft() === 0) {
 			var barrier = buffs.getBarrierLeft();
 			if (barrier > 0) {

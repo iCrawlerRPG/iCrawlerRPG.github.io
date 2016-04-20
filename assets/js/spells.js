@@ -316,7 +316,7 @@ var Spells = function() {
 	var curePotency = function(cure) {
 		var cureBasePotency = 25;
 		var cureLevelPotency = Math.pow(1.5, cure.level);
-		var cureMagicPotency = Math.pow(1.1, player.getMagicLevel() - 5) - 1;
+		var cureMagicPotency = Math.pow(1.1, player.getMagicLevel() + player.getMagicBonus() - 5) - 1;
 		return Math.floor(cureBasePotency * cureLevelPotency + cureMagicPotency);
 	};
 
@@ -342,7 +342,7 @@ var Spells = function() {
 	var fireballPotency = function(fireball) {
 		var fireballBasePotency = 15;
 		var fireballLevelPotency = Math.pow(1.5, fireball.level);
-		var fireballMagicPotency = Math.pow(1.1, player.getMagicLevel() - 5) - 1;
+		var fireballMagicPotency = Math.pow(1.1, player.getMagicLevel() + player.getMagicBonus() - 5) - 1;
 		return Math.floor(fireballBasePotency * fireballLevelPotency + fireballMagicPotency);
 	};
 
@@ -366,7 +366,7 @@ var Spells = function() {
 	var barrierPotency = function(barrier) {
 		var barrierBasePotency = 50;
 		var barrierLevelPotency = 50 * barrier.level;
-		var barrierMagicPotency = (10 * (player.getMagicLevel() - 10));
+		var barrierMagicPotency = (10 * (player.getMagicLevel() + player.getMagicBonus() - 10));
 		return Math.floor(barrierBasePotency + barrierLevelPotency + barrierMagicPotency);
 	};
 
@@ -389,7 +389,7 @@ var Spells = function() {
 	var aegisPotency = function(aegis) {
 		var aegisBasePotency = 5;
 		var aegisLevelPotency = 5 * aegis.level;
-		var aegisMagicPotency = player.getMagicLevel() - 50;
+		var aegisMagicPotency = player.getMagicLevel() + player.getMagicBonus() - 50;
 		return Math.floor(aegisBasePotency + aegisLevelPotency + aegisMagicPotency);
 	};
 
@@ -427,7 +427,7 @@ var Spells = function() {
 	var ragePotency = function(rage) {
 		var rageBasePotency = 5;
 		var rageLevelPotency = rage.level;
-		var rageMagicPotency = (0.2 * (player.getMagicLevel() - 25));
+		var rageMagicPotency = (0.2 * (player.getMagicLevel() + player.getMagicBonus() - 25));
 		return Math.floor(rageBasePotency + rageLevelPotency + rageMagicPotency);
 	};
 };

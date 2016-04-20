@@ -241,6 +241,26 @@ var Player = function() {
 		return magic.experience;
 	};
 
+	self.getStrengthBonus = function() {
+		return strength.bonus;
+	};
+
+	self.getDexterityBonus = function() {
+		return dexterity.bonus;
+	};
+
+	self.getConstitutionBonus = function() {
+		return constitution.bonus;
+	};
+
+	self.getSpeedBonus = function() {
+		return speed.bonus;
+	};
+
+	self.getMagicBonus = function() {
+		return magic.bonus;
+	};
+
 	//Setters
 	self.setInBattle = function(boolean) {
 		inBattle = boolean;
@@ -336,7 +356,7 @@ var Player = function() {
 	var setConstitutionLevel = function(newLevel) {
 		constitution.level = newLevel;
 		constitution.nextLevel = neededExperience(constitution.level + 1);
-		self.setHealthMaximumValue(Math.pow(constitution.level,2) * 4);
+		self.setHealthMaximumValue(Math.pow(constitution.level + constitution.bonus,2) * 4);
 		loadStatScreen("con", constitution);
 	};
 
@@ -350,7 +370,7 @@ var Player = function() {
 		magic.level = newLevel;
 		magic.nextLevel = neededExperience(magic.level + 1);
 		spells.updateSpellbook();
-		self.setManaMaximumValue(Math.pow(magic.level,2) * 2);
+		self.setManaMaximumValue(Math.pow(magic.level + magic.bonus,2) * 2);
 		loadStatScreen("mgc", magic);
 	};
 
@@ -366,6 +386,7 @@ var Player = function() {
 
 	self.setConstitutionBonus = function(bonus) {
 		constitution.bonus = bonus;
+		self.setHealthMaximumValue(Math.pow(constitution.level + constitution.bonus,2) * 4);
 		loadStatScreen("con", constitution);
 	};
 
@@ -376,6 +397,7 @@ var Player = function() {
 
 	self.setMagicBonus = function(bonus) {
 		magic.bonus = bonus;
+		self.setManaMaximumValue(Math.pow(magic.level + magic.bonus,2) * 2);
 		loadStatScreen("mgc", magic);
 	};
 
