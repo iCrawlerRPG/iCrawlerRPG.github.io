@@ -4,16 +4,16 @@
 *Vendor!*
 - (Currently in-dev) A vendor will be added to Floor 0 of the tower.
 - (Currently in-dev) The vendor will buy loot you get from the dungeon, and sell you chest keys.
-- (Currently in-dev) Vendor transactions will use a new resource: Gold.
-- (Currently in-dev) Chest keys can be used to open treasure chests you may find on the dungeon.
+- Vendor transactions will use a new resource: Gold.
+- Chest keys can be used to open treasure chests you may find on the dungeon.
 
 *Floor Events!*
 - Find mysterious treasure chests while exploring, they might contain anything!
 - (Currently in-dev) Explore 100% of a floor for a special bonus.
 
 *Equipments!*
-- (Currently in-dev) You can find equipments in treasure chests from floor events.
-- (Currently in-dev) Equipments will have several stats, and each one will be different from the other.
+- You can find equipments in treasure chests from floor events.
+- Equipments will have several stats, and each one will be different from the other.
 - (Currently in-dev) Some might even have real nice perks attached to them!
 
 *Spell Changes!*
