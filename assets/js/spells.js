@@ -238,8 +238,8 @@ var Spells = function() {
 			document.getElementById(spell.id + "arcaniacostall").innerHTML = spell.arcaniaCost;
 		}
 		else {
-			document.getElementById(spell.id + "costall").innerHTML = Math.floor(spell.baseMana + Math.pow(spell.level, 2));
-			document.getElementById(spell.id + "cost").innerHTML = Math.floor(spell.baseMana + Math.pow(spell.level, 2));
+			document.getElementById(spell.id + "costall").innerHTML = spellCost(spell);
+			document.getElementById(spell.id + "cost").innerHTML = spellCost(spell);
 			document.getElementById(spell.id + "xpall").style.width = 100*(spell.experience/spell.nextLevel) + "%";
 			document.getElementById(spell.id + "progall").innerHTML = Math.round(100 * (100 * (spell.experience/spell.nextLevel)))/100 + "%";
 			document.getElementById(spell.id + "levelall").innerHTML = spell.level;
@@ -395,11 +395,10 @@ var Spells = function() {
 
 	var castSlow = function(slow) {
 		var monster = monsters.getInstancedMonster();
-		if (!player.getInBattle() && monster.status !== 0) {
+		if (!player.getInBattle() || monster.dexterity <= 1) {
 			return false;
 		}
 		else {
-			monster.status = 1;
 			monster.dexterity = monster.dexterity/2;
 			document.getElementById("monsterdex").innerHTML = monster.dexterity;
 			document.getElementById("combatlog").innerHTML = '';
