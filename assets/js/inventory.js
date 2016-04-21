@@ -238,7 +238,7 @@ var Inventory = function() {
 		var name = "";
 		var highest = Math.max(weapon.damage, weapon.speed, weapon.defense, weapon.magic);
 		name += nameRarity(weapon);
-		name += nameDamageAttribute(weapon.damage);
+		name += nameDamageAttribute(highest);
 		if (highest == weapon.damage) {
 			name += "Sword";
 		}
@@ -249,7 +249,26 @@ var Inventory = function() {
 			name += "Shield";
 		}
 		else if (highest == weapon.magic) {
-			return "Staff";
+			name += "Staff";
+		}
+		return name;
+	};
+
+	var nameArmor = function(armor) {
+		var name = "";
+		var highest = Math.max(armor.defense, armor.movement, armor.magic);
+		name += nameRarity(armor);
+		if (highest == armor.defense) {
+			name += nameDefenseAttribute(armor.defense);
+			name += "Plate Armor";
+		}
+		else if (highest == armor.movement) {
+			name += nameSpeedAttribute(armor.movement);
+			name += "Leather Vest";
+		}
+		else if (highest == armor.magic) {
+			name += nameMagicalAttribute(armor.magic);
+			name += "Cloth Robe";
 		}
 		return name;
 	};
@@ -280,6 +299,7 @@ var Inventory = function() {
 	var nameDamageAttribute = function(damage) {
 		var name = "";
 		damage = damage*10;
+		console.log(damage);
 		name += nameAdjective(damage%10);
 		if (damage < 10) {
 			name += "Wooden ";
@@ -292,6 +312,66 @@ var Inventory = function() {
 		}
 		else if (damage < 40) {
 			name += "Steel ";
+		}
+		return name;
+	};
+
+	var nameDefenseAttribute = function(defense) {
+		var name = "";
+		defense = defense*10;
+		console.log(defense);
+		name += nameAdjective(defense%10);
+		if (defense < 10) {
+			name += "Makeshift ";
+		}
+		else if (defense < 20) {
+			name += "Copper ";
+		}
+		else if (defense < 30) {
+			name += "Iron ";
+		}
+		else if (defense < 40) {
+			name += "Steel ";
+		}
+		return name;
+	};
+
+	var nameSpeedAttribute = function(speed) {
+		var name = "";
+		speed = speed*10;
+		console.log(speed);
+		name += nameAdjective(speed%10);
+		if (speed < 10) {
+			name += "Uncomfortable ";
+		}
+		else if (speed < 20) {
+			name += "Light ";
+		}
+		else if (speed < 30) {
+			name += "Heavy ";
+		}
+		else if (speed < 40) {
+			name += "Resistant ";
+		}
+		return name;
+	};
+
+	var nameSpeedAttribute = function(speed) {
+		var name = "";
+		speed = speed*10;
+		console.log(speed);
+		name += nameAdjective(speed%10);
+		if (speed < 10) {
+			name += "Useless ";
+		}
+		else if (speed < 20) {
+			name += "Cotton ";
+		}
+		else if (speed < 30) {
+			name += "Eerie ";
+		}
+		else if (speed < 40) {
+			name += "Magical ";
 		}
 		return name;
 	};
@@ -310,92 +390,6 @@ var Inventory = function() {
 			return "Pristine ";
 		}
 	};
-
-	var nameArmor = function(armor) {
-		var name = "";
-		name += nameRarity(armor);
-		name += nameDefenseAttribute(armor.defense);
-		name += nameSpeedAttribute(armor.movement);
-		name += nameMagicAttribute(armor.magic);
-		name += nameArmorType(armor);
-		return name;
-	};
-
-	var nameSpeedAttribute = function(speed) {
-		if (speed === 0) {
-			return "Stagnant ";
-		}
-		else if (speed < 2) {
-			return "Lethargic ";
-		}
-		else if (speed < 5) {
-			return "Heavy ";
-		}
-		else if (speed < 10) {
-			return "Slow ";
-		}
-		else if (speed < 20) {
-			return "Flowy ";
-		}
-		else {
-			return "Light ";
-		}
-	};
-
-	var nameDefenseAttribute = function(defense) {
-		if (defense === 0) {
-			return "Feeble ";
-		}
-		else if (defense < 2) {
-			return "Decrepit ";
-		}
-		else if (defense < 5) {
-			return "Shabby ";
-		}
-		else if (defense < 10) {
-			return "Delicate ";
-		}
-		else if (defense < 20) {
-			return "Thick ";
-		}
-		else {
-			return "Sturdy ";
-		}
-	};
-
-	var nameMagicAttribute = function(magic) {
-		if (magic === 0) {
-			return "Plain ";
-		}
-		else if (magic < 2) {
-			return "Regular ";
-		}
-		else if (magic < 5) {
-			return "Unusual ";
-		}
-		else if (magic < 10) {
-			return "Eerie ";
-		}
-		else if (magic < 20) {
-			return "Odd ";
-		}
-		else {
-			return "Magical ";
-		}
-	};
-
-	var nameArmorType = function(armor) {
-		var highest = Math.max(armor.defense, armor.movement, armor.magic);
-		if (highest == armor.defense) {
-			return "Plate Armor";
-		}
-		else if (highest == armor.movement) {
-			return "Leather Vest";
-		}
-		else if (highest == armor.movement) {
-			return "Cloth Robe";
-		}
-	}
 
 	self.findChest = function(rarity) {
 		var chest = {type: "chest", name: "", rarity: rarity};
