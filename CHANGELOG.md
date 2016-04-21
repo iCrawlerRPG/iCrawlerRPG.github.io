@@ -2,9 +2,9 @@
 **(In-development now) Changes coming in alpha v0.9:**
 
 *Vendor!*
-- (Currently in-dev) A vendor will be added to Floor 0 of the tower.
+- A vendor has been added to the tower.
 - (Currently in-dev) The vendor will buy loot you get from the dungeon, and sell you chest keys.
-- Vendor transactions will use a new resource: Gold.
+- Vendor transactions use a new resource: Gold.
 - Chest keys can be used to open treasure chests you may find on the dungeon.
 
 *Floor Events!*
