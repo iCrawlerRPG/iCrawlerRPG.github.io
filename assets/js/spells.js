@@ -49,7 +49,7 @@ var Spells = function() {
 		learned: false,
 		baseMana: 400,
 		experience: 0,
-		next: 4000,
+		nextLevel: 4000,
 		baseNextLevel: 4000,
 		level: 0,
 		description: ""});
@@ -62,7 +62,7 @@ var Spells = function() {
 		learned: false,
 		baseMana: 1250,
 		experience: 0,
-		next: 12500,
+		nextLevel: 12500,
 		baseNextLevel: 12500,
 		level: 0,
 		description: ""});
@@ -75,7 +75,7 @@ var Spells = function() {
 		learned: false,
 		baseMana: 5000,
 		experience: 0,
-		next: 50000,
+		nextLevel: 50000,
 		baseNextLevel: 50000,
 		level: 0,
 		description: ""});
