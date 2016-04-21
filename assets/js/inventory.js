@@ -229,30 +229,29 @@ var Inventory = function() {
 		return armor;
 	};
 
-	var nameWeapon = function(weapon) {
-		var name = "";
-		name += nameRarity(weapon);
-		name += nameDamageAttribute(weapon.damage);
-		name += nameSpeedAttribute(weapon.speed);
-		name += nameDefenseAttribute(weapon.defense);
-		name += nameMagicAttribute(weapon.magic);
-		name += nameWeaponType(weapon);
-		return name;
-	};
-
-	var nameArmor = function(armor) {
-		var name = "";
-		name += nameRarity(armor);
-		name += nameDefenseAttribute(armor.defense);
-		name += nameSpeedAttribute(armor.movement);
-		name += nameMagicAttribute(armor.magic);
-		name += nameArmorType(armor);
-		return name;
-	}
-
 	var equipmentRarity = function() {
 		var rarity = Math.floor(Math.random()*101);
 		return rarity;
+	};
+
+	var nameWeapon = function(weapon) {
+		var name = "";
+		var highest = Math.max(weapon.damage, weapon.speed, weapon.defense, weapon.magic);
+		name += nameRarity(weapon);
+		name += nameDamageAttribute(weapon.damage);
+		if (highest == weapon.damage) {
+			name += "Sword";
+		}
+		else if (highest == weapon.speed) {
+			name += "Daggers";
+		}
+		else if (highest == weapon.defense) {
+			name += "Shield";
+		}
+		else if (highest == weapon.magic) {
+			return "Staff";
+		}
+		return name;
 	};
 
 	var nameRarity = function(equipment) {
@@ -279,24 +278,47 @@ var Inventory = function() {
 	};
 
 	var nameDamageAttribute = function(damage) {
-		if (damage === 0) {
-			return "Broken ";
-		}
-		else if (damage < 2) {
-			return "Useless ";
-		}
-		else if (damage < 5) {
-			return "Blunt ";
-		}
-		else if (damage < 10) {
-			return "Weak ";
+		var name = "";
+		damage = damage*10;
+		name += nameAdjective(damage%10);
+		if (damage < 10) {
+			name += "Wooden ";
 		}
 		else if (damage < 20) {
-			return "Average ";
+			name += "Copper ";
+		}
+		else if (damage < 30) {
+			name += "Iron ";
+		}
+		else if (damage < 40) {
+			name += "Steel ";
+		}
+		return name;
+	};
+
+	var nameAdjective = function(stats) {
+		if (stats < 3) {
+			return "Weak ";
+		}
+		else if (stats < 6) {
+			return "Regular ";
+		}
+		else if (stats < 9) {
+			return "Strong ";
 		}
 		else {
-			return "Sharp ";
+			return "Pristine ";
 		}
+	};
+
+	var nameArmor = function(armor) {
+		var name = "";
+		name += nameRarity(armor);
+		name += nameDefenseAttribute(armor.defense);
+		name += nameSpeedAttribute(armor.movement);
+		name += nameMagicAttribute(armor.magic);
+		name += nameArmorType(armor);
+		return name;
 	};
 
 	var nameSpeedAttribute = function(speed) {
@@ -361,22 +383,6 @@ var Inventory = function() {
 			return "Magical ";
 		}
 	};
-
-	var nameWeaponType = function(weapon) {
-		var highest = Math.max(weapon.damage, weapon.speed, weapon.defense, weapon.magic);
-		if (highest == weapon.damage) {
-			return "Sword";
-		}
-		else if (highest == weapon.speed) {
-			return "Daggers";
-		}
-		else if (highest == weapon.defense) {
-			return "Shield";
-		}
-		else if (highest == weapon.magic) {
-			return "Staff";
-		}
-	}
 
 	var nameArmorType = function(armor) {
 		var highest = Math.max(armor.defense, armor.movement, armor.magic);
