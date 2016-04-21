@@ -101,6 +101,10 @@ var Inventory = function() {
 				printArmor(bag[i], i, sellMode);
 			}
 		}
+
+		$(document).ready(function(){
+			$('[data-toggle="tooltip"]').tooltip({html: true}); 
+		});
 	};
 
 	self.updateShop = function(boolean) {
@@ -125,22 +129,24 @@ var Inventory = function() {
 	};
 
 	var printWeapon = function(weapon, number, sellMode) {
+		var tooltip = "Bonus STR: " + Math.round(100*weapon.damage * weapon.rarity)/100 + "<br>Bonus DEX: " + Math.round(100*weapon.speed * weapon.rarity)/100 + "<br>Bonus CON: " + Math.round(100*weapon.defense * weapon.rarity)/100 + "<br>Bonus MGC: " + Math.round(100*weapon.magic * weapon.rarity)/100;
 		if (!sellMode) {
-			document.getElementById("inventory").innerHTML += '<button type="button" class="list-group-item" onClick="inventory.equipWeapon(' + number + ')"><span class="badge">Weapon</span>' + weapon.name + '</button>';
+			document.getElementById("inventory").innerHTML += '<button type="button" class="list-group-item" data-toggle="tooltip" title="' + tooltip + '" onClick="inventory.equipWeapon(' + number + ')"><span class="badge">Weapon</span>' + weapon.name + '</button>';
 		}
 		else {
 			var price = Math.round((weapon.damage + weapon.speed + weapon.defense + weapon.magic) * 5 * weapon.rarity);
-			document.getElementById("inventory").innerHTML += '<button type="button" class="list-group-item list-group-item-success" onClick="inventory.sell(' + number + ',' + price + ')"><span class="badge">' + price + '</span>' + weapon.name + '</button>';
+			document.getElementById("inventory").innerHTML += '<button type="button" class="list-group-item list-group-item-success" data-toggle="tooltip" title="' + tooltip + '" onClick="inventory.sell(' + number + ',' + price + ')"><span class="badge">' + price + '</span>' + weapon.name + '</button>';
 		}
 	};
 
 	var printArmor = function(armor, number, sellMode) {
+		var tooltip = "Bonus CON: " + Math.round(100*armor.defense * armor.rarity)/100 + "<br>Bonus SPD: " + Math.round(100*armor.movement * armor.rarity)/100 + "<br>Bonus MGC: " + Math.round(100*armor.magic * armor.rarity)/100;
 		if (!sellMode) {
-			document.getElementById("inventory").innerHTML += '<button type="button" class="list-group-item" onClick="inventory.equipArmor(' + number + ')"><span class="badge">Armor</span>' + armor.name + '</button>';
+			document.getElementById("inventory").innerHTML += '<button type="button" class="list-group-item" data-toggle="tooltip" title="' + tooltip + '" onClick="inventory.equipArmor(' + number + ')"><span class="badge">Armor</span>' + armor.name + '</button>';
 		}
 		else {
 			var price = Math.round((armor.defense + armor.movement + armor.magic) * 10 * armor.rarity);
-			document.getElementById("inventory").innerHTML += '<button type="button" class="list-group-item list-group-item-success" onClick="inventory.sell(' + number + ',' + price + ')"><span class="badge">' + price + '</span>' + armor.name + '</button>';
+			document.getElementById("inventory").innerHTML += '<button type="button" class="list-group-item list-group-item-success" data-toggle="tooltip" title="' + tooltip + '" onClick="inventory.sell(' + number + ',' + price + ')"><span class="badge">' + price + '</span>' + armor.name + '</button>';
 		}
 	};
 
