@@ -368,7 +368,7 @@ var Inventory = function() {
 		return name;
 	};
 
-	var nameSpeedAttribute = function(speed) {
+	var nameMagicalAttribute = function(speed) {
 		var name = "";
 		speed = speed*10;
 		console.log(speed);
