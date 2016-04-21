@@ -1,4 +1,5 @@
 var Monsters = function() {
+	var inBossBattle = false;
 	var monsterList = [
 		//First Tier
 		{name:"Rat", killed:0},
@@ -61,6 +62,14 @@ var Monsters = function() {
 		{name: "Frenzied Goblin", killed: 0}
 	];
 
+	var bossList = [
+		{name: "The First Guardian, Alstroemeria", currentHealth: 91204, maximumHealth: 91204, strength: 151, dexterity: 151, constitution: 151, status: 0},
+		{name: "The Second Guardian, Bouvardia", currentHealth: 372100, maximumHealth: 372100, strength: 305, dexterity: 305, constitution: 305, status: 0},
+		{name: "The Third Guardian, Clarkia", currentHealth: 864900, maximumHealth: 864900, strength: 465, dexterity: 465, constitution: 465, status: 0},
+		{name: "The Fourth Guardian, Dianthus", currentHealth: 1638400, maximumHealth: 1638400, strength: 640, dexterity: 640, constitution: 640, status: 0},
+		{name: "The Fifth Guardian, Erigeron", currentHealth: 2930944, maximumHealth: 2930944, strength: 856, dexterity: 856, constitution: 856, status: 0}
+	];
+
 	var instancedMonster = {
 		name: "",
 		currentHealth: 0,
@@ -76,7 +85,8 @@ var Monsters = function() {
 	self.save = function() {
 		var monstersSave = {
 			savedMonsterList: monsterList,
-			savedInstancedMonster: instancedMonster
+			savedInstancedMonster: instancedMonster,
+			savedInBossBattle: inBossBattle
 		};
 		localStorage.setItem("monstersSave",JSON.stringify(monstersSave));
 	};
@@ -90,6 +100,9 @@ var Monsters = function() {
 			}
 			if (monstersSave.savedInstancedMonster !== undefined) {
 				loadInstancedMonster(monstersSave.savedInstancedMonster);
+			}
+			if (monstersSave.savedInBossBattle !== undefined) {
+				inBossBattle = monstersSave.savedInBossBattle;
 			}
 		}
 	};
@@ -138,9 +151,21 @@ var Monsters = function() {
 		return instancedMonster;
 	};
 
+	self.getBossMonster = function(number) {
+		return bossList[number];
+	};
+
+	self.getInBossBattle = function() {
+		return inBossBattle;
+	};
+
 	//Setters
 	self.setInstancedMonster = function(updatedMonster) {
 		instancedMonster = updatedMonster;
+	};
+
+	self.setInBossBattle = function(boolean) {
+		inBossBattle = boolean;
 	};
 
 	//Other Methods
@@ -158,7 +183,12 @@ var Monsters = function() {
 			document.getElementById("monsterdex").innerHTML = monster.dexterity;
 			document.getElementById("monstercon").innerHTML = monster.constitution;
 			document.getElementById("monsterbar").style.width = 100*(monster.currentHealth/monster.maximumHealth) + "%";
-			document.getElementById("combatlog").innerHTML = "You are attacked by a " + monster.name + "!<br>";
+			if (!inBossBattle) {
+				document.getElementById("combatlog").innerHTML = "You are attacked by a " + monster.name + "!<br>";
+			}
+			else {
+				document.getElementById("combatlog").innerHTML = "You challenge a floor boss! You begin fighting " + monster.name + "!<br>";
+			}
 			player.setInBattle(true);
 		}
 		else {
@@ -229,8 +259,17 @@ var Monsters = function() {
 
 	var monsterDeath = function(monster) {
 		player.setInBattle(false);
-		document.getElementById("combatlog").innerHTML += "You have defeated the " + monster.name + "!<br>";
-		updateMonsterKilled(monster.name);
+		if (!inBossBattle) {
+			document.getElementById("combatlog").innerHTML += "You have defeated the " + monster.name + "!<br>";
+			updateMonsterKilled(monster.name);
+		}
+		else {
+			document.getElementById("combatlog").innerHTML += "You have defeated a floor boss! " + monster.name + " recognizes your strength and allows you to advance.";
+			tower.setBossFound(false);
+			tower.setLastBossDefeated(player.getCurrentFloor());
+			tower.bossDefeated();
+			inBossBattle = false;
+		}
 		upgrades.gainExcelia(monster);
 		player.loadRestButton();
 		player.loadExploreButton();
@@ -371,6 +410,9 @@ var Monsters = function() {
 				document.getElementById("combatlog").innerHTML += "You failed to run away.<br>";
 				self.battle(instancedMonster, true);
 			}
+		}
+		if (inBossBattle) {
+			inBossBattle = false;
 		}
 	}
 };

@@ -495,6 +495,9 @@ var Player = function() {
 
 	self.death = function(monster) {
 		inBattle = false;
+		if (monsters.getInBossBattle()) {
+			monsters.setInBossBattle(false);
+		}
 		document.getElementById("combatlog").innerHTML += "You have been defeated by the " + monster.name + "!";
 		if (system.getIdleMode()) {
 			system.toggleIdle();

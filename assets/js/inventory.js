@@ -429,7 +429,6 @@ var Inventory = function() {
 
 	var extraRarity = function(chest) {
 		var rarity = Math.floor(Math.random() * 101);
-		chest.rarity += Math.floor(rarity/10);
 		if (rarity < 50) {
 			return "Poor ";
 		}

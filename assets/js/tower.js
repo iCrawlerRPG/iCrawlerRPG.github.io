@@ -69,6 +69,13 @@ var Tower = function() {
 	};
 
 	//Setters
+	self.setBossFound = function(boolean) {
+		bossFound = boolean;
+	};
+
+	self.setLastBossDefeated = function(floor) {
+		lastBossDefeated = floor;
+	};
 
 	//Other Methods
 	self.floorExplorationComplete = function(floor) {
@@ -84,11 +91,14 @@ var Tower = function() {
 		document.getElementById("explperc").innerHTML = Math.round(100*(floors[currentFloor].explored/floors[currentFloor].size)*100)/100 + "%";
 		document.getElementById("floorbar").style.width = 100*(floors[currentFloor].explored/floors[currentFloor].size) + "%";
 		if (floors[currentFloor].canAdvance && currentFloor < monsters.getMonsterList().length) {
+			document.getElementById("advbut").innerHTML = '<button class="btn btn-default btn-block" onClick="tower.changeFloor(1)">Next Floor</button>';
+		}
+		else if (bossFound) {
 			if (currentFloor % 10 !== 0) {
 				document.getElementById("advbut").innerHTML = '<button class="btn btn-default btn-block" onClick="tower.changeFloor(1)">Next Floor</button>';
 			}
 			else {
-				if (currentFloor < lastBossDefeated) {
+				if (currentFloor <= lastBossDefeated) {
 					document.getElementById("advbut").innerHTML = '<button class="btn btn-default btn-block" onClick="tower.changeFloor(1)">Next Floor</button>';
 				}
 				else {
@@ -105,6 +115,19 @@ var Tower = function() {
 		else {
 			document.getElementById("retbut").innerHTML = '';
 		}
+	};
+
+	self.startBossBattle = function() {
+		if (!player.getInBattle()) {
+			monsters.setInstancedMonster(monsters.getBossMonster((player.getCurrentFloor()/10)-1));
+			monsters.setInBossBattle(true);
+			monsters.battle(monsters.getInstancedMonster(), false);
+		}
+	};
+
+	self.bossDefeated = function() {
+		floors[player.getCurrentFloor()].canAdvance = true;
+		self.loadTowerScreen();
 	};
 
 	self.changeFloor = function(floorsChanged) {
@@ -155,16 +178,17 @@ var Tower = function() {
 	var checkFloorEvent = function() {
 		var eventChance = 10;
 		var eventRoll = Math.random()*100;
-		console.log(eventChance, eventRoll);
 		if (eventRoll <= eventChance) {
 			eventRoll = Math.random()*10;
 			if (eventRoll < 5) {
+				var rarity = player.getCurrentFloor() + Math.floor(Math.random() * player.getCurrentFloor());
 				document.getElementById("floorlog").innerHTML = "You turn a corner, finding a treasure chest."
-				inventory.findChest(player.getCurrentFloor() + Math.floor(Math.random() * player.getCurrentFloor()));
+				inventory.findChest(rarity);
 			}
 			else if (eventRoll < 8) {
 				var gold = Math.round(Math.random() * 50 * player.getCurrentFloor()) + 1;
 				document.getElementById("floorlog").innerHTML = "You find the body of another adventurer. You check their pockets, obtaining " + gold + " gold.";
+				inventory.setGold(inventory.getGold() + gold);
 			}
 			else {
 				document.getElementById("floorlog").innerHTML = "You find the body of another adventurer. You check their pockets, obtaining a chest key.";
