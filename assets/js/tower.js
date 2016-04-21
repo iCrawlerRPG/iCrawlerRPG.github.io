@@ -177,7 +177,7 @@ var Tower = function() {
 
 	var checkFloorEvent = function() {
 		var eventChance = 2;
-		var eventRoll = Math.floor(Math.random()*101);
+		var eventRoll = Math.floor(Math.random()*100);
 		if (eventRoll <= eventChance) {
 			eventRoll = Math.random()*10;
 			if (eventRoll < 6) {
