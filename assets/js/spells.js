@@ -253,7 +253,7 @@ var Spells = function() {
 		var spell = findSpell(spellId);
 		var manaCost = spellCost(spellbook[spell]);
 
-		if (player.getManaCurrentValue() >= manaCost && buffs.getRageTimeLeft() === 0 && !player.getResting()) {
+		if (player.getManaCurrentValue() >= manaCost && buffs.getRageTimeLeft() === 0) {
 			var castSuccessful;
 			if (spellbook[spell].id == "cure") {
 				castSuccessful = castCure(spellbook[spell]);
