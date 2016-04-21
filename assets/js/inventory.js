@@ -160,14 +160,19 @@ var Inventory = function() {
 		if (equippedArmor !== undefined) {
 			printEquippedArmor();
 		}
+		$(document).ready(function(){
+			$('[data-toggle="tooltip"]').tooltip({html: true}); 
+		});
 	}
 
 	var printEquippedWeapon = function() {
-		document.getElementById("equipment").innerHTML += '<button type="button" class="list-group-item" onClick="inventory.unequipWeapon()"><span class="badge">Equipped</span>' + equippedWeapon.name + '</button>';
+		var tooltip = "Bonus STR: " + Math.round(100*equippedWeapon.damage * equippedWeapon.rarity)/100 + "<br>Bonus DEX: " + Math.round(100*equippedWeapon.speed * equippedWeapon.rarity)/100 + "<br>Bonus CON: " + Math.round(100*equippedWeapon.defense * equippedWeapon.rarity)/100 + "<br>Bonus MGC: " + Math.round(100*equippedWeapon.magic * equippedWeapon.rarity)/100;
+		document.getElementById("equipment").innerHTML += '<button type="button" class="list-group-item" data-toggle="tooltip" title="' + tooltip + '" onClick="inventory.unequipWeapon()"><span class="badge">Equipped</span>' + equippedWeapon.name + '</button>';
 	};
 
 	var printEquippedArmor = function() {
-		document.getElementById("equipment").innerHTML += '<button type="button" class="list-group-item" onClick="inventory.unequipArmor()"><span class="badge">Equipped</span>' + equippedArmor.name + '</button>';
+		var tooltip = "Bonus CON: " + Math.round(100*equippedArmor.defense * equippedArmor.rarity)/100 + "<br>Bonus SPD: " + Math.round(100*equippedArmor.movement * equippedArmor.rarity)/100 + "<br>Bonus MGC: " + Math.round(100*equippedArmor.magic * equippedArmor.rarity)/100;
+		document.getElementById("equipment").innerHTML += '<button type="button" class="list-group-item" data-toggle="tooltip" title="' + tooltip + '" onClick="inventory.unequipArmor()"><span class="badge">Equipped</span>' + equippedArmor.name + '</button>';
 	};
 
 	self.openChest = function(chest) {
