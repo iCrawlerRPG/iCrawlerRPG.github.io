@@ -229,7 +229,7 @@ var Monsters = function() {
 
 	var monsterDeath = function(monster) {
 		player.setInBattle(false);
-		document.getElementById("combatlog").innerHTML += "You have defeated the " + monster.name + "!";
+		document.getElementById("combatlog").innerHTML += "You have defeated the " + monster.name + "!<br>";
 		updateMonsterKilled(monster.name);
 		upgrades.gainExcelia(monster);
 		player.loadRestButton();

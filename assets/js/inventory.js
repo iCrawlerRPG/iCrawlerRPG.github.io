@@ -2,9 +2,11 @@ var Inventory = function() {
 	var gold = 0;
 	var keys = 0;
 	var bag = [];
+	var keyPrice = 10;
 	var equippedWeapon;
 	var equippedArmor;
 	var equippedAccessory;
+	var sellMode = false;
 
 	var self = this;
 	//Save Method
@@ -16,6 +18,7 @@ var Inventory = function() {
 			savedEquippedWeapon: equippedWeapon,
 			savedEquippedArmor: equippedArmor,
 			savedEquippedAccessory: equippedAccessory,
+			savedKeyPrice: keyPrice
 		};
 		localStorage.setItem("inventorySave",JSON.stringify(inventorySave));
 	};
@@ -41,6 +44,9 @@ var Inventory = function() {
 			}
 			if (inventorySave.savedEquippedAccessory !== undefined) {
 				equippedAccessory = inventorySave.savedEquippedAccessory;
+			}
+			if (inventorySave.savedKeyPrice !== undefined) {
+				keyPrice = inventorySave.savedKeyPrice;
 			}
 		}
 	};
@@ -81,31 +87,61 @@ var Inventory = function() {
 		document.getElementById("keys").innerHTML = keys;
 	};
 
-	self.updateInventory = function() {
+	self.updateInventory = function(boolean) {
+		self.updateShop(boolean);
 		document.getElementById("inventory").innerHTML = "";
 		for (var i = 0; i < bag.length; i++) {
 			if (bag[i].type == "chest") {
-				printChest(bag[i], i);
+				printChest(bag[i], i, sellMode);
 			}
 			else if (bag[i].type == "weapon") {
-				printWeapon(bag[i], i);
+				printWeapon(bag[i], i, sellMode);
 			}
 			else if (bag[i].type == "armor") {
-				printArmor(bag[i], i);
+				printArmor(bag[i], i, sellMode);
 			}
 		}
 	};
 
-	var printChest = function(chest, number) {
-		document.getElementById("inventory").innerHTML += '<button type="button" class="list-group-item" onClick="inventory.openChest(' + number + ')"><span class="badge">Open</span> ' + chest.name + '</button>';
+	self.updateShop = function(boolean) {
+		sellMode = boolean;
+		if (sellMode) {
+			document.getElementById("sellbutton").innerHTML = '<button class="btn btn-block btn-success" onClick="inventory.updateInventory(false)">Exit Sell Mode</button>'
+		}
+		else {
+			document.getElementById("sellbutton").innerHTML = '<button class="btn btn-block btn-success" onClick="inventory.updateInventory(true)">Enter Sell Mode</button>'
+		}
+		document.getElementById("keyprice").innerHTML = keyPrice;
 	};
 
-	var printWeapon = function(weapon, number) {
-		document.getElementById("inventory").innerHTML += '<button type="button" class="list-group-item" onClick="inventory.equipWeapon(' + number + ')"><span class="badge">Weapon</span>' + weapon.name + '</button>';
+	var printChest = function(chest, number, sellMode) {
+		if (!sellMode) {
+			document.getElementById("inventory").innerHTML += '<button type="button" class="list-group-item" onClick="inventory.openChest(' + number + ')"><span class="badge">Open</span> ' + chest.name + '</button>';
+		}
+		else {
+			var price = chest.rarity;
+			document.getElementById("inventory").innerHTML += '<button type="button" class="list-group-item list-group-item-success" onClick="inventory.sell(' + number + ',' + price + ')"><span class="badge">' + price + '</span> ' + chest.name + '</button>';
+		}
 	};
 
-	var printArmor = function(armor, number) {
-		document.getElementById("inventory").innerHTML += '<button type="button" class="list-group-item" onClick="inventory.equipArmor(' + number + ')"><span class="badge">Armor</span>' + armor.name + '</button>';
+	var printWeapon = function(weapon, number, sellMode) {
+		if (!sellMode) {
+			document.getElementById("inventory").innerHTML += '<button type="button" class="list-group-item" onClick="inventory.equipWeapon(' + number + ')"><span class="badge">Weapon</span>' + weapon.name + '</button>';
+		}
+		else {
+			var price = Math.round((weapon.damage + weapon.speed + weapon.defense + weapon.magic) * 5 * weapon.rarity);
+			document.getElementById("inventory").innerHTML += '<button type="button" class="list-group-item list-group-item-success" onClick="inventory.sell(' + number + ',' + price + ')"><span class="badge">' + price + '</span>' + weapon.name + '</button>';
+		}
+	};
+
+	var printArmor = function(armor, number, sellMode) {
+		if (!sellMode) {
+			document.getElementById("inventory").innerHTML += '<button type="button" class="list-group-item" onClick="inventory.equipArmor(' + number + ')"><span class="badge">Armor</span>' + armor.name + '</button>';
+		}
+		else {
+			var price = Math.round((armor.defense + armor.movement + armor.magic) * 10 * armor.rarity);
+			document.getElementById("inventory").innerHTML += '<button type="button" class="list-group-item list-group-item-success" onClick="inventory.sell(' + number + ',' + price + ')"><span class="badge">' + price + '</span>' + armor.name + '</button>';
+		}
 	};
 
 
@@ -143,15 +179,15 @@ var Inventory = function() {
 				createEnhancingStone(bag[chest].rarity)
 			}
 			bag.splice(chest, 1);
-			self.updateInventory();
+			self.updateInventory(sellMode);
+			self.setKeys(keys - 1);
 		}
-		self.setKeys(keys - 1);
 	};
 
 	var createWeapon = function(points) {
 		var weapon = {type: "weapon", name: "", damage: 0, speed: 0, defense: 0, magic: 0, rarity: 0};
 		var roll;
-		while (points > 1) {
+		while (points > 0) {
 			roll = Math.floor(Math.random()*4);
 			if (roll === 0) {
 				weapon.damage += 0.1 * Math.round(points/2);
@@ -175,7 +211,7 @@ var Inventory = function() {
 	var createArmor = function(points) {
 		var armor = {type: "armor", name: "", defense: 0, movement: 0, magic: 0, rarity: 0};
 		var roll;
-		while (points > 1) {
+		while (points > 0) {
 			roll = Math.floor(Math.random()*3);
 			if (roll === 0) {
 				armor.defense += 0.1 * Math.round(points/2);
@@ -359,12 +395,12 @@ var Inventory = function() {
 		var chest = {type: "chest", name: "", rarity: rarity};
 		chest.name = nameChest(rarity) + " Chest";
 		bag.push(chest);
-		self.updateInventory();
+		self.updateInventory(sellMode);
 	};
 
 	self.clearBag = function() {
 		bag = [];
-		self.updateInventory();
+		self.updateInventory(sellMode);
 	};
 
 	var nameChest = function(rarity) {
@@ -393,6 +429,7 @@ var Inventory = function() {
 
 	var extraRarity = function(chest) {
 		var rarity = Math.floor(Math.random() * 101);
+		chest.rarity += Math.floor(rarity/10);
 		if (rarity < 50) {
 			return "Poor ";
 		}
@@ -408,7 +445,6 @@ var Inventory = function() {
 		else if (rarity == 100) {
 			return "Heavenly ";
 		}
-		chest.rarity += Math.floor(rarity/10);
 	};
 
 	self.equipWeapon = function(number) {
@@ -422,7 +458,7 @@ var Inventory = function() {
 		player.setConstitutionBonus(player.getConstitutionBonus() + weapon.defense * weapon.rarity);
 		player.setMagicBonus(player.getMagicBonus() + weapon.magic * weapon.rarity);
 		bag.splice(number, 1);
-		self.updateInventory();
+		self.updateInventory(sellMode);
 		self.updateEquipment();
 	};
 
@@ -436,7 +472,7 @@ var Inventory = function() {
 		player.setSpeedBonus(player.getSpeedBonus() + armor.movement * armor.rarity);
 		player.setMagicBonus(player.getMagicBonus() + armor.magic * armor.rarity);
 		bag.splice(number, 1);
-		self.updateInventory();
+		self.updateInventory(sellMode);
 		self.updateEquipment();
 	};
 
@@ -450,7 +486,7 @@ var Inventory = function() {
 		player.setManaCurrentValue(player.getManaCurrentValue());
 		equippedWeapon = undefined;
 		self.updateEquipment();
-		self.updateInventory();
+		self.updateInventory(sellMode);
 	};
 
 	self.unequipArmor = function() {
@@ -462,8 +498,23 @@ var Inventory = function() {
 		player.setManaCurrentValue(player.getManaCurrentValue());
 		equippedArmor = undefined;
 		self.updateEquipment();
-		self.updateInventory();
-	}
+		self.updateInventory(sellMode);
+	};
+
+	self.buyKey = function() {
+		if (gold >= keyPrice) {
+			self.setGold(self.getGold() - keyPrice);
+			self.setKeys(self.getKeys() + 1);
+			keyPrice += 10;
+			self.updateInventory(sellMode);
+		}
+	};
+
+	self.sell = function(number, price) {
+		self.setGold(self.getGold() + price);
+		bag.splice(number, 1);
+		self.updateInventory(sellMode);
+	};
 };
 
 var inventory = new Inventory();

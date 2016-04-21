@@ -154,11 +154,11 @@
 									<div class="row">
 										<div class="col-xs-6">
 											<h3 class="panel-title" style="font-family: 'Germania One', cursive;">
-												Inventory
+												<img src="assets/knapsack.png" style="height: 25px;"></img> Inventory
 											</h3>
 										</div>
 										<div class="col-xs-6 text-right">
-											Gold: <span id="gold">0</span>
+											Keys: <span id="keys">0</span>
 										</div>
 									</div>
 								</div>
@@ -170,13 +170,6 @@
 													<span id="inventory"></span>
 												</ul>
 											</div>
-										</div>
-									</div>
-								</div>
-								<div class="panel-footer">
-									<div class="row">
-										<div class="col-xs-12">
-											Keys: <span id="keys">0</span>
 										</div>
 									</div>
 								</div>
@@ -281,10 +274,13 @@
 							<div class="panel panel-default">
 								<div class="panel-heading" data-toggle="collapse" data-target="#collapseShop">
 									<div class="row">
-										<div class="col-xs-12">
+										<div class="col-xs-6">
 											<h3 class="panel-title" style="font-family: 'Germania One', cursive;">
-												The Shop
+												<img src="assets/swap-bag.png" style="height: 25px;"></img> The Shop
 											</h3>
+										</div>
+										<div class="col-xs-6 text-right">
+											Gold: <span id="gold">0</span>
 										</div>
 									</div>
 								</div>
@@ -301,11 +297,10 @@
 											<div class="col-xs-6">
 												<button class="btn btn-block btn-primary" onClick="inventory.buyKey()">Buy a Chest Key! (Price: <span id="keyprice">0</span>)</button>
 											</div>
-											<div class="col-xs-3">
-												<button class="btn btn-block btn-success" onClick="inventory.sellMode(true)">Enter Sell Mode</button>
-											</div>
-											<div class="col-xs-3">
-												<button class="btn btn-block btn-danger" onClick="inventory.sellAll()">Sell Everything</button>
+											<div class="col-xs-6">
+												<span id="sellbutton">
+													<button class="btn btn-block btn-success" onClick="inventory.updateInventory(true)">Enter Sell Mode</button>
+												</span>
 											</div>
 										</div>
 									</div>
@@ -530,7 +525,7 @@
 									<div class="row">
 										<div class="col-xs-12">
 											<h3 class="panel-title" style="font-family: 'Germania One', cursive;">
-												Equipment
+												<img src="assets/battle-gear.png" style="height: 25px;"></img> Equipment
 											</h3>
 										</div>
 									</div>

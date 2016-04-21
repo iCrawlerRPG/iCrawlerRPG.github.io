@@ -1,5 +1,8 @@
 var Tower = function() {
+	var lastBossDefeated = 0;
+	var bossFound = false;
 	var floors = [];
+
 	for (var i = 0; i < monsters.getMonsterList().length; i++) {
 		if (i === 0) {
 			floors.push({size: 100, explored: 100, canAdvance: true, stairsPosition: 0, monsterDensity: 0});
@@ -17,7 +20,9 @@ var Tower = function() {
 	//Save Method
 	self.save = function() {
 		var towerSave = {
-			savedFloors: floors
+			savedFloors: floors,
+			savedLastBossDefeated: lastBossDefeated,
+			savedBossFound: bossFound
 		};
 		localStorage.setItem("towerSave",JSON.stringify(towerSave));
 	};
@@ -28,6 +33,12 @@ var Tower = function() {
 		if (towerSave) {
 			if (towerSave.savedFloors !== undefined) {
 				loadFloors(towerSave.savedFloors);
+			}
+			if (towerSave.savedLastBossDefeated !== undefined) {
+				lastBossDefeated = towerSave.savedLastBossDefeated;
+			}
+			if (towerSave.savedBossFound !== undefined) {
+				bossFound = towerSave.savedBossFound;
 			}
 		}
 	};
@@ -73,7 +84,17 @@ var Tower = function() {
 		document.getElementById("explperc").innerHTML = Math.round(100*(floors[currentFloor].explored/floors[currentFloor].size)*100)/100 + "%";
 		document.getElementById("floorbar").style.width = 100*(floors[currentFloor].explored/floors[currentFloor].size) + "%";
 		if (floors[currentFloor].canAdvance && currentFloor < monsters.getMonsterList().length) {
-			document.getElementById("advbut").innerHTML = '<button class="btn btn-default btn-block" onClick="tower.changeFloor(1)">Next Floor</button>';
+			if (currentFloor % 10 !== 0) {
+				document.getElementById("advbut").innerHTML = '<button class="btn btn-default btn-block" onClick="tower.changeFloor(1)">Next Floor</button>';
+			}
+			else {
+				if (currentFloor < lastBossDefeated) {
+					document.getElementById("advbut").innerHTML = '<button class="btn btn-default btn-block" onClick="tower.changeFloor(1)">Next Floor</button>';
+				}
+				else {
+					document.getElementById("advbut").innerHTML = '<button class="btn btn-danger btn-block" onClick="tower.startBossBattle()">Fight Floor Boss</button>';
+				}
+			}
 		}
 		else {
 			document.getElementById("advbut").innerHTML = '';
@@ -113,7 +134,12 @@ var Tower = function() {
 			}
 			floors[currentFloor].explored += explored;
 			if (hasFoundStairs(currentFloor) && !floors[currentFloor].canAdvance && currentFloor < monsters.getMonsterList().length) {
-				floors[currentFloor].canAdvance = true;
+				if (currentFloor % 10 !== 0) {
+					floors[currentFloor].canAdvance = true;
+				}
+				else {
+					bossFound = true;
+				}
 			}
 			player.setSpeedExperience(player.getSpeedExperience() + explored);
 			self.loadTowerScreen();
@@ -127,11 +153,23 @@ var Tower = function() {
 	};
 
 	var checkFloorEvent = function() {
-		var eventChance = 0.5;
+		var eventChance = 10;
 		var eventRoll = Math.random()*100;
+		console.log(eventChance, eventRoll);
 		if (eventRoll <= eventChance) {
-			document.getElementById("floorlog").innerHTML = "You turn a corner, finding a treasure chest."
-			inventory.findChest(player.getCurrentFloor() + Math.floor(Math.random() * player.getCurrentFloor()));
+			eventRoll = Math.random()*10;
+			if (eventRoll < 5) {
+				document.getElementById("floorlog").innerHTML = "You turn a corner, finding a treasure chest."
+				inventory.findChest(player.getCurrentFloor() + Math.floor(Math.random() * player.getCurrentFloor()));
+			}
+			else if (eventRoll < 8) {
+				var gold = Math.round(Math.random() * 50 * player.getCurrentFloor()) + 1;
+				document.getElementById("floorlog").innerHTML = "You find the body of another adventurer. You check their pockets, obtaining " + gold + " gold.";
+			}
+			else {
+				document.getElementById("floorlog").innerHTML = "You find the body of another adventurer. You check their pockets, obtaining a chest key.";
+				inventory.setKeys(inventory.getKeys() + 1);
+			}
 			return true;
 		}
 		else {
