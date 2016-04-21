@@ -1,5 +1,5 @@
 # Changelog
-**(In-development now) Changes coming in alpha v0.9:**
+**Changes in alpha v0.9:**
 
 *Vendor!*
 - A vendor has been added to the tower.
@@ -10,7 +10,6 @@
 *Floor Events!*
 - Find mysterious treasure chests while exploring, they might contain anything!
 - You may also find the body of a misfortuned adventurer. Will they have anything useful for you?
-- (Currently in-dev) Explore 100% of a floor for a special bonus.
 
 *Equipments!*
 - You can find equipments in treasure chests from floor events.
@@ -30,7 +29,11 @@
 *More Floors!*
 - You can now go up to floor 50!
 
-*Quality Changes*
+*Floor Bosses!*
+- Fight a boss to advance every 10 floors!
+- Be careful, the bosses are pretty hard!
+
+*Quality Changes!*
 - Click on a panel heading to hide that panel.
 
 **Changes in alpha v0.8.1:**
