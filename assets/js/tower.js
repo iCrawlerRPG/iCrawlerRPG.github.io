@@ -176,16 +176,16 @@ var Tower = function() {
 	};
 
 	var checkFloorEvent = function() {
-		var eventChance = 10;
-		var eventRoll = Math.random()*100;
+		var eventChance = 2;
+		var eventRoll = Math.floor(Math.random()*101);
 		if (eventRoll <= eventChance) {
 			eventRoll = Math.random()*10;
-			if (eventRoll < 5) {
+			if (eventRoll < 6) {
 				var rarity = player.getCurrentFloor() + Math.floor(Math.random() * player.getCurrentFloor());
 				document.getElementById("floorlog").innerHTML = "You turn a corner, finding a treasure chest."
 				inventory.findChest(rarity);
 			}
-			else if (eventRoll < 8) {
+			else if (eventRoll < 9) {
 				var gold = Math.round(Math.random() * 50 * player.getCurrentFloor()) + 1;
 				document.getElementById("floorlog").innerHTML = "You find the body of another adventurer. You check their pockets, obtaining " + gold + " gold.";
 				inventory.setGold(inventory.getGold() + gold);
