@@ -179,7 +179,7 @@ var Upgrades = function() {
 			else if (upgradeList[i].id == "timewarp2" && upgradeList[i].purchased === true) {
 				document.getElementById("speed5").innerHTML = '<button class="btn btn-primary" onClick="system.gameSpeed(200)">x5</button>';
 			}
-			else if (upgradeList[i].id == "timewarp2" && upgradeList[i].purchased === true) {
+			else if (upgradeList[i].id == "timewarp3" && upgradeList[i].purchased === true) {
 				document.getElementById("speed10").innerHTML = '<button class="btn btn-primary" onClick="system.gameSpeed(100)">x10</button>';
 			}
 		}
