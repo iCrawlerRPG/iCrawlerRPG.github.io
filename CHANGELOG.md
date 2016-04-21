@@ -3,12 +3,13 @@
 
 *Vendor!*
 - A vendor has been added to the tower.
-- (Currently in-dev) The vendor will buy loot you get from the dungeon, and sell you chest keys.
+- The vendor will buys loot you get from the dungeon, and sell you chest keys.
 - Vendor transactions use a new resource: Gold.
 - Chest keys can be used to open treasure chests you may find on the dungeon.
 
 *Floor Events!*
 - Find mysterious treasure chests while exploring, they might contain anything!
+- You may also find the body of a misfortuned adventurer. Will they have anything useful for you?
 - (Currently in-dev) Explore 100% of a floor for a special bonus.
 
 *Equipments!*
