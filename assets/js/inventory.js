@@ -119,12 +119,13 @@ var Inventory = function() {
 	};
 
 	var printChest = function(chest, number, sellMode) {
+		var tooltip = "Chest rarity: " + chest.rarity + "<br>The higher the rarity, the better the stats of the item inside will be."
 		if (!sellMode) {
-			document.getElementById("inventory").innerHTML += '<button type="button" class="list-group-item" onClick="inventory.openChest(' + number + ')"><span class="badge">Open</span> ' + chest.name + '</button>';
+			document.getElementById("inventory").innerHTML += '<button type="button" class="list-group-item" data-toggle="tooltip" title="' + tooltip + '" onClick="inventory.openChest(' + number + ')"><span class="badge">Open</span> ' + chest.name + '</button>';
 		}
 		else {
 			var price = chest.rarity;
-			document.getElementById("inventory").innerHTML += '<button type="button" class="list-group-item list-group-item-success" onClick="inventory.sell(' + number + ',' + price + ')"><span class="badge">' + price + '</span> ' + chest.name + '</button>';
+			document.getElementById("inventory").innerHTML += '<button type="button" class="list-group-item list-group-item-success" data-toggle="tooltip" title="' + tooltip + '" onClick="inventory.sell(' + number + ',' + price + ')"><span class="badge">' + price + '</span> ' + chest.name + '</button>';
 		}
 	};
 
@@ -399,7 +400,7 @@ var Inventory = function() {
 
 	self.findChest = function(rarity) {
 		var chest = {type: "chest", name: "", rarity: rarity};
-		chest.name = nameChest(rarity) + " Chest";
+		chest.name = nameChest(chest) + " Chest";
 		bag.push(chest);
 		self.updateInventory(sellMode);
 	};
@@ -409,25 +410,25 @@ var Inventory = function() {
 		self.updateInventory(sellMode);
 	};
 
-	var nameChest = function(rarity) {
+	var nameChest = function(chest) {
 		var name = "";
-		name += extraRarity();
-		if (rarity < 5) {
+		name += extraRarity(chest);
+		if (chest.rarity < 5) {
 			name += "Useless";
 		}
-		else if (rarity < 10) {
+		else if (chest.rarity < 10) {
 			name += "Dusty";
 		}
-		else if (rarity < 25) {
+		else if (chest.rarity < 25) {
 			name += "Rusty";
 		}
-		else if (rarity < 50) {
+		else if (chest.rarity < 50) {
 			name += "Shabby";
 		}
-		else if (rarity < 100) {
+		else if (chest.rarity < 100) {
 			name += "Common";
 		}
-		else if (rarity < 250) {
+		else if (chest.rarity < 250) {
 			name += "Odd";
 		}
 		return name;
@@ -439,15 +440,19 @@ var Inventory = function() {
 			return "Poor ";
 		}
 		else if (rarity < 75) {
+			chest.rarity += 2;
 			return "Regular ";
 		}
 		else if (rarity < 90) {
+			chest.rarity += 5;
 			return "Shiny ";
 		}
 		else if (rarity < 100) {
+			chest.rarity += 10;
 			return "Aetherial ";
 		}
 		else if (rarity == 100) {
+			chest.rarity += 20;
 			return "Heavenly ";
 		}
 	};
