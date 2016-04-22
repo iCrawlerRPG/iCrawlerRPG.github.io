@@ -226,6 +226,7 @@ var Upgrades = function() {
 	};
 
 	var loadUpgradeList = function(savedUpgradeList) {
+		var success = false;
 		for (var i = 0; i < savedUpgradeList.length; i++) {
 			if (i == upgradeList.length) {
 				break;
@@ -233,14 +234,18 @@ var Upgrades = function() {
 			for (var j = 0; j < upgradeList.length; j++) {
 				if (upgradeList[j].id == savedUpgradeList[i].id) {
 					break;
+					success=true;
 				}
 			}
-			if (savedUpgradeList[i].shown !== undefined) {
-				upgradeList[j].shown = savedUpgradeList[i].shown;
+			if (success) {
+				if (savedUpgradeList[i].shown !== undefined) {
+					upgradeList[j].shown = savedUpgradeList[i].shown;
+				}
+				if (savedUpgradeList[i].purchased !== undefined) {
+					upgradeList[j].purchased = savedUpgradeList[i].purchased;
+				}
 			}
-			if (savedUpgradeList[i].purchased !== undefined) {
-				upgradeList[j].purchased = savedUpgradeList[i].purchased;
-			}
+			success=false;
 		}
 	};
 
