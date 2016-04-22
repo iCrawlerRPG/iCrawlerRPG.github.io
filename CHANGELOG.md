@@ -1,8 +1,12 @@
 # Changelog
-**Coming in alpha v0.9.1:**
+**Changes in alpha v0.9.1:**
 
 *New UI!*
 - Panels have been separated on different tabs.
+
+*Experience Crystals!*
+- Monsters can now drop Experience Crystals when they die (5% chance).
+- Experience crystals are a way to permanently boost one of your stats.
 
 *Upgrades Changes*
 - You can now see all upgrades you have the requirements for (even if you don't have the excelia yet!)
@@ -14,6 +18,9 @@
 
 *Vendor Changes*
 - Keys now have a fixed price of 100 gold.
+- The vendor will both buy and sell experience crystals.
+- Experience crystals cost 1000 gold, and give the same amount of experience.
+- You can buy a random crystal for half the price: 500 gold.
 
 *Quality Changes!*
 - Base resting is now 5x faster.
