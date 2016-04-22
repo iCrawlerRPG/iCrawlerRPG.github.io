@@ -1,4 +1,10 @@
 # Changelog
+**Coming in alpha v0.9.1:**
+
+*New UI!*
+- Things have been separated on different tabs.
+- You can now see all upgrades you have the requirements for (even if you don't have the excelia yet!)
+
 **Changes in alpha v0.9:**
 
 *Vendor!*
@@ -33,8 +39,7 @@
 - Fight a boss to advance every 10 floors!
 - Be careful, the bosses are pretty hard!
 
-*New UI!*
-- Things have been separated on different tabs.
+*Quality Changes!*
 - Click on a panel heading to hide that panel.
 
 **Changes in alpha v0.8.1:**
