@@ -233,8 +233,8 @@ var Upgrades = function() {
 			}
 			for (var j = 0; j < upgradeList.length; j++) {
 				if (upgradeList[j].id == savedUpgradeList[i].id) {
+					success = true;
 					break;
-					success=true;
 				}
 			}
 			if (success) {
