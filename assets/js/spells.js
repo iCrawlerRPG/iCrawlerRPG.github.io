@@ -126,6 +126,10 @@ var Spells = function() {
 	//Getters
 
 	//Setters
+	self.setArcania = function(number) {
+		arcania = number;
+		document.getElementById("arcania").innerHTML = Math.round(100*arcania)/100;
+	};
 
 	//Other Methods
 	var updateSpellDescriptions = function() {
@@ -371,7 +375,7 @@ var Spells = function() {
 	};
 
 	var castAegis = function(aegis) {
-		if (buffs.getAegisTimeLeft !== 0) {
+		if (buffs.getAegisTimeLeft() !== 0) {
 			return false;
 		}
 		else {
