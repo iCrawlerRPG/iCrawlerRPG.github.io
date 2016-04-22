@@ -263,6 +263,7 @@ var Monsters = function() {
 			document.getElementById("combatlog").innerHTML += "You have defeated the " + monster.name + "!<br>";
 			if (Math.floor(Math.random()*100) < 5) {
 				monsterCrystalDrop(monster);
+				inventory.updateInventory();
 			}
 			updateMonsterKilled(monster.name);
 		}
