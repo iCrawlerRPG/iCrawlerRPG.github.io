@@ -178,6 +178,30 @@ var Upgrades = function() {
 		purchased: false,
 		description:"Double the speed your stats gain experience."});
 
+	upgradeList.push({name: "Faster Exploration 1",
+		id: "fasterexploration1",
+		exceliaCost: 1000,
+		required: "",
+		shown: true,
+		purchased: false,
+		description:"Double the speed of floor exploration."});
+
+	upgradeList.push({name: "Faster Exploration 1",
+		id: "fasterexploration2",
+		exceliaCost: 5000,
+		required: "fasterexploration1",
+		shown: false,
+		purchased: false,
+		description:"Double the speed of floor exploration."});
+
+	upgradeList.push({name: "Faster Exploration 1",
+		id: "fasterexploration3",
+		exceliaCost: 20000,
+		required: "fasterexploration2",
+		shown: false,
+		purchased: false,
+		description:"Double the speed of floor exploration."});
+
 	var self = this;
 	//Save Method
 	self.save = function() {
@@ -346,6 +370,9 @@ var Upgrades = function() {
 		}
 		else if (upgrade.id == "fasterleveling1" || upgrade.id == "fasterleveling2" || upgrade.id == "fasterleveling3") {
 			buffs.setLevelingSpeedMultiplier(buffs.getLevelingSpeedMultiplier() * 2);
+		}
+		else if (upgrade.id == "fasterexploration1" || upgrade.id == "fasterexploration2" || upgrade.id == "fasterexploration3") {
+			buffs.setExplorationSpeedMultiplier(buffs.getExplorationSpeedMultiplier() * 2);
 		}
 	};
 };

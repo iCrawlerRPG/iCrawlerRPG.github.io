@@ -4,6 +4,7 @@ var Buffs = function() {
 	var spellLevelingMultiplier = 1;
 	var restingMultiplier = 1;
 	var levelingSpeedMultiplier = 1;
+	var explorationSpeedMultiplier = 1;
 
 	//Adders
 	var manaPerSecond = 0;
@@ -164,6 +165,10 @@ var Buffs = function() {
 		return levelingSpeedMultiplier;
 	};
 
+	self.getExplorationSpeedMultiplier = function() {
+		return explorationSpeedMultiplier;
+	};
+
 	//Setters
 	self.setBarrierLeft = function(barrierValue) {
 		barrierLeft = barrierValue;
@@ -215,6 +220,10 @@ var Buffs = function() {
 
 	self.setLevelingSpeedMultiplier = function(newMultiplier) {
 		levelingSpeedMultiplier = newMultiplier;
+	};
+
+	self.setExplorationSpeedMultiplier = function(newMultiplier) {
+		explorationSpeedMultiplier = newMultiplier;
 	};
 
 	//Other Methods
@@ -288,6 +297,9 @@ var Buffs = function() {
 		}
 		if (manaPerSecond !== 0) {
 			document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">+' + manaPerSecond + '</span>Exploration Mana per Second</li>';
+		}
+		if (explorationSpeedMultiplier !== 1) {
+			document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">x' + explorationSpeedMultiplier + '</span>Exploration Speed</li>';
 		}
 		if (restingMultiplier !== 1) {
 			document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">x' + restingMultiplier + '</span>Rest Speed</li>';
