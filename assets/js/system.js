@@ -109,7 +109,7 @@ var System = function() {
 		}
 		if (idleMode) {
 			if (!player.getInBattle()) {
-				if (buffs.getBarrierLeft() === 0) {
+				if (buffs.getBarrierLeft() === 0 && buffs.getAutoBarrierCast()) {
 					spells.castSpell("barrier");
 				}
 				if ((100*(player.getHealthCurrentValue()/player.getHealthMaximumValue()) >= idleHealthSlider.getValue()) && !player.getResting()) {
