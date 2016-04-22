@@ -206,8 +206,8 @@ var Upgrades = function() {
 	//Save Method
 	self.save = function() {
 		var upgradesSave = {
-      savedExcelia: excelia,
-      savedUpgradeList: upgradeList
+      		savedExcelia: excelia,
+      		savedUpgradeList: upgradeList
 		};
 		localStorage.setItem("upgradesSave",JSON.stringify(upgradesSave));
 	};
@@ -245,6 +245,10 @@ var Upgrades = function() {
 	};
 
 	//Setters
+	self.setExcelia = function(number) {
+		excelia = number;
+		self.loadExcelia();
+	};
 
 	//Other Methods
 	self.loadExcelia = function() {
@@ -276,20 +280,7 @@ var Upgrades = function() {
 		self.loadExcelia();
 	};
 
-	function dynamicSort(property) {
-	    var sortOrder = 1;
-	    if(property[0] === "-") {
-	        sortOrder = -1;
-	        property = property.substr(1);
-	    }
-	    return function (a,b) {
-	        var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
-	        return result * sortOrder;
-	    }
-	}
-
 	self.updateUpgrades = function() {
-		upgradeList.sort(dynamicSort("exceliaCost"));
 		document.getElementById("upgrades").innerHTML = '';
 		for (var i = 0; i < upgradeList.length; i++) {
 			if (!upgradeList[i].purchased && self.isUpgradePurchased(upgradeList[i].required)) {
