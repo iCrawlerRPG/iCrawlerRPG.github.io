@@ -3,6 +3,7 @@ var Inventory = function() {
 	var keys = 0;
 	var bag = [];
 	var keyPrice = 100;
+	var crystalPrice = 1000;
 	var equippedWeapon;
 	var equippedArmor;
 	var equippedAccessory;
@@ -96,6 +97,9 @@ var Inventory = function() {
 			else if (bag[i].type == "armor") {
 				printArmor(bag[i], i, sellMode);
 			}
+			else if (bag[i].type == "crystal") {
+				printCrystal(bag[i], i, sellMode);
+			}
 		}
 
 		$(document).ready(function(){
@@ -112,6 +116,7 @@ var Inventory = function() {
 			document.getElementById("sellbutton").innerHTML = '<button class="btn btn-block btn-success" onClick="inventory.updateInventory(true)">Enter Sell Mode</button>'
 		}
 		document.getElementById("keyprice").innerHTML = keyPrice;
+		document.getElementById("crystalprice").innerHTML = crystalPrice;
 	};
 
 	var printChest = function(chest, number, sellMode) {
@@ -147,6 +152,16 @@ var Inventory = function() {
 		}
 	};
 
+	var printCrystal = function(crystal, number, sellMode) {
+		var tooltip = "This crystal will grant " + crystal.experience + " experience in " + crystal.stat + ".";
+		if (!sellMode) {
+			document.getElementById("inventory").innerHTML += '<button type="button" class="list-group-item" data-toggle="tooltip" title="' + tooltip + '" onClick="inventory.useCrystal(' + number + ')"><span class="badge">Crystal</span>' + crystal.stat + ' Experience Crystal</button>';
+		}
+		else {
+			var price = Math.round(crystal.experience/2);
+			document.getElementById("inventory").innerHTML += '<button type="button" class="list-group-item" data-toggle="tooltip" title="' + tooltip + '" onClick="inventory.sell(' + number + ',' + price + ')"><span class="badge">Crystal</span>' + crystal.stat + ' Experience Crystal</button>';
+		}
+	}
 
 	self.updateEquipment = function() {
 		document.getElementById("equipment").innerHTML = '';
@@ -512,10 +527,63 @@ var Inventory = function() {
 		self.updateInventory(sellMode);
 	};
 
+	self.createCrystal = function(crystalStat, crystalExperience) {
+		bag.push({type: "crystal", stat: crystalStat, experience: crystalExperience});
+	};
+
+	self.useCrystal = function(slot) {
+		var crystal = bag[slot];
+		if (crystal.stat == "Strength") {
+			player.setStrengthExperience(player.getStrengthExperience() + crystal.experience);
+		}
+		else if (crystal.stat == "Dexterity") {
+			player.setDexterityExperience(player.getDexterityExperience() + crystal.experience);
+		}
+		else if (crystal.stat == "Constitution") {
+			player.setConstitutionExperience(player.getConstitutionExperience() + crystal.experience);
+		}
+		else if (crystal.stat == "Speed") {
+			player.setSSpeedExperience(player.getSpeedExperience() + crystal.experience);
+		}
+		else if (crystal.stat == "Magic") {
+			player.setMagicExperience(player.getMagicExperience() + crystal.experience);
+		}
+		bag.splice(slot, 1);
+		self.updateInventory(sellMode);
+	};
+
 	self.buyKey = function() {
 		if (gold >= keyPrice) {
 			self.setGold(self.getGold() - keyPrice);
 			self.setKeys(self.getKeys() + 1);
+			self.updateInventory(sellMode);
+		}
+	};
+
+	self.buyCrystal = function(stat) {
+		var price = crystalPrice;
+		if (stat === "") {
+			price = price/2;
+			var type = Math.floor(Math.random()*5);
+			if (type === 0) {
+				stat = "Strength";
+			}
+			else if (type == 1) {
+				stat = "Dexterity";
+			}
+			else if (type == 2) {
+				stat = "Constitution";
+			}
+			else if (type == 3) {
+				stat = "Speed";
+			}
+			else if (type == 4) {
+				stat = "Magic";
+			}
+		}
+		if (gold >= price) {
+			self.setGold(self.getGold() - price);
+			self.createCrystal(stat, 1000);
 			self.updateInventory(sellMode);
 		}
 	};

@@ -261,6 +261,9 @@ var Monsters = function() {
 		player.setInBattle(false);
 		if (!inBossBattle) {
 			document.getElementById("combatlog").innerHTML += "You have defeated the " + monster.name + "!<br>";
+			if (Math.floor(Math.random()*100) < 5) {
+				monsterCrystalDrop(monster);
+			}
 			updateMonsterKilled(monster.name);
 		}
 		else {
@@ -275,6 +278,27 @@ var Monsters = function() {
 		player.loadExploreButton();
 		self.loadMonsterInfo();
 	};
+
+	var monsterCrystalDrop = function(monster) {
+		var type = Math.floor(Math.random()*5);
+		var experience = monster.strength + monster.dexterity + monster.constitution;
+		if (type === 0) {
+			inventory.createCrystal("Strength", experience);
+		}
+		else if (type == 1) {
+			inventory.createCrystal("Dexterity", experience);
+		}
+		else if (type == 2) {
+			inventory.createCrystal("Constitution", experience);
+		}
+		else if (type == 3) {
+			inventory.createCrystal("Speed", experience);
+		}
+		else if (type == 4) {
+			inventory.createCrystal("Magic", experience);
+		}
+		document.getElementById("combatlog").innerHTML += "The " + monster.name + " has left an experience crystal behind!<br>";
+	}
 
 	var updateMonsterKilled = function(name) {
 		for (var i = 0; i < monsterList.length; i++) {

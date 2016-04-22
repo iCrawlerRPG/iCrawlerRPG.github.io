@@ -482,11 +482,10 @@
 											<div class="panel-body">
 												<div class="row">
 													<div class="col-xs-12">
-														A weird stall is placed at the floor entrance. The shopkeeper seems bored, but rejoices upon noticing you and says: "Welcome, welcome to my humble shop! May I interest you in some keys? Or are you here to sell?"
+														A weird stall is placed at the floor entrance. The shopkeeper seems bored, but rejoices upon noticing you and says: "Welcome, welcome to my humble shop! May I interest you in some keys or experience crystals? Or are you here to sell?"
 													</div>
 												</div>
-												<div class="row" style="height: 10px;">
-												</div>
+												<div class="row" style="height: 10px;"></div>
 												<div class="row">
 													<div class="col-xs-6">
 														<button class="btn btn-block btn-primary" onClick="inventory.buyKey()">Buy a Chest Key! (Price: <span id="keyprice">0</span>)</button>
@@ -495,6 +494,22 @@
 														<span id="sellbutton">
 															<button class="btn btn-block btn-success" onClick="inventory.updateInventory(true)">Enter Sell Mode</button>
 														</span>
+													</div>
+												</div>
+												<div class="row" style="height: 10px;"></div>
+												<div class="row">
+													<div class="col-xs-12">
+														Experience Crystals (Price: <span id="crystalprice">0</span>):
+													</div>
+												</div>
+												<div class="row">
+													<div class="col-xs-12">
+														<button class="btn btn-primary" onClick="inventory.buyCrystal('Strength')">Strength</button>
+														<button class="btn btn-primary" onClick="inventory.buyCrystal('Dexterity')">Dexterity</button>
+														<button class="btn btn-primary" onClick="inventory.buyCrystal('Constitution')">Constitution</button>
+														<button class="btn btn-primary" onClick="inventory.buyCrystal('Speed')">Speed</button>
+														<button class="btn btn-primary" onClick="inventory.buyCrystal('Magic')">Magic</button>
+														<button class="btn btn-danger" data-toggle="tooltip" title="Small tip: A random crystal costs only half the price!" onClick="inventory.buyCrystal('')">Random</button>
 													</div>
 												</div>
 											</div>

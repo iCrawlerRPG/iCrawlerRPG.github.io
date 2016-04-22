@@ -221,7 +221,7 @@ var Player = function() {
 		return magic.level;
 	};
 
-	self.getStrenthExperience = function() {
+	self.getStrengthExperience = function() {
 		return strength.experience;
 	};
 
