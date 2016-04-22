@@ -543,7 +543,7 @@ var Inventory = function() {
 			player.setConstitutionExperience(player.getConstitutionExperience() + crystal.experience);
 		}
 		else if (crystal.stat == "Speed") {
-			player.setSSpeedExperience(player.getSpeedExperience() + crystal.experience);
+			player.setSpeedExperience(player.getSpeedExperience() + crystal.experience);
 		}
 		else if (crystal.stat == "Magic") {
 			player.setMagicExperience(player.getMagicExperience() + crystal.experience);
