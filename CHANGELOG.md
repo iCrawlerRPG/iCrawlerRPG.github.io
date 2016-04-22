@@ -33,7 +33,8 @@
 - Fight a boss to advance every 10 floors!
 - Be careful, the bosses are pretty hard!
 
-*Quality Changes!*
+*New UI!*
+- Things have been separated on different tabs.
 - Click on a panel heading to hide that panel.
 
 **Changes in alpha v0.8.1:**
