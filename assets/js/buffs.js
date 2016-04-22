@@ -32,6 +32,8 @@ var Buffs = function() {
 			savedExceliaMultiplier: exceliaMultiplier,
 			savedSpellLevelingMultiplier: spellLevelingMultiplier,
 			savedRestingMultiplier: restingMultiplier,
+			savedLevelingSpeedMultiplier: levelingSpeedMultiplier,
+			savedExplorationSpeedMultiplier: explorationSpeedMultiplier,
 			savedManaPerSecond: manaPerSecond,
 			savedExceliaSavedOnDeath: exceliaSavedOnDeath,
 			savedDeathPenaltyReduction: deathPenaltyReduction,
@@ -67,6 +69,12 @@ var Buffs = function() {
 		}
 		if (buffsSave.savedRestingMultiplier !== undefined) {
 			restingMultiplier = buffsSave.savedRestingMultiplier;
+		}
+		if (buffsSave.savedLevelingSpeedMultiplier !== undefined) {
+			levelingSpeedMultiplier = buffsSave.savedLevelingSpeedMultiplier;
+		}
+		if (buffsSave.savedExplorationSpeedMultiplier !== undefined) {
+			explorationSpeedMultiplier = buffsSave.savedExplorationSpeedMultiplier;
 		}
 	};
 
