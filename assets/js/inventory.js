@@ -2,7 +2,7 @@ var Inventory = function() {
 	var gold = 0;
 	var keys = 0;
 	var bag = [];
-	var keyPrice = 10;
+	var keyPrice = 100;
 	var equippedWeapon;
 	var equippedArmor;
 	var equippedAccessory;
@@ -18,7 +18,6 @@ var Inventory = function() {
 			savedEquippedWeapon: equippedWeapon,
 			savedEquippedArmor: equippedArmor,
 			savedEquippedAccessory: equippedAccessory,
-			savedKeyPrice: keyPrice
 		};
 		localStorage.setItem("inventorySave",JSON.stringify(inventorySave));
 	};
@@ -44,9 +43,6 @@ var Inventory = function() {
 			}
 			if (inventorySave.savedEquippedAccessory !== undefined) {
 				equippedAccessory = inventorySave.savedEquippedAccessory;
-			}
-			if (inventorySave.savedKeyPrice !== undefined) {
-				keyPrice = inventorySave.savedKeyPrice;
 			}
 		}
 	};
@@ -520,7 +516,6 @@ var Inventory = function() {
 		if (gold >= keyPrice) {
 			self.setGold(self.getGold() - keyPrice);
 			self.setKeys(self.getKeys() + 1);
-			keyPrice += 10;
 			self.updateInventory(sellMode);
 		}
 	};
