@@ -2,8 +2,22 @@
 **Coming in alpha v0.9.1:**
 
 *New UI!*
-- Things have been separated on different tabs.
+- Panels have been separated on different tabs.
+
+*Upgrades Changes*
 - You can now see all upgrades you have the requirements for (even if you don't have the excelia yet!)
+- Several upgrade costs have been changed.
+- New tiers added for several existing upgrades.
+- NEW UPGRADE: Barrier Casting - Cast barrier automatically whenever you don't have one up.
+- NEW UPGRADE: Faster Leveling - Increase the experience gain speed for all stats.
+- NEW UPGRADE: Faster Exploration - Increase the speed you'll explore new floors.
+
+*Vendor Changes*
+- Keys now have a fixed price of 100 gold.
+
+*Quality Changes!*
+- Base resting is now 5x faster.
+- Speed leveling is now 5x faster.
 
 **Changes in alpha v0.9:**
 
