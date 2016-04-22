@@ -1,5 +1,5 @@
 # ICrawler
-Current version: alpha v0.9
+Current version: alpha v0.9.1
 
 This was an idea that was on my head for a few days now. I've finally had the patience to sit down and actually code.
 It is currently in a very early stage, but it's playable enough for me to be satisfied with posting it here.
