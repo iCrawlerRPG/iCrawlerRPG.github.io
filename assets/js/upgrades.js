@@ -6,7 +6,7 @@ var Upgrades = function() {
 		id: "timewarp1",
 		exceliaCost: 100,
 		required: "",
-		shown: false,
+		shown: true,
 		purchased: false,
 		description:"Is idle mode too slow? Make it go at twice the speed!"});
 
@@ -14,7 +14,7 @@ var Upgrades = function() {
 		id: "aetheric1",
 		exceliaCost: 100,
 		required: "",
-		shown: false,
+		shown: true,
 		purchased: false,
 		description:"Tap into the mana around you. Recover +1 MP per second while exploring."});
 
@@ -22,7 +22,7 @@ var Upgrades = function() {
 		id: "blessings1",
 		exceliaCost: 500,
 		required: "",
-		shown:false,
+		shown: true,
 		purchased: false,
 		description:"Keep 10% of your excelia upon death."});
 
@@ -30,7 +30,7 @@ var Upgrades = function() {
 		id: "autoshoot",
 		exceliaCost: 500,
 		required: "",
-		shown: false,
+		shown: true,
 		purchased: false,
 		description:"Shoot a fireball at the start of every battle without losing a turn!"});
 
@@ -38,7 +38,7 @@ var Upgrades = function() {
 		id: "fastresting1",
 		exceliaCost: 500,
 		required: "",
-		shown: false,
+		shown: true,
 		purchased: false,
 		description:"Recover at twice the normal speed."});
 
@@ -54,7 +54,7 @@ var Upgrades = function() {
 		id: "doubleexcelia",
 		exceliaCost: 2000,
 		required: "",
-		shown: false,
+		shown: true,
 		purchased: false,
 		description:"Double the amount of Excelia you gain per monster."});
 
@@ -62,7 +62,7 @@ var Upgrades = function() {
 		id: "musclememory",
 		exceliaCost: 3000,
 		required: "",
-		shown: false,
+		shown: true,
 		purchased: false,
 		description:"Lose 1% less stats when dying."});
 
@@ -70,7 +70,7 @@ var Upgrades = function() {
 		id: "adeptmage",
 		exceliaCost: 5000,
 		required: "",
-		shown: false,
+		shown: true,
 		purchased: false,
 		description:"Master spells twice as fast. Blow yourself up twice as much."});
 
@@ -78,7 +78,7 @@ var Upgrades = function() {
 		id: "battlehealing",
 		exceliaCost: 5000,
 		required: "",
-		shown: false,
+		shown: true,
 		purchased: false,
 		description:"Cast Cure whenever you get under 50% HP during battle."});
 
@@ -199,7 +199,7 @@ var Upgrades = function() {
 	self.updateUpgrades = function() {
 		document.getElementById("upgrades").innerHTML = '';
 		for (var i = 0; i < upgradeList.length; i++) {
-			if ((excelia >= upgradeList[i].exceliaCost || upgradeList[i].shown === true) && upgradeList[i].purchased === false && self.isUpgradePurchased(upgradeList[i].required)) {
+			if (!upgradeList[i].purchased && self.isUpgradePurchased(upgradeList[i].required)) {
 				upgradeList[i].shown = true;
 				document.getElementById("upgrades").innerHTML += '<div class="row"><div class="col-xs-7"><button class="btn btn-primary btn-block" data-toggle="tooltip" data-placement="top" title="' + upgradeList[i].description + '" onClick="upgrades.buyUpgrade(\'' + upgradeList[i].id + '\')">' + upgradeList[i].name + '</button></div><div class="col-xs-5"><p>(Cost: ' + upgradeList[i].exceliaCost + ')</p></div></div><div class="row" style="height: 5px;"></div>';
 			}
