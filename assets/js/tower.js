@@ -164,7 +164,7 @@ var Tower = function() {
 					bossFound = true;
 				}
 			}
-			player.setSpeedExperience(player.getSpeedExperience() + explored);
+			player.setSpeedExperience(player.getSpeedExperience() + 5*explored*buffs.getLevelingSpeedMultiplier());
 			self.loadTowerScreen();
 			if (!checkFloorEvent()) {
 				monsters.battleChance(false);

@@ -488,9 +488,10 @@ var Player = function() {
 	};
 
 	self.gainExperience = function(monster) {
-		self.setStrengthExperience(strength.experience + (monster.strength/strength.level));
-		self.setDexterityExperience(dexterity.experience + (monster.dexterity/dexterity.level));
-		self.setConstitutionExperience(constitution.experience + (monster.constitution/constitution.level));
+		var multiplier = buffs.getLevelingSpeedMultiplier();
+		self.setStrengthExperience(strength.experience + multiplier*(monster.strength/strength.level));
+		self.setDexterityExperience(dexterity.experience + multiplier*(monster.dexterity/dexterity.level));
+		self.setConstitutionExperience(constitution.experience + multiplier*(monster.constitution/constitution.level));
 	};
 
 	self.death = function(monster) {

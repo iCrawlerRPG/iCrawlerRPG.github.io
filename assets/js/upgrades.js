@@ -4,7 +4,7 @@ var Upgrades = function() {
 	var upgradeList = [];
 	upgradeList.push({name: "Time Warp 1",
 		id: "timewarp1",
-		exceliaCost: 100,
+		exceliaCost: 10,
 		required: "",
 		shown: true,
 		purchased: false,
@@ -12,7 +12,7 @@ var Upgrades = function() {
 
 	upgradeList.push({name: "Aetheric Attunement 1",
 		id: "aetheric1",
-		exceliaCost: 100,
+		exceliaCost: 10,
 		required: "",
 		shown: true,
 		purchased: false,
@@ -20,7 +20,7 @@ var Upgrades = function() {
 
 	upgradeList.push({name: "Blessings 1",
 		id: "blessings1",
-		exceliaCost: 500,
+		exceliaCost: 100,
 		required: "",
 		shown: true,
 		purchased: false,
@@ -28,7 +28,7 @@ var Upgrades = function() {
 
 	upgradeList.push({name: "Auto-Shooting",
 		id: "autoshoot",
-		exceliaCost: 500,
+		exceliaCost: 250,
 		required: "",
 		shown: true,
 		purchased: false,
@@ -36,7 +36,7 @@ var Upgrades = function() {
 
 	upgradeList.push({name: "Faster Resting 1",
 		id: "fastresting1",
-		exceliaCost: 500,
+		exceliaCost: 100,
 		required: "",
 		shown: true,
 		purchased: false,
@@ -44,23 +44,23 @@ var Upgrades = function() {
 
 	upgradeList.push({name: "Time Warp 2",
 		id: "timewarp2",
-		exceliaCost: 1000,
+		exceliaCost: 500,
 		required: "timewarp1",
 		shown: false,
 		purchased: false,
 		description:"Change to the next gear! With this, idle mode is five times faster!"});
 
-	upgradeList.push({name: "Excelia x2",
-		id: "doubleexcelia",
+	upgradeList.push({name: "Double Excelia 1",
+		id: "doubleexcelia1",
 		exceliaCost: 2000,
 		required: "",
 		shown: true,
 		purchased: false,
 		description:"Double the amount of Excelia you gain per monster."});
 
-	upgradeList.push({name: "Muscle Memory",
-		id: "musclememory",
-		exceliaCost: 3000,
+	upgradeList.push({name: "Muscle Memory 1",
+		id: "musclememory1",
+		exceliaCost: 1000,
 		required: "",
 		shown: true,
 		purchased: false,
@@ -72,11 +72,11 @@ var Upgrades = function() {
 		required: "",
 		shown: true,
 		purchased: false,
-		description:"Master spells twice as fast. Blow yourself up twice as much."});
+		description:"Master spells twice as fast."});
 
 	upgradeList.push({name: "Battle Healing",
 		id: "battlehealing",
-		exceliaCost: 5000,
+		exceliaCost: 250,
 		required: "",
 		shown: true,
 		purchased: false,
@@ -84,7 +84,7 @@ var Upgrades = function() {
 
 	upgradeList.push({name: "Blessings 2",
 		id: "blessings2",
-		exceliaCost: 5000,
+		exceliaCost: 2000,
 		required: "blessings1",
 		shown: false,
 		purchased: false,
@@ -92,7 +92,7 @@ var Upgrades = function() {
 
 	upgradeList.push({name: "Faster Resting 2",
 		id: "fastresting2",
-		exceliaCost: 7500,
+		exceliaCost: 500,
 		required: "fastresting1",
 		shown: false,
 		purchased: false,
@@ -100,7 +100,7 @@ var Upgrades = function() {
 
 	upgradeList.push({name: "Time Warp 3",
 		id: "timewarp3",
-		exceliaCost: 10000,
+		exceliaCost: 2000,
 		required: "timewarp2",
 		shown: false,
 		purchased: false,
@@ -108,7 +108,7 @@ var Upgrades = function() {
 
 	upgradeList.push({name: "Aetheric Attunement 2",
 		id: "aetheric2",
-		exceliaCost: 10000,
+		exceliaCost: 350,
 		required: "aetheric1",
 		shown: false,
 		purchased: false,
@@ -116,11 +116,67 @@ var Upgrades = function() {
 
 	upgradeList.push({name: "Blessings 3",
 		id: "blessings3",
-		exceliaCost: 50000,
-		required:"blessings2",
+		exceliaCost: 5000,
+		required: "blessings2",
 		shown: false,
 		purchased: false,
 		description:"Keep 30% of your excelia upon death."});
+
+	upgradeList.push({name: "Barrier Casting",
+		id: "barriercast",
+		exceliaCost: 2000,
+		required: "",
+		shown: true,
+		purchased: false,
+		description:"Cast Barrier whenever it is down. You need the Barrier spell for it to have any effect."});
+
+	upgradeList.push({name: "Faster Resting 3",
+		id: "fastresting3",
+		exceliaCost: 2500,
+		required: "fastresting2",
+		shown: false,
+		purchased: false,
+		description:"Recover at eight times the normal speed."});
+
+	upgradeList.push({name: "Muscle Memory 2",
+		id: "musclememory2",
+		exceliaCost: 5000,
+		required: "musclememory1",
+		shown: false,
+		purchased: false,
+		description:"Lose 1% less stats when dying."});
+
+	upgradeList.push({name: "Double Excelia 2",
+		id: "doubleexcelia2",
+		exceliaCost: 10000,
+		required: "doubleexcelia1",
+		shown: false,
+		purchased: false,
+		description:"Double the amount of Excelia you gain per monster."});
+
+	upgradeList.push({name: "Faster Leveling 1",
+		id: "fasterleveling1",
+		exceliaCost: 2000,
+		required: "",
+		shown: true,
+		purchased: false,
+		description:"Double the speed your stats gain experience."});
+
+	upgradeList.push({name: "Faster Leveling 2",
+		id: "fasterleveling2",
+		exceliaCost: 15000,
+		required: "fasterleveling1",
+		shown: false,
+		purchased: false,
+		description:"Double the speed your stats gain experience."});
+
+	upgradeList.push({name: "Faster Leveling 3",
+		id: "fasterleveling3",
+		exceliaCost: 50000,
+		required: "fasterleveling2",
+		shown: false,
+		purchased: false,
+		description:"Double the speed your stats gain experience."});
 
 	var self = this;
 	//Save Method
@@ -196,7 +252,20 @@ var Upgrades = function() {
 		self.loadExcelia();
 	};
 
+	function dynamicSort(property) {
+	    var sortOrder = 1;
+	    if(property[0] === "-") {
+	        sortOrder = -1;
+	        property = property.substr(1);
+	    }
+	    return function (a,b) {
+	        var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
+	        return result * sortOrder;
+	    }
+	}
+
 	self.updateUpgrades = function() {
+		upgradeList.sort(dynamicSort("exceliaCost"));
 		document.getElementById("upgrades").innerHTML = '';
 		for (var i = 0; i < upgradeList.length; i++) {
 			if (!upgradeList[i].purchased && self.isUpgradePurchased(upgradeList[i].required)) {
@@ -254,7 +323,7 @@ var Upgrades = function() {
 		else if (upgrade.id == "battleHealing") {
 			buffs.setCastCureInBattle(true);
 		}
-		else if (upgrade.id == "doubleexcelia") {
+		else if (upgrade.id == "doubleexcelia1" || upgrade.id == "doubleexcelia2") {
 			buffs.setExceliaMultiplier(buffs.getExceliaMultiplier() * 2);
 		}
 		else if (upgrade.id == "adeptmage") {
@@ -266,11 +335,17 @@ var Upgrades = function() {
 		else if (upgrade.id == "autoshoot") {
 			buffs.setCastFireballInBattle(true);
 		}
-		else if (upgrade.id == "fastresting1" || upgrade.id == "fastresting2") {
+		else if (upgrade.id == "fastresting1" || upgrade.id == "fastresting2" || upgrade.id == "fastresting3") {
 			buffs.setRestingMultiplier(buffs.getRestingMultiplier() * 2);
 		}
-		else if (upgrade.id == "musclememory") {
+		else if (upgrade.id == "musclememory1" || upgrade.id == "musclememory2") {
 			buffs.setDeathPenaltyReduction(buffs.getDeathPenaltyReduction() + 1);
+		}
+		else if (upgrade.id == "barriercast") {
+			buffs.setAutoBarrierCast(true);
+		}
+		else if (upgrade.id == "fasterleveling1" || upgrade.id == "fasterleveling2" || upgrade.id == "fasterleveling3") {
+			buffs.setLevelingSpeedMultiplier(buffs.getLevelingSpeedMultiplier() * 2);
 		}
 	};
 };
