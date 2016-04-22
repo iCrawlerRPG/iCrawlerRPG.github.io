@@ -109,6 +109,9 @@ var System = function() {
 		}
 		if (idleMode) {
 			if (!player.getInBattle()) {
+				if (buffs.getBarrierLeft() === 0) {
+					spells.castSpell("barrier");
+				}
 				if ((100*(player.getHealthCurrentValue()/player.getHealthMaximumValue()) >= idleHealthSlider.getValue()) && !player.getResting()) {
 					tower.exploreFloor();
 				}

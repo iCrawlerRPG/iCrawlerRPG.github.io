@@ -3,6 +3,8 @@ var Buffs = function() {
 	var exceliaMultiplier = 1;
 	var spellLevelingMultiplier = 1;
 	var restingMultiplier = 1;
+	var levelingSpeedMultiplier = 1;
+	var explorationSpeedMultiplier = 1;
 
 	//Adders
 	var manaPerSecond = 0;
@@ -14,6 +16,7 @@ var Buffs = function() {
 	//Toggleables
 	var castCureInBattle = false;
 	var castFireballInBattle = false;
+	var autoBarrierCast = false;
 
 	//Timed Buffs
 	var aegisTimeLeft = 0;
@@ -34,6 +37,7 @@ var Buffs = function() {
 			savedDeathPenaltyReduction: deathPenaltyReduction,
 			savedCastCureInBattle: castCureInBattle,
 			savedCastFireballInBattle: castFireballInBattle,
+			savedAutoBarrierCast: autoBarrierCast,
 			savedAegisTimeLeft: aegisTimeLeft,
 			savedRageTimeLeft: rageTimeLeft,
 			savedBarrierLeft: barrierLeft
@@ -87,6 +91,9 @@ var Buffs = function() {
 		}
 		if (buffsSave.savedCastFireballInBattle !== undefined) {
 			castFireballInBattle = buffsSave.savedCastFireballInBattle;
+		}
+		if (buffsSave.savedAutoBarrierCast !== undefined) {
+			autoBarrierCast = buffsSave.autoBarrierCast;
 		}
 	};
 
@@ -150,6 +157,18 @@ var Buffs = function() {
 		return deathPenaltyReduction;
 	};
 
+	self.getAutoBarrierCast = function() {
+		return autoBarrierCast;
+	};
+
+	self.getLevelingSpeedMultiplier = function() {
+		return levelingSpeedMultiplier;
+	};
+
+	self.getExplorationSpeedMultiplier = function() {
+		return explorationSpeedMultiplier;
+	};
+
 	//Setters
 	self.setBarrierLeft = function(barrierValue) {
 		barrierLeft = barrierValue;
@@ -193,6 +212,18 @@ var Buffs = function() {
 
 	self.setDeathPenaltyReduction = function(newPercentage) {
 		deathPenaltyReduction = newPercentage;
+	};
+
+	self.setAutoBarrierCast = function(boolean) {
+		autoBarrierCast = boolean;
+	};
+
+	self.setLevelingSpeedMultiplier = function(newMultiplier) {
+		levelingSpeedMultiplier = newMultiplier;
+	};
+
+	self.setExplorationSpeedMultiplier = function(newMultiplier) {
+		explorationSpeedMultiplier = newMultiplier;
 	};
 
 	//Other Methods
@@ -241,6 +272,16 @@ var Buffs = function() {
 			}
 			document.getElementById("toggleable").innerHTML += '<button type="button" class="list-group-item" onClick="buffs.toggleBuff(\'castCureInBattle\')"><span class="badge">' + toggleStatusText + '</span>Battle Healing</button>';
 		}
+
+		if (autoBarrierCast || upgrades.isUpgradePurchased("barriercast")) {
+			if (autoBarrierCast) {
+				toggleStatusText = "ON";
+			}
+			else {
+				toggleStatusText = "OFF";
+			}
+			document.getElementById("toggleable").innerHTML += '<button type="button" class="list-group-item" onClick="buffs.toggleBuff(\'autoBarrierCast\')"><span class="badge">' + toggleStatusText + '</span>Barrier Casting</button>';
+		}
 	};
 
 	self.updatePermanentBuffs = function() {
@@ -257,11 +298,17 @@ var Buffs = function() {
 		if (manaPerSecond !== 0) {
 			document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">+' + manaPerSecond + '</span>Exploration Mana per Second</li>';
 		}
+		if (explorationSpeedMultiplier !== 1) {
+			document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">x' + explorationSpeedMultiplier + '</span>Exploration Speed</li>';
+		}
 		if (restingMultiplier !== 1) {
 			document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">x' + restingMultiplier + '</span>Rest Speed</li>';
 		}
 		if (spellLevelingMultiplier !== 1) {
 			document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">x' + spellLevelingMultiplier + '</span>Spell Level Gain</li>';
+		}
+		if (levelingSpeedMultiplier !== 1) {
+			document.getElementById("permanent").innerHTML += '<li class="list-group-item"><span class="badge">x' + levelingSpeedMultiplier + '</span>Stats Experience Gain</li>';
 		}
 	};
 
@@ -271,6 +318,9 @@ var Buffs = function() {
 		}
 		else if (buffId == "castFireballInBattle") {
 			castFireballInBattle = !castFireballInBattle;
+		}
+		else if (buffId == "autoBarrierCast") {
+			autoBarrierCast = !autoBarrierCast;
 		}
 		self.updateToggleableBuffs();
 	};

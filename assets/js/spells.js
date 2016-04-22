@@ -253,11 +253,25 @@ var Spells = function() {
 		}
 	};
 
+	self.isSpellLearned = function(spellId) {
+		if (spellId === "") {
+			return true;
+		}
+		else {
+			for (var i = 0; i < spellbook.length; i++) {
+				if (spellbook[i].id == spellId) {
+					return spellbook[i].learned;
+				}
+			}
+			return false;
+		}
+	};
+
 	self.castSpell = function(spellId) {
 		var spell = findSpell(spellId);
 		var manaCost = spellCost(spellbook[spell]);
 
-		if (player.getManaCurrentValue() >= manaCost && buffs.getRageTimeLeft() === 0) {
+		if (player.getManaCurrentValue() >= manaCost && buffs.getRageTimeLeft() === 0 && self.isSpellLearned(spellId)) {
 			var castSuccessful;
 			if (spellbook[spell].id == "cure") {
 				castSuccessful = castCure(spellbook[spell]);
@@ -281,7 +295,7 @@ var Spells = function() {
 				arcania += spellbook[spell].level + manaCost/100;
 				player.setManaCurrentValue(player.getManaCurrentValue() - manaCost);
 				levelSpell(spellbook[spell], buffs.getSpellLevelingMultiplier() * manaCost);
-				player.setMagicExperience(player.getMagicExperience() + spellbook[spell].level + 1 + manaCost/10);
+				player.setMagicExperience(player.getMagicExperience() + buffs.getLevelingSpeedMultiplier()*(spellbook[spell].level + 1 + manaCost/10));
 				return true;
 			}
 		}

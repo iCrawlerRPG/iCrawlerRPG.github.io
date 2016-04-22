@@ -150,7 +150,7 @@ var Tower = function() {
 		var currentFloor = player.getCurrentFloor();
 		player.setManaCurrentValue(player.getManaCurrentValue() + buffs.getManaPerSecond());
 		if (!self.floorExplorationComplete(currentFloor)) {
-			var explored = (player.getSpeedLevel() + player.getSpeedBonus())/10;
+			var explored = buffs.getExplorationSpeedMultiplier() * ((player.getSpeedLevel() + player.getSpeedBonus())/10);
 			var explorationLeft = floors[currentFloor].size - floors[currentFloor].explored;
 			if (explored > explorationLeft) {
 				explored = explorationLeft;
@@ -164,7 +164,7 @@ var Tower = function() {
 					bossFound = true;
 				}
 			}
-			player.setSpeedExperience(player.getSpeedExperience() + explored);
+			player.setSpeedExperience(player.getSpeedExperience() + 5*explored*buffs.getLevelingSpeedMultiplier()/buffs.getExplorationSpeedMultiplier());
 			self.loadTowerScreen();
 			if (!checkFloorEvent()) {
 				monsters.battleChance(false);
