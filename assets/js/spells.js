@@ -28,6 +28,19 @@ var Spells = function() {
 		level: 0,
 		description:""});
 
+	spellbook.push({name: "Transmutation",
+		id: "transmutation",
+		type: 3,
+		requiredMagic: 5,
+		arcaniaCost: 0,
+		learned: true,
+		baseMana: 50,
+		experience: 0,
+		nextLevel: 500,
+		baseNextLevel: 500,
+		level: 0,
+		description:""});
+
 	spellbook.push({name: "Barrier",
 		id: "barrier",
 		type: 0,
@@ -104,22 +117,32 @@ var Spells = function() {
 	};
 
 	var loadSpellbook = function(savedSpellbook) {
+		var success = false;
 		for(var i = 0; i < savedSpellbook.length; i++) {
 			if (i == spellbook.length) {
 				break;
 			}
-			if (savedSpellbook[i].learned !== undefined) {
-				spellbook[i].learned = savedSpellbook[i].learned;
+			for (var j = 0; j < spellbook.length; j++) {
+				if (spellbook[j].id == savedSpellbook[i].id) {
+					success = true;
+					break;
+				}
 			}
-			if (savedSpellbook[i].experience !== undefined) {
-				spellbook[i].experience = savedSpellbook[i].experience;
+			if (success) {
+				if (savedSpellbook[i].learned !== undefined) {
+					spellbook[i].learned = savedSpellbook[i].learned;
+				}
+				if (savedSpellbook[i].experience !== undefined) {
+					spellbook[i].experience = savedSpellbook[i].experience;
+				}
+				if (savedSpellbook[i].nextLevel !== undefined) {
+					spellbook[i].nextLevel = savedSpellbook[i].nextLevel;
+				}
+				if (savedSpellbook[i].level !== undefined) {
+					spellbook[i].level = savedSpellbook[i].level;
+				}
 			}
-			if (savedSpellbook[i].nextLevel !== undefined) {
-				spellbook[i].nextLevel = savedSpellbook[i].nextLevel;
-			}
-			if (savedSpellbook[i].level !== undefined) {
-				spellbook[i].level = savedSpellbook[i].level;
-			}
+			success = false;
 		}
 	};
 
@@ -151,6 +174,9 @@ var Spells = function() {
 			}
 			else if (spellbook[i].id == "rage") {
 				spellbook[i].description = "Fill yourself with rage for " + ragePotency(spellbook[i]) + " seconds. You deal 5x damage, however, you take 2x damage and cannot cast other spells.";
+			}
+			else if (spellbook[i].id == "transmutation") {
+				spellbook[i].description = "Give material form to the Arcania inside you. Transforms 100 Arcania into " + transmutationPotency(spellbook[i]) + " gold.";
 			}
 		}
 	};
@@ -291,8 +317,13 @@ var Spells = function() {
 			else if (spellbook[spell].id == "rage") {
 				castSuccessful = castRage(spellbook[spell]);
 			}
+			else if (spellbook[spell].id == "transmutation") {
+				castSuccessful = castTransmutation(spellbook[spell]);
+			}
 			if (castSuccessful) {
-				arcania += spellbook[spell].level + manaCost/100;
+				if (spellbook[spell].id !== "transmutation") {
+					arcania += spellbook[spell].level + manaCost/100;
+				}
 				player.setManaCurrentValue(player.getManaCurrentValue() - manaCost);
 				levelSpell(spellbook[spell], buffs.getSpellLevelingMultiplier() * manaCost);
 				player.setMagicExperience(player.getMagicExperience() + buffs.getLevelingSpeedMultiplier()*(spellbook[spell].level + 1 + manaCost/10));
@@ -446,6 +477,22 @@ var Spells = function() {
 		var rageLevelPotency = rage.level;
 		var rageMagicPotency = (0.2 * (player.getMagicLevel() + player.getMagicBonus() - 25));
 		return Math.floor(rageBasePotency + rageLevelPotency + rageMagicPotency);
+	};
+
+	var castTransmutation = function(transmutation) {
+		if (arcania < 100 || player.getInBattle()) {
+			return false;
+		}
+		else {
+			self.setArcania(arcania - 100);
+			inventory.setGold(inventory.getGold() + transmutationPotency(transmutation));
+			return true;
+		}
+	};
+
+	var transmutationPotency = function(transmutation) {
+		var transmutationLevelPotency = Math.pow(1.5, transmutation.level)
+		return Math.round(transmutationLevelPotency);
 	};
 };
 

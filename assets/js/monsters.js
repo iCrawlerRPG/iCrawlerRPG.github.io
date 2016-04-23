@@ -242,7 +242,7 @@ var Monsters = function() {
 			damage = monster.currentHealth;
 		}
 		document.getElementById("combatlog").innerHTML += "You dealt " + Math.round(damage) + " damage to the " + monster.name + ".<br>";
-		player.gainExperience(monster);
+		player.gainExperience(monster, true);
 		return self.monsterTakeDamage(monster, damage);
 	};
 
@@ -353,6 +353,7 @@ var Monsters = function() {
 		else {
 			document.getElementById("combatlog").innerHTML += "Aegis absorbed " + Math.round(damage) + " damage from " + monster.name + "'s attack.<br>";
 		}
+		player.gainExperience(monster, false);
 		return false;
 	};
 

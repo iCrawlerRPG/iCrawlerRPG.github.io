@@ -414,7 +414,7 @@ var Player = function() {
 	};
 
 	var loadStatScreen = function(statId, statName) {
-		document.getElementById(statId).innerHTML = statName.level + Math.round(100*statName.bonus)/100;
+		document.getElementById(statId).innerHTML = Math.round(100*(statName.level + statName.bonus))/100;
 		document.getElementById(statId + "per").innerHTML = Math.round(100*(100*(statName.experience/statName.nextLevel)))/100 + "%";
 		document.getElementById(statId + "prog").style.width = 100*(statName.experience/statName.nextLevel) + "%";
 	};
@@ -487,11 +487,15 @@ var Player = function() {
 		}
 	};
 
-	self.gainExperience = function(monster) {
+	self.gainExperience = function(monster, attacking) {
 		var multiplier = buffs.getLevelingSpeedMultiplier();
-		self.setStrengthExperience(strength.experience + multiplier*(monster.strength/strength.level));
-		self.setDexterityExperience(dexterity.experience + multiplier*(monster.dexterity/dexterity.level));
-		self.setConstitutionExperience(constitution.experience + multiplier*(monster.constitution/constitution.level));
+		if (attacking) {
+			self.setStrengthExperience(strength.experience + multiplier*(monster.strength/constitution.level));
+			self.setDexterityExperience(dexterity.experience + multiplier*(monster.dexterity/dexterity.level));
+		}
+		else {
+			self.setConstitutionExperience(constitution.experience + multiplier*(monster.strength/constitution.level));
+		}
 	};
 
 	self.death = function(monster) {
