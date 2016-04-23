@@ -88,6 +88,9 @@ var Inventory = function() {
 		self.updateShop(boolean);
 		document.getElementById("inventory").innerHTML = "";
 		for (var i = 0; i < 50; i++) {
+			if (i >= bag.length) {
+				break;
+			}
 			if (bag[i].type == "chest") {
 				printChest(bag[i], i, sellMode);
 			}
