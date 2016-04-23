@@ -336,6 +336,7 @@ var Spells = function() {
 	self.buySpell = function(spellId) {
 		var spell = findSpell(spellId);
 		if (arcania >= spellbook[spell].arcaniaCost) {
+			self.setArcania(arcania - spellbook[spell.arcaniaCost]);
 			spellbook[spell].learned = true;
 		}
 		self.updateSpellbook();
