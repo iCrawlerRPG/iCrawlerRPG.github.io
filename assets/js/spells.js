@@ -130,16 +130,16 @@ var Spells = function() {
 			}
 			if (success) {
 				if (savedSpellbook[i].learned !== undefined) {
-					spellbook[i].learned = savedSpellbook[i].learned;
+					spellbook[j].learned = savedSpellbook[i].learned;
 				}
 				if (savedSpellbook[i].experience !== undefined) {
-					spellbook[i].experience = savedSpellbook[i].experience;
+					spellbook[j].experience = savedSpellbook[i].experience;
 				}
 				if (savedSpellbook[i].nextLevel !== undefined) {
-					spellbook[i].nextLevel = savedSpellbook[i].nextLevel;
+					spellbook[j].nextLevel = savedSpellbook[i].nextLevel;
 				}
 				if (savedSpellbook[i].level !== undefined) {
-					spellbook[i].level = savedSpellbook[i].level;
+					spellbook[j].level = savedSpellbook[i].level;
 				}
 			}
 			success = false;
