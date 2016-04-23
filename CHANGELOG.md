@@ -32,6 +32,7 @@
 *Quality Changes!*
 - Base resting is now 5x faster.
 - Speed leveling is now 5x faster.
+- Inventory display is limited to top 50 items. Although you're still able to keep getting items, you won't be able to see them unless you equip/use/sell the top ones.
 
 **Changes in alpha v0.9:**
 
