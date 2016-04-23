@@ -162,7 +162,7 @@ var Inventory = function() {
 		}
 		else {
 			var price = Math.round(crystal.experience/2);
-			document.getElementById("inventory").innerHTML += '<button type="button" class="list-group-item list-group-item-success" data-toggle="tooltip" title="' + tooltip + '" onClick="inventory.sell(' + number + ',' + price + ')"><span class="badge">Crystal</span>' + price + ' Experience Crystal</button>';
+			document.getElementById("inventory").innerHTML += '<button type="button" class="list-group-item list-group-item-success" data-toggle="tooltip" title="' + tooltip + '" onClick="inventory.sell(' + number + ',' + price + ')"><span class="badge">' + price + '</span>' + crystal.stat + ' Experience Crystal</button>';
 		}
 	}
 
