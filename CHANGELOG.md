@@ -4,11 +4,18 @@
 *New UI!*
 - Panels have been separated on different tabs.
 
+*Stats Changes!*
+- STR and CON experience gain formulas have been changed.
+- You will now gain CON experience on getting hit, rather than hitting.
+
 *Experience Crystals!*
 - Monsters can now drop Experience Crystals when they die (5% chance).
 - Experience crystals are a way to permanently boost one of your stats.
 
-*Upgrades Changes*
+*Spell Changes!*
+- NEW SPELL: Transmutation - Changes Arcania into Gold.
+
+*Upgrades Changes!*
 - You can now see all upgrades you have the requirements for (even if you don't have the excelia yet!)
 - Several upgrade costs have been changed.
 - New tiers added for several existing upgrades.
@@ -16,7 +23,7 @@
 - NEW UPGRADE: Faster Leveling - Increase the experience gain speed for all stats.
 - NEW UPGRADE: Faster Exploration - Increase the speed you'll explore new floors.
 
-*Vendor Changes*
+*Vendor Changes!*
 - Keys now have a fixed price of 100 gold.
 - The vendor will both buy and sell experience crystals.
 - Experience crystals cost 1000 gold, and give the same amount of experience.
