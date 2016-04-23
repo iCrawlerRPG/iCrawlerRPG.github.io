@@ -87,7 +87,7 @@ var Inventory = function() {
 	self.updateInventory = function(boolean) {
 		self.updateShop(boolean);
 		document.getElementById("inventory").innerHTML = "";
-		for (var i = 0; i < bag.length; i++) {
+		for (var i = 0; i < 50; i++) {
 			if (bag[i].type == "chest") {
 				printChest(bag[i], i, sellMode);
 			}
