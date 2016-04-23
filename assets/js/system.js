@@ -7,6 +7,7 @@ var System = function() {
 
 	var theGame;
 	var idleHealthSlider;
+	var idleManaSlider;
 
 	var self = this;
 	//Save Method
@@ -65,6 +66,14 @@ var System = function() {
 		});
 	};
 
+	var loadIdleManaSlider = function() {
+		idleManaSlider = new Slider("#idleMpRest", {
+			ticks: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+			ticks_snap_bounds: 10,
+			value: 100
+		});
+	};
+
 	self.runGame = function() {
 		theGame = window.setInterval(main, refreshSpeed);
 	};
@@ -112,7 +121,7 @@ var System = function() {
 				if (buffs.getBarrierLeft() === 0 && buffs.getAutoBarrierCast()) {
 					spells.castSpell("barrier");
 				}
-				if ((100*(player.getHealthCurrentValue()/player.getHealthMaximumValue()) >= idleHealthSlider.getValue()) && !player.getResting()) {
+				if ((100*(player.getHealthCurrentValue()/player.getHealthMaximumValue()) >= idleHealthSlider.getValue()) && (100*(player.getManaCurrentValue()/player.getManaMaximumValue())) >= idleManaSlider.getValue() && !player.getResting()) {
 					tower.exploreFloor();
 				}
 				else if (!player.getResting() || player.isFullyRested()) {
@@ -146,6 +155,7 @@ var System = function() {
 	var startTheEngine = function() {
 		loadAll();
 		loadIdleHealthSlider();
+		loadIdleManaSlider();
 		loadIdleButton();
 		player.loadPlayerScreen();
 		player.loadExploreButton();
