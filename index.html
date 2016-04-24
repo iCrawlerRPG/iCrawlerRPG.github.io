@@ -7,7 +7,7 @@
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/7.0.0/css/bootstrap-slider.min.css">
 		<link href="https://fonts.googleapis.com/css?family=Germania+One" rel="stylesheet">
 		<link rel="stylesheet" href="assets/css/main.css">
-		<link rel="shortcut icon" type="image/png" href="http://shiroge.github.io/assets/white-tower.png"/>
+		<link rel="shortcut icon" type="image/png" href="http://icrawlerrpg.github.io/assets/white-tower.png"/>
 		<title>ICrawler · v0.9.1</title>
 	</head>
 	<body>
@@ -56,9 +56,12 @@
 						<li role="presentation">
 							<a href="#upgradesTab" role="tab" data-toggle="tab">Upgrades</a>
 						</li>
-						<li role="presentation">
-							<a href="#changelogTab" role="tab" data-toggle="tab">Changelog</a>
-						</li>
+                        <li role="presentation">
+                            <a href="#changelogTab" role="tab" data-toggle="tab">Changelog</a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#dataTab" role="tab" data-toggle="tab">Game Data</a>
+                        </li>
 					</ul>
 				</div>
 			</div>
@@ -672,14 +675,52 @@
 						</div>
 					</div>
 				</div>
+                <div role="tabpanel" class="tab-pane" id="dataTab">
+                    <div class="row" style="height: 10px;"></div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" data-toggle="collapse" data-target="#collapseDataTab">
+                                    <h3 class="panel-title" style="font-family: 'Germania One', cursive;">
+                                        Game Data
+                                    </h3>
+                                </div>
+                                <div id="collapseDataTab" class="panel-collapse collapse in">
+                                    <div class="panel-body">
+
+                                        <div class="row">
+                                            <div class="col-xs-4 text-center">
+                                                <button class="btn btn-primary btn-block" onClick="system.exportGame()">Export</button>
+                                            </div>
+
+                                            <div class="col-xs-4 text-center">
+                                                <button class="btn btn-success btn-block" onClick="system.importGame()">Import</button>
+                                            </div>
+
+                                            <div class="col-xs-4 text-center">
+                                                <button class="btn btn-danger btn-block" onClick="system.hardReset()">Wipe data</button>
+                                            </div>
+
+                                            <hr>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-xs-12">
+                                                <p class="text-center text-muted small">Click export to dump your data into the textbox below. Paste in exported data and click Import to load your saved data.</p>
+                                                <textarea rows="10" class="form-control" id="dataContainer"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 			</div>
 			<div class="row">
 				<hr>
-				<div class="col-xs-10 text-center">
+				<div class="col-xs-12 text-center">
 					ICrawler was made by Shiroge. Special thanks to peterbrinck. Icons are from their respective creators at <a href="http://game-icons.net/">http://game-icons.net/</a>.
-				</div>
-				<div class="col-xs-2">
-					<button class="btn btn-danger btn-block" onClick="system.hardReset()" style="margin-bottom:5px;">Hard Reset!</button>
 				</div>
 			</div>
 		</div>
