@@ -445,7 +445,7 @@ var Spells = function() {
             monster.dexterity -= slowEffect;
             document.getElementById("monsterdex").innerHTML = monster.dexterity;
             document.getElementById("combatlog").innerHTML = '';
-            document.getElementById("combatlog").innerHTML += "You have cast slow on the " + monster.name + ". Its dexterity has been lowered by " + slowEffect + "<br>";
+            document.getElementById("combatlog").innerHTML += "You have cast slow on the " + monster.name + ". Its dexterity has been lowered by " + slowEffect + ".<br>";
             monsters.setInstancedMonster(monster);
             monsters.battle(monsters.getInstancedMonster(), true);
             return true;
