@@ -5,6 +5,7 @@
 - Spell scaling has been changed for all spells.
 - Slow no longer halves dexterity, it now lowers it by a set amount, that scales with the spell level and the magic stat.
 - Aegis and Rage now last for battle turns, instead of seconds.
+- NEW SPELL: Shadow Ball - destroy enemies with a stronger damage spell!
 
 *Inventory Changes!*
 - Inventory display is limited to top 50 items.
