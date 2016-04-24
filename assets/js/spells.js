@@ -547,7 +547,7 @@ var Spells = function() {
         }
     };
 
-    var shadowBallPotency = function(fireball) {
+    var shadowBallPotency = function(shadowBall) {
         var shadowBallBasePotency = 300;
         var shadowBallLevelPotency = 50 * shadowBall.level;
         var shadowBallMagicPotency = 10 * (player.getMagicLevel() + player.getMagicBonus() - 30);
