@@ -1,4 +1,6 @@
 # ICrawler
+
+[![Join the chat at https://gitter.im/iCrawlerRPG/iCrawlerRPG.github.io](https://badges.gitter.im/iCrawlerRPG/iCrawlerRPG.github.io.svg)](https://gitter.im/iCrawlerRPG/iCrawlerRPG.github.io?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 Current version: alpha v0.9.1
 
 This was an idea that was on my head for a few days now. I've finally had the patience to sit down and actually code.
