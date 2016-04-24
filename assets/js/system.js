@@ -87,14 +87,70 @@ var System = function() {
 		}
 	};
 
+    self.exportGame = function() {
+        theGame = window.clearInterval(theGame);
+        saveAll();
+
+        var exportedData = {
+            systemSave: localStorage.getItem('systemSave'),
+            playerSave: localStorage.getItem('playerSave'),
+            spellsSave: localStorage.getItem('spellsSave'),
+            upgradesSave: localStorage.getItem('upgradesSave'),
+            buffsSave: localStorage.getItem('buffsSave'),
+            monstersSave: localStorage.getItem('monstersSave'),
+            towerSave: localStorage.getItem('towerSave'),
+            inventorySave: localStorage.getItem('inventorySave')
+        };
+
+        document.getElementById('dataContainer').innerHTML = JSON.stringify(exportedData);
+        this.runGame();
+    };
+
+    self.importGame = function() {
+        theGame = window.clearInterval(theGame);
+        try {
+            var text = document.getElementById('dataContainer').value;
+            var importedData = JSON.parse(text);
+
+            if (confirm("Are you sure you want to import this data? Your existing save will be wiped.")) {
+                localStorage.clear();
+
+                localStorage.setItem('systemSave', importedData.systemSave);
+                localStorage.setItem('playerSave', importedData.playerSave);
+                localStorage.setItem('spellsSave', importedData.spellsSave);
+                localStorage.setItem('upgradesSave', importedData.upgradesSave);
+                localStorage.setItem('buffsSave', importedData.buffsSave);
+                localStorage.setItem('monstersSave', importedData.monstersSave);
+                localStorage.setItem('towerSave', importedData.towerSave);
+                localStorage.setItem('inventorySave', importedData.inventorySave);
+
+                loadAll();
+                location.reload();
+            }
+        } catch (e) {
+            console.warn(e);
+            alert('Unable to parse save game data!');
+        }
+        this.runGame();
+    };
+
 	self.hardReset = function() {
 		theGame = window.clearInterval(theGame);
 		if (confirm("Are you sure you want to wipe all your progress?")) {
-			localStorage.clear();
+			// localStorage.clear();
+                localStorage.removeItem('systemSave');
+                localStorage.removeItem('playerSave');
+                localStorage.removeItem('spellsSave');
+                localStorage.removeItem('upgradesSave');
+                localStorage.removeItem('buffsSave');
+                localStorage.removeItem('monstersSave');
+                localStorage.removeItem('towerSave');
+                localStorage.removeItem('inventorySave');
+
 			location.reload();
 		}
 		else {
-			runGame();
+			this.runGame();
 		}
 	};
 
