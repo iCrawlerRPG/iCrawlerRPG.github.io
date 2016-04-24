@@ -8,12 +8,14 @@ var System = function() {
     var theGame;
     var idleHealthSlider;
     var idleManaSlider;
+    var trackOptOut = false;
 
     var self = this;
     //Save Method
     var save = function() {
         var systemSave = {
-            savedTicks: ticks
+            savedTicks: ticks,
+            trackOptOut: trackOptOut
         };
         localStorage.setItem("systemSave",JSON.stringify(systemSave));
     };
@@ -29,12 +31,27 @@ var System = function() {
         inventory.save();
     };
 
+    self.toggleTracking = function() {
+        trackOptOut = !trackOptOut;
+        saveAll();
+        location.reload();
+    }
+
+    var trackEvent = function(eventCategory, eventAction, eventLabel, eventValue) {
+        if (true !== trackOptOut) {
+            return ga('send', 'event', eventCategory, eventAction, eventLabel || null, eventValue || null);
+        }
+    };
+
     //Load Method
     var load = function() {
         var systemSave = JSON.parse(localStorage.getItem("systemSave"));
         if (systemSave) {
             if (systemSave.savedTicks !== undefined) {
                 ticks = systemSave.savedTicks;
+            }
+            if (systemSave.trackOptOut !== undefined) {
+                trackOptOut = systemSave.trackOptOut;
             }
         }
     };
@@ -48,6 +65,13 @@ var System = function() {
         monsters.load();
         tower.load();
         inventory.load();
+
+        trackEvent('game_load', 'speed', player.getSpeedLevel());
+        trackEvent('game_load', 'magic', player.getMagicLevel());
+        trackEvent('game_load', 'strength', player.getStrengthLevel());
+        trackEvent('game_load', 'dexterity', player.getDexterityLevel());
+        trackEvent('game_load', 'constitution', player.getConstitutionLevel());
+        trackEvent('game_load', 'tower_level', tower.getMaxFloor());
     };
 
     //Getters
