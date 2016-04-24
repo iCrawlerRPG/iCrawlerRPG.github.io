@@ -82,7 +82,7 @@ var Spells = function() {
 
     spellbook.push({name: "Shadow Ball",
         id: "shadowball",
-        type: 0,
+        type: 1,
         requiredMagic: 30,
         arcaniaCost: 3000,
         learned: false,
