@@ -68,6 +68,16 @@ var Tower = function() {
 		return floors[floor].monsterDensity;
 	};
 
+    self.getMaxFloor = function() {
+        var maxFloor = 0;
+        for (var i = 0; i < floors.length; i++) {
+            if (floors[i].explored === floors[i].size) {
+                maxFloor = i;
+            }
+        };
+        return maxFloor;
+    };
+
 	//Setters
 	self.setBossFound = function(boolean) {
 		bossFound = boolean;
