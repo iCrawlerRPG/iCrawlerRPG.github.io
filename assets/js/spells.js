@@ -80,6 +80,19 @@ var Spells = function() {
 		level: 0,
 		description: ""});
 
+    spellbook.push({name: "Shadow Ball",
+        id: "shadowball",
+        type: 0,
+        requiredMagic: 30,
+        arcaniaCost: 3000,
+        learned: false,
+        baseMana: 400,
+        experience: 0,
+        nextLevel: 4000,
+        baseNextLevel: 4000,
+        level: 0,
+        description: ""});
+
 	spellbook.push({name: "Aegis",
 		id: "aegis",
 		type: 0,
@@ -158,13 +171,13 @@ var Spells = function() {
 	var updateSpellDescriptions = function() {
 		for (var i = 0; i < spellbook.length; i++) {
 			if (spellbook[i].id == "cure") {
-			spellbook[i].description = "Heal " + curePotency(spellbook[i]) + " HP";
+			spellbook[i].description = "Call the powers of nature to heal yourself for " + curePotency(spellbook[i]) + " HP";
 			}
 			else if (spellbook[i].id == "fireball") {
-				spellbook[i].description = "Deal " + fireballPotency(spellbook[i]) + " fire damage.";
+				spellbook[i].description = "Ignite mana around your hand and throw it. Deals " + fireballPotency(spellbook[i]) + " fire damage.";
 			}
 			else if (spellbook[i].id == "barrier") {
-				spellbook[i].description = "Put up a barrier that will protect you from " + barrierPotency(spellbook[i]) + " damage.";
+				spellbook[i].description = "Condense mana around you to put up a barrier that will absorb " + barrierPotency(spellbook[i]) + " damage.";
 			}
 			else if (spellbook[i].id == "aegis") {
 				spellbook[i].description = "Take no damage for " + aegisPotency(spellbook[i]) + " seconds.";
@@ -178,6 +191,9 @@ var Spells = function() {
 			else if (spellbook[i].id == "transmutation") {
 				spellbook[i].description = "Give material form to the Arcania inside you. Transforms 100 Arcania into " + transmutationPotency(spellbook[i]) + " gold.";
 			}
+            else if (spellbook[i].id == "shadowball") {
+                spellbook[i].description = "Condense shadow energy into a sphere you can hurl into enemies. Deals " + shadowBallPotency(spellbook[i]) + " damage.";
+            }
 		}
 	};
 
