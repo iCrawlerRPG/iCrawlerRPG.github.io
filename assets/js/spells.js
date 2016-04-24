@@ -86,10 +86,10 @@ var Spells = function() {
         requiredMagic: 30,
         arcaniaCost: 3000,
         learned: false,
-        baseMana: 400,
+        baseMana: 150,
         experience: 0,
-        nextLevel: 4000,
-        baseNextLevel: 4000,
+        nextLevel: 1500,
+        baseNextLevel: 1500,
         level: 0,
         description: ""});
 
