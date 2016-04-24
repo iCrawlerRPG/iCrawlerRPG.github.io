@@ -1,4 +1,18 @@
 # Changelog
+**Changes in (pre)-alpha v0.9.2:**
+
+*Spell Changes!*
+- Spell scaling has been changed for all spells.
+- Slow no longer halves dexterity, it now lowers it by a set amount, that scales with the spell level and the magic stat.
+- Aegis and Rage now last for battle turns, instead of seconds.
+
+*Inventory Changes!*
+- Inventory display is limited to top 50 items.
+- Added a button to use all crystals.
+
+*Bug fixes!*
+- Fixed Rage not increasing damage taken.
+
 **Changes in alpha v0.9.1:**
 
 *New UI!*
