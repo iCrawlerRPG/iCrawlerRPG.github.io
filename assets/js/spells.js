@@ -180,13 +180,13 @@ var Spells = function() {
 				spellbook[i].description = "Condense mana around you to put up a barrier that will absorb " + barrierPotency(spellbook[i]) + " damage.";
 			}
 			else if (spellbook[i].id == "aegis") {
-				spellbook[i].description = "Take no damage for " + aegisPotency(spellbook[i]) + " seconds.";
+				spellbook[i].description = "Call for heavenly protection and take no damage for " + aegisPotency(spellbook[i]) + " turns.";
 			}
 			else if (spellbook[i].id == "slow") {
-                spellbook[i].description = "Lower an enemy's dexterity by " + slowPotency(spellbook[i]) + ".";
+                spellbook[i].description = "Magically shackle your enemy, reducing its dexterity for " + slowPotency(spellbook[i]) + " points.";
             }
 			else if (spellbook[i].id == "rage") {
-				spellbook[i].description = "Fill yourself with rage for " + ragePotency(spellbook[i]) + " seconds. You deal 5x damage, however, you take 2x damage and cannot cast other spells.";
+				spellbook[i].description = "Fill yourself with rage for " + ragePotency(spellbook[i]) + " turns. You deal 5x damage, however, you take 2x damage and cannot cast other spells.";
 			}
 			else if (spellbook[i].id == "transmutation") {
 				spellbook[i].description = "Give material form to the Arcania inside you. Transforms 100 Arcania into " + transmutationPotency(spellbook[i]) + " gold.";
@@ -336,6 +336,9 @@ var Spells = function() {
 			else if (spellbook[spell].id == "transmutation") {
 				castSuccessful = castTransmutation(spellbook[spell]);
 			}
+            else if (spellbook[spell].id == "shadowball") {
+                castSuccessful = castShadowBall(spellbook[spell]);
+            }
 			if (castSuccessful) {
 				if (spellbook[spell].id !== "transmutation") {
 					arcania += spellbook[spell].level + manaCost/100;
@@ -523,6 +526,32 @@ var Spells = function() {
         var transmutationLevelPotency = 1 * transmutation.level;
         var transmutationMagicPotency = 0.2 * (player.getMagicLevel() + player.getMagicBonus() - 5);
         return Math.floor(transmutationBasePotency + transmutationLevelPotency + transmutationMagicPotency);
+    };
+
+    var castShadowBall = function(shadowBall) {
+        if (!player.getInBattle()) {
+            return false;
+        }
+        else {
+            var monster = monsters.getInstancedMonster();
+            var shadowBallDamage = shadowBallPotency(shadowBall);
+            if (monster.currentHealth <= shadowBallDamage) {
+                shadowBallDamage = monster.currentHealth;
+            }
+            document.getElementById("combatlog").innerHTML = '';
+            document.getElementById("combatlog").innerHTML += "Your shadow ball hit the " + monster.name + " for " + Math.floor(shadowBallDamage) + " damage.<br>";
+            if (!monsters.monsterTakeDamage(monsters.getInstancedMonster(), shadowBallDamage)) {
+                monsters.battle(monsters.getInstancedMonster(), true);
+            }
+            return true;
+        }
+    };
+
+    var shadowBallPotency = function(fireball) {
+        var shadowBallBasePotency = 300;
+        var shadowBallLevelPotency = 50 * shadowBall.level;
+        var shadowBallMagicPotency = 10 * (player.getMagicLevel() + player.getMagicBonus() - 30);
+        return Math.floor(shadowBallBasePotency + shadowBallLevelPotency + shadowBallMagicPotency);
     };
 };
 
