@@ -66,12 +66,12 @@ var System = function() {
         tower.load();
         inventory.load();
 
-        trackEvent('game_load', 'load', 'speed', player.getSpeedLevel());
-        trackEvent('game_load', 'load', 'magic', player.getMagicLevel());
-        trackEvent('game_load', 'load', 'strength', player.getStrengthLevel());
-        trackEvent('game_load', 'load', 'dexterity', player.getDexterityLevel());
-        trackEvent('game_load', 'load', 'constitution', player.getConstitutionLevel());
-        trackEvent('game_load', 'load', 'tower_level', tower.getMaxFloor());
+        trackEvent('system', 'load', 'speed', player.getSpeedLevel());
+        trackEvent('system', 'load', 'magic', player.getMagicLevel());
+        trackEvent('system', 'load', 'strength', player.getStrengthLevel());
+        trackEvent('system', 'load', 'dexterity', player.getDexterityLevel());
+        trackEvent('system', 'load', 'constitution', player.getConstitutionLevel());
+        trackEvent('system', 'load', 'tower_level', tower.getMaxFloor());
     };
 
     //Getters
