@@ -405,7 +405,7 @@ var Spells = function() {
 	var barrierPotency = function(barrier) {
 		var barrierBasePotency = 50;
 		var barrierLevelPotency = 50 * barrier.level;
-		var barrierMagicPotency = 10 * (player.getMagicLevel() + player.getMagicBonus() - 10));
+		var barrierMagicPotency = 10 * (player.getMagicLevel() + player.getMagicBonus() - 10);
 		return Math.floor(barrierBasePotency + barrierLevelPotency + barrierMagicPotency);
 	};
 
