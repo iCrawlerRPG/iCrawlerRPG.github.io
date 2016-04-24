@@ -183,8 +183,8 @@ var Spells = function() {
 				spellbook[i].description = "Take no damage for " + aegisPotency(spellbook[i]) + " seconds.";
 			}
 			else if (spellbook[i].id == "slow") {
-				spellbook[i].description = "Halve an enemy's DEX.";
-			}
+                spellbook[i].description = "Lower an enemy's dexterity by " + slowPotency(spellbook[i]) + ".";
+            }
 			else if (spellbook[i].id == "rage") {
 				spellbook[i].description = "Fill yourself with rage for " + ragePotency(spellbook[i]) + " seconds. You deal 5x damage, however, you take 2x damage and cannot cast other spells.";
 			}
@@ -359,158 +359,171 @@ var Spells = function() {
 	}
 
 	var castCure = function(cure) {
-    var currentHealth = player.getHealthCurrentValue();
-		var maximumHealth = player.getHealthMaximumValue();
-		if (currentHealth == maximumHealth) {
-			return false;
-		}
-		else {
-			var cureValue = curePotency(cure);
-			if (maximumHealth - currentHealth < cureValue) {
-				cureValue = maximumHealth - currentHealth;
-			}
-			player.setHealthCurrentValue(currentHealth + cureValue);
-			if (player.getInBattle()) {
-				document.getElementById("combatlog").innerHTML = '';
-				document.getElementById("combatlog").innerHTML += "You healed yourself for " + Math.round(cureValue) + " HP with Cure.<br>";
-				monsters.battle(monsters.getInstancedMonster(), true);
-			}
-			return true;
-		}
-	};
+        var currentHealth = player.getHealthCurrentValue();
+        var maximumHealth = player.getHealthMaximumValue();
+        if (currentHealth == maximumHealth) {
+            return false;
+        }
+        else {
+            var cureValue = curePotency(cure);
+            if (maximumHealth - currentHealth < cureValue) {
+                cureValue = maximumHealth - currentHealth;
+            }
+            player.setHealthCurrentValue(currentHealth + cureValue);
+            if (player.getInBattle()) {
+                document.getElementById("combatlog").innerHTML = '';
+                document.getElementById("combatlog").innerHTML += "You healed yourself for " + Math.round(cureValue) + " HP with Cure.<br>";
+                monsters.battle(monsters.getInstancedMonster(), true);
+            }
+            return true;
+        }
+    };
 
-	var curePotency = function(cure) {
-		var cureBasePotency = 25;
-		var cureLevelPotency = Math.pow(1.5, cure.level);
-		var cureMagicPotency = Math.pow(1.1, player.getMagicLevel() + player.getMagicBonus() - 5) - 1;
-		return Math.floor(cureBasePotency * cureLevelPotency + cureMagicPotency);
-	};
+    var curePotency = function(cure) {
+        var cureBasePotency = 25;
+        var cureLevelPotency = 15 * cure.level;
+        var cureMagicPotency = 3 * (player.getMagicLevel() + player.getMagicBonus() - 5);
+        return Math.floor(cureBasePotency + cureLevelPotency + cureMagicPotency);
+    };
 
-	var castFireball = function(fireball) {
-		if (!player.getInBattle()) {
-			return false;
-		}
-		else {
-			var monster = monsters.getInstancedMonster();
-			var fireballDamage = fireballPotency(fireball);
-			if (monster.currentHealth <= fireballDamage) {
-				fireballDamage = monster.currentHealth;
-			}
-			document.getElementById("combatlog").innerHTML = '';
-			document.getElementById("combatlog").innerHTML += "Your fireball hit the " + monster.name + " for " + Math.floor(fireballDamage) + " damage.<br>";
-			if (!monsters.monsterTakeDamage(monsters.getInstancedMonster(), fireballDamage)) {
-				monsters.battle(monsters.getInstancedMonster(), true);
-			}
-			return true;
-		}
-	};
+    var castFireball = function(fireball) {
+        if (!player.getInBattle()) {
+            return false;
+        }
+        else {
+            var monster = monsters.getInstancedMonster();
+            var fireballDamage = fireballPotency(fireball);
+            if (monster.currentHealth <= fireballDamage) {
+                fireballDamage = monster.currentHealth;
+            }
+            document.getElementById("combatlog").innerHTML = '';
+            document.getElementById("combatlog").innerHTML += "Your fireball hit the " + monster.name + " for " + Math.floor(fireballDamage) + " damage.<br>";
+            if (!monsters.monsterTakeDamage(monsters.getInstancedMonster(), fireballDamage)) {
+                monsters.battle(monsters.getInstancedMonster(), true);
+            }
+            return true;
+        }
+    };
 
-	var fireballPotency = function(fireball) {
-		var fireballBasePotency = 15;
-		var fireballLevelPotency = Math.pow(1.5, fireball.level);
-		var fireballMagicPotency = Math.pow(1.1, player.getMagicLevel() + player.getMagicBonus() - 5) - 1;
-		return Math.floor(fireballBasePotency * fireballLevelPotency + fireballMagicPotency);
-	};
+    var fireballPotency = function(fireball) {
+        var fireballBasePotency = 15;
+        var fireballLevelPotency = 5 * fireball.level;
+        var fireballMagicPotency = 1 * (player.getMagicLevel() + player.getMagicBonus() - 5);
+        return Math.floor(fireballBasePotency + fireballLevelPotency + fireballMagicPotency);
+    };
 
-	var castBarrier = function(barrier) {
-		var barrierValue = barrierPotency(barrier);
-		if (buffs.getBarrierLeft() == barrierValue) {
-			return false;
-		}
-		else {
-			buffs.setBarrierLeft(barrierValue);
-			buffs.updateTemporaryBuffs(false);
-			if (player.getInBattle()) {
-				document.getElementById("combatlog").innerHTML = '';
-				document.getElementById("combatlog").innerHTML += "You created a magical barrier.<br>";
-				monsters.battle(monsters.getInstancedMonster(), true);
-			}
-			return true;
-		}
-	};
+    var castBarrier = function(barrier) {
+        var barrierValue = barrierPotency(barrier);
+        if (buffs.getBarrierLeft() == barrierValue) {
+            return false;
+        }
+        else {
+            buffs.setBarrierLeft(barrierValue);
+            buffs.updateTemporaryBuffs(false);
+            if (player.getInBattle()) {
+                document.getElementById("combatlog").innerHTML = '';
+                document.getElementById("combatlog").innerHTML += "You created a magical barrier.<br>";
+                monsters.battle(monsters.getInstancedMonster(), true);
+            }
+            return true;
+        }
+    };
 
-	var barrierPotency = function(barrier) {
-		var barrierBasePotency = 50;
-		var barrierLevelPotency = 50 * barrier.level;
-		var barrierMagicPotency = (10 * (player.getMagicLevel() + player.getMagicBonus() - 10));
-		return Math.floor(barrierBasePotency + barrierLevelPotency + barrierMagicPotency);
-	};
+    var barrierPotency = function(barrier) {
+        var barrierBasePotency = 50;
+        var barrierLevelPotency = 50 * barrier.level;
+        var barrierMagicPotency = 10 * (player.getMagicLevel() + player.getMagicBonus() - 10);
+        return Math.floor(barrierBasePotency + barrierLevelPotency + barrierMagicPotency);
+    };
 
-	var castAegis = function(aegis) {
-		if (buffs.getAegisTimeLeft() !== 0) {
-			return false;
-		}
-		else {
-			buffs.setAegisTimeLeft(aegisPotency(aegis));
-			buffs.updateTemporaryBuffs(false);
-			if (player.getInBattle()) {
-				document.getElementById("combatlog").innerHTML = '';
-				document.getElementById("combatlog").innerHTML += "You summon the heavenly shield, Aegis.<br>";
-				monsters.battle(monsters.getInstancedMonster(), true);
-			}
-			return true;
-		}
-	};
+    var castAegis = function(aegis) {
+        if (buffs.getAegisTimeLeft() !== 0) {
+            return false;
+        }
+        else {
+            buffs.setAegisTimeLeft(aegisPotency(aegis));
+            buffs.updateTemporaryBuffs(false);
+            if (player.getInBattle()) {
+                document.getElementById("combatlog").innerHTML = '';
+                document.getElementById("combatlog").innerHTML += "You summon the heavenly shield, Aegis.<br>";
+                monsters.battle(monsters.getInstancedMonster(), true);
+            }
+            return true;
+        }
+    };
 
-	var aegisPotency = function(aegis) {
-		var aegisBasePotency = 5;
-		var aegisLevelPotency = 5 * aegis.level;
-		var aegisMagicPotency = player.getMagicLevel() + player.getMagicBonus() - 50;
-		return Math.floor(aegisBasePotency + aegisLevelPotency + aegisMagicPotency);
-	};
+    var aegisPotency = function(aegis) {
+        var aegisBasePotency = 5;
+        var aegisLevelPotency = 1 * aegis.level;
+        var aegisMagicPotency = 0.2 * (player.getMagicLevel() + player.getMagicBonus() - 50);
+        return Math.floor(aegisBasePotency + aegisLevelPotency + aegisMagicPotency);
+    };
 
-	var castSlow = function(slow) {
-		var monster = monsters.getInstancedMonster();
-		if (!player.getInBattle() || monster.dexterity <= 1) {
-			return false;
-		}
-		else {
-			monster.dexterity = monster.dexterity/2;
-			document.getElementById("monsterdex").innerHTML = monster.dexterity;
-			document.getElementById("combatlog").innerHTML = '';
-			document.getElementById("combatlog").innerHTML += "You have cast slow on the " + monster.name + ". Its DEX has been halved.<br>";
-			monsters.setInstancedMonster(monster);
-			monsters.battle(monsters.getInstancedMonster(), true);
-			return true;
-		}
-	};
+    var castSlow = function(slow) {
+        var monster = monsters.getInstancedMonster();
+        if (!player.getInBattle() || monster.dexterity <= 1) {
+            return false;
+        }
+        else {
+            var slowEffect = slowPotency(slow);
+            if (monster.dexterity <= slowEffect) {
+                slowEffect = monster.dexterity - 1;
+            }
+            monster.dexterity -= slowEffect;
+            document.getElementById("monsterdex").innerHTML = monster.dexterity;
+            document.getElementById("combatlog").innerHTML = '';
+            document.getElementById("combatlog").innerHTML += "You have cast slow on the " + monster.name + ". Its dexterity has been lowered by " + slowEffect + ".<br>";
+            monsters.setInstancedMonster(monster);
+            monsters.battle(monsters.getInstancedMonster(), true);
+            return true;
+        }
+    };
 
-	var castRage = function(rage) {
-		if (!player.getInBattle()) {
-			return false;
-		}
-		else {
-			buffs.setRageTimeLeft(ragePotency(rage));
-			buffs.updateTemporaryBuffs(false);
-			document.getElementById("combatlog").innerHTML = '';
-			document.getElementById("combatlog").innerHTML += "You have entered a state of frenzy!<br>";
-			monsters.battle(monsters.getInstancedMonster(), true);
-			return true;
-		}
-	};
+    var slowPotency = function(slow) {
+        var slowBasePotency = 5;
+        var slowLevelPotency = 1 * slow.level;
+        var slowMagicPotency = 0.2 * (player.getMagicLevel() + player.getMagicBonus() - 20);
+        return Math.floor(slowBasePotency + slowLevelPotency + slowMagicPotency);
+    };
 
-	var ragePotency = function(rage) {
-		var rageBasePotency = 5;
-		var rageLevelPotency = rage.level;
-		var rageMagicPotency = (0.2 * (player.getMagicLevel() + player.getMagicBonus() - 25));
-		return Math.floor(rageBasePotency + rageLevelPotency + rageMagicPotency);
-	};
+    var castRage = function(rage) {
+        if (!player.getInBattle()) {
+            return false;
+        }
+        else {
+            buffs.setRageTimeLeft(ragePotency(rage));
+            buffs.updateTemporaryBuffs(false);
+            document.getElementById("combatlog").innerHTML = '';
+            document.getElementById("combatlog").innerHTML += "You have entered a state of frenzy!<br>";
+            monsters.battle(monsters.getInstancedMonster(), true);
+            return true;
+        }
+    };
 
-	var castTransmutation = function(transmutation) {
-		if (arcania < 100 || player.getInBattle()) {
-			return false;
-		}
-		else {
-			self.setArcania(arcania - 100);
-			inventory.setGold(inventory.getGold() + transmutationPotency(transmutation));
-			return true;
-		}
-	};
+    var ragePotency = function(rage) {
+        var rageBasePotency = 5;
+        var rageLevelPotency = 1 * rage.level;
+        var rageMagicPotency = 0.2 * (player.getMagicLevel() + player.getMagicBonus() - 25);
+        return Math.floor(rageBasePotency + rageLevelPotency + rageMagicPotency);
+    };
 
-	var transmutationPotency = function(transmutation) {
-		var transmutationLevelPotency = Math.pow(1.5, transmutation.level)
-		return Math.round(transmutationLevelPotency);
-	};
+    var castTransmutation = function(transmutation) {
+        if (arcania < 100 || player.getInBattle()) {
+            return false;
+        }
+        else {
+            self.setArcania(arcania - 100);
+            inventory.setGold(inventory.getGold() + transmutationPotency(transmutation));
+            return true;
+        }
+    };
+
+    var transmutationPotency = function(transmutation) {
+        var transmutationBasePotency = 1;
+        var transmutationLevelPotency = 1 * transmutation.level;
+        var transmutationMagicPotency = 0.2 * (player.getMagicLevel() + player.getMagicBonus() - 5);
+        return Math.floor(transmutationBasePotency + transmutationLevelPotency + transmutationMagicPotency);
+    };
 };
 
 var spells = new Spells();
