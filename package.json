@@ -1,0 +1,22 @@
+{
+  "name": "icrawlerrpg",
+  "version": "0.9.1",
+  "description": "An incremental dungeon crawler",
+  "devDependencies": {
+    "grunt": "latest"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iCrawlerRPG/iCrawlerRPG.github.io.git"
+  },
+  "author": "iCrawlerRPG",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/iCrawlerRPG/iCrawlerRPG.github.io/issues"
+  },
+  "homepage": "https://github.com/iCrawlerRPG/iCrawlerRPG.github.io#readme"
+}
