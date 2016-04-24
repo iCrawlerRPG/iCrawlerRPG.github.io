@@ -439,6 +439,9 @@ var Spells = function() {
         }
         else {
             var slowEffect = slowPotency(slow);
+            if (monster.dexterity <= slowEffect) {
+                slowEffect = monster.dexterity - 1;
+            }
             monster.dexterity -= slowEffect;
             document.getElementById("monsterdex").innerHTML = monster.dexterity;
             document.getElementById("combatlog").innerHTML = '';
