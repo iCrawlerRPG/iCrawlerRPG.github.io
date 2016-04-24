@@ -328,6 +328,9 @@ var Monsters = function() {
 
     var monsterAttacks = function(monster) {
         var damage = damageFormula(monster.strength, monster.dexterity, player.getConstitutionLevel() + player.getConstitutionBonus(), player.getHealthCurrentValue());
+        if (buffs.getRageTimeLeft() !== 0) {
+            damage = damage*2;
+        }
         if (buffs.getAegisTimeLeft() === 0) {
             var barrier = buffs.getBarrierLeft();
             if (barrier > 0) {
