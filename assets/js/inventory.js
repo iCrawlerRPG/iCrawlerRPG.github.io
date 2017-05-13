@@ -243,7 +243,7 @@ var Inventory = function() {
                 armor.defense += 0.1 * Math.round(points/2);
             }
             else if (roll == 1) {
-                armor.movement += 0.1 * Math.round(points/2);
+                armor.magic += 0.1 * Math.round(points/2);
             }
             else if (roll == 2) {
                 armor.movement += 0.1 * Math.round(points/2);
