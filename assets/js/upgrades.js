@@ -65,6 +65,14 @@ var Upgrades = function() {
 		shown: false,
 		purchased: false,
 		description:"Recover at four times the normal speed."});
+	
+	upgradeList.push({name: "Auto-Shooting 2",
+		id: "autoshoot2",
+		exceliaCost: 500,
+		required: "",
+		shown: true,
+		purchased: false,
+		description:"Shoot a shadow ball at the start of every battle without losing a turn!"});
 
 	upgradeList.push({name: "Time Warp 2",
 		id: "timewarp2",
