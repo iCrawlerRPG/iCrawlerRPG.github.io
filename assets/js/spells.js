@@ -203,8 +203,10 @@ var Spells = function() {
 			else if (spellbook[i].id == "transmutation") {
 				spellbook[i].description = "Give material form to the Arcania inside you. Transforms 100 Arcania into " + transmutationPotency(spellbook[i]) + " gold.";
 			}
-            else if (spellbook[i].id == "shadowball") {
-                spellbook[i].description = "Condense shadow energy into a sphere you can hurl into enemies. Deals " + shadowBallPotency(spellbook[i]) + " damage.";
+			else if (spellbook[i].id == "doom") {
+                spellbook[i].description = "
+            else if (spellbook[i].id == "doom") {
+                spellbook[i].description = "death to all " ;
             }
 		}
 	};
