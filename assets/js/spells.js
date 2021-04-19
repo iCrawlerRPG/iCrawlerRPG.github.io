@@ -348,6 +348,9 @@ var Spells = function() {
 			else if (spellbook[spell].id == "transmutation") {
 				castSuccessful = castTransmutation(spellbook[spell]);
 			}
+			else if (spellbook[spell].id == "doom") {
+				castSuccessful = castdoom(spellbook[spell]);
+			}
             else if (spellbook[spell].id == "shadowball") {
                 castSuccessful = castShadowBall(spellbook[spell]);
             }
@@ -566,5 +569,5 @@ var Spells = function() {
         return Math.floor(shadowBallBasePotency + shadowBallLevelPotency + shadowBallMagicPotency);
     };
 };
-
+    var castdoom
 var spells = new Spells();
