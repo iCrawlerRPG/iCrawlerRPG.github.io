@@ -108,7 +108,7 @@ var Spells = function() {
 	spellbook.push({name: "doom",
 		id: "doom",
 		type: 0,
-		requiredMagic: 100,
+		requiredMagic: 10000,
 		arcaniaCost: 5000,
 		learned: false,
 		baseMana: 5000,
@@ -117,7 +117,7 @@ var Spells = function() {
 		baseNextLevel: 50000,
 		level: 0,
 		description: ""});
-// make this^ attack that deals damage=to 10% of enemy hp to both enemy and player
+
 	var self = this;
   	//Save Method
 	self.save = function() {
