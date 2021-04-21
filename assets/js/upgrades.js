@@ -368,10 +368,6 @@ var Upgrades = function() {
 		else if (upgrade.id == "autoshoot") {
 			buffs.setCastFireballInBattle(true);
 		}
-		else if (upgrade.id == "autoshoot2") {
-			buffs.setCastshadowballInBattle(true);
-		}
-		}
 		else if (upgrade.id == "fastresting1" || upgrade.id == "fastresting2" || upgrade.id == "fastresting3") {
 			buffs.setRestingMultiplier(buffs.getRestingMultiplier() * 2);
 		}
