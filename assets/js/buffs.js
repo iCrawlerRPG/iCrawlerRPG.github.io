@@ -21,7 +21,7 @@ var Buffs = function() {
 	//Timed Buffs
 	var aegisTimeLeft = 0;
 	var rageTimeLeft = 0;
-
+        vat tauntTimeLeft = 0;
 	//Non-timed Temporary Buffs
 	var barrierLeft = 0;
 
@@ -42,6 +42,7 @@ var Buffs = function() {
 			savedAutoBarrierCast: autoBarrierCast,
 			savedAegisTimeLeft: aegisTimeLeft,
 			savedRageTimeLeft: rageTimeLeft,
+			savedTauntTimeLeft: tauntTimeLeft,
 			savedBarrierLeft: barrierLeft
 		};
 		localStorage.setItem("buffsSave",JSON.stringify(buffsSave));
@@ -112,6 +113,9 @@ var Buffs = function() {
 		if (buffsSave.savedRageTimeLeft !== undefined) {
 			rageTimeLeft = buffsSave.savedRageTimeLeft;
 		}
+		if (buffsSave.savedTauntTimeLeft !== undefined) {
+			tauntTimeLeft = buffsSave.savedTauntTimeLeft;
+		}
 	};
 
 	var loadTemporaryBuffs = function(buffsSave) {
@@ -127,6 +131,9 @@ var Buffs = function() {
 
 	self.getRageTimeLeft = function() {
 		return rageTimeLeft;
+	};
+	self.getTauntTimeLeft = function() {
+		return tauntTimeLeft;
 	};
 
 	self.getSpellLevelingMultiplier = function() {
@@ -188,6 +195,9 @@ var Buffs = function() {
 
 	self.setRageTimeLeft = function(rageTime) {
 		rageTimeLeft = rageTime;
+	};
+	self.setTauntTimeLeft = function(tauntTime) {
+		tauntTimeLeft = tauntTime;
 	};
 
 	self.setManaPerSecond = function(newManaPerSecond) {
@@ -254,6 +264,12 @@ var Buffs = function() {
 				rageTimeLeft--;
 			}
 			document.getElementById("temporary").innerHTML += '<li class="list-group-item list-group-item-info"><span class="badge">' + Math.round(rageTimeLeft) + '</span>Rage</li>';
+		}
+		if (tauntTimeLeft !== 0) {
+			if (decrease) {
+				tauntTimeLeft--;
+			}
+			document.getElementById("temporary").innerHTML += '<li class="list-group-item list-group-item-info"><span class="badge">' + Math.round(tauntTimeLeft) + '</span>Taunt</li>';
 		}
 	};
 
