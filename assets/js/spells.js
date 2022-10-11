@@ -105,6 +105,18 @@ var Spells = function() {
 		baseNextLevel: 50000,
 		level: 0,
 		description: ""});
+	spellbook.push({name: "Taunt",
+		id: "taunt",
+		type: 2,
+		requiredMagic: 50,
+		arcaniaCost: 5000,
+		learned: false,
+		baseMana: 2500,
+		experience: 0,
+		nextLevel: 25000,
+		baseNextLevel: 25000,
+		level: 0,
+		description: ""});
 
 	var self = this;
   	//Save Method
@@ -193,6 +205,9 @@ var Spells = function() {
 			}
             else if (spellbook[i].id == "shadowball") {
                 spellbook[i].description = "Condense shadow energy into a sphere you can hurl into enemies. Deals " + shadowBallPotency(spellbook[i]) + " damage.";
+            }
+			else if (spellbook[i].id == "taunt") {
+                spellbook[i].description = "enrage your enemy and raise both their and your attack  " + tauntPotency(spellbook[i]) + " damage.";
             }
 		}
 	};
@@ -339,6 +354,9 @@ var Spells = function() {
             else if (spellbook[spell].id == "shadowball") {
                 castSuccessful = castShadowBall(spellbook[spell]);
             }
+			else if (spellbook[spell].id == "taunt") {
+				castSuccessful = castTaunt(spellbook[spell]);
+			}
 			if (castSuccessful) {
 				if (spellbook[spell].id !== "transmutation") {
 					arcania += spellbook[spell].level + manaCost/100;
@@ -481,12 +499,34 @@ var Spells = function() {
             return true;
         }
     };
+	var castTaunt= function(taunt) {
+        var monster = monsters.getInstancedMonster();
+        if (!player.getInBattle()) {
+            return false;
+        }
+        else {
+            var tauntEffect = tauntPotency(taunt);
+            if (monster.strength <= tauntEffect) {
+                tauntEffect = monster.strength * 2;
+		//tauntEffect = player.strencth * 2; figure out how player works
+	    
+            }
+	    
+            monster.strength *= tauntEffect;
+            document.getElementById("monsterstr").innerHTML = monster.strength;
+            document.getElementById("combatlog").innerHTML = '';
+            document.getElementById("combatlog").innerHTML += "You have cast taunt on the " + monster.name + ". Its strength has been increased by " + tauntEffect + ".<br>";
+            monsters.setInstancedMonster(monster);
+            monsters.battle(monsters.getInstancedMonster(), true);
+            return true;
+        }
+    };
 
-    var slowPotency = function(slow) {
-        var slowBasePotency = 5;
-        var slowLevelPotency = 1 * slow.level;
-        var slowMagicPotency = 0.2 * (player.getMagicLevel() + player.getMagicBonus() - 20);
-        return Math.floor(slowBasePotency + slowLevelPotency + slowMagicPotency);
+    var tauntPotency = function(taunt) {
+        var tauntBasePotency = 5;
+        var tauntLevelPotency = 1 * taunt.level;
+        var tauntMagicPotency = 0.2 * (player.getMagicLevel() + player.getMagicBonus() - 20);
+        return Math.floor(tauntBasePotency + tauntLevelPotency + tauntMagicPotency);
     };
 
     var castRage = function(rage) {
